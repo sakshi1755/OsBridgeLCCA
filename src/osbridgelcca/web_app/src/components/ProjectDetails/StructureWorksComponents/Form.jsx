@@ -40,14 +40,15 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
   }
 
   return (
-    <div className="border border-gray-300 rounded-sm bg-white max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="flex justify-between items-center p-4 border-b border-gray-200">
-        <h3 className="text-lg font-medium">{title}</h3>
-        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-          ×
-        </button>
-      </div>
+<div className="w-full max-w-4xl mx-auto mt-6">
+  {/* Title bar aligned perfectly with component box */}
+  <div className="flex justify-between items-center bg-[#F0E6E6] px-4 py-2 rounded-sm border border-gray-300 w-fit border-b-[#522828b0] border-b-[0.25rem]">
+    <h3 className="text-lg font-medium">{title}</h3>
+    <button onClick={onClose} className="text-gray-500 hover:text-gray-700 ml-4">×</button>
+  </div>
+
+  {/* Component box (no extra margin/indent) */}
+  <div className="bg-[#FFF9F9] p-6 border  border-gray-300 rounded-b-sm">
 
       <div className="px-6 py-4">
         {/* Render grouped materials by component */}
@@ -118,7 +119,7 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
                   />
                 </div>
                 <div className="flex items-center justify-center">
-                  <span className="text-center text-sm">{material.unit}</span>
+                  <span className="w-full border bg-white border-gray-300 rounded-md px-3 py-1 text-sm">{material.unit}</span>
                 </div>
                 <div>
                   <input
@@ -166,6 +167,7 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
           </button>
         </div>
       </div>
+    </div>
     </div>
   )
 }

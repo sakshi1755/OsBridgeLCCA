@@ -1,0 +1,113 @@
+import React, { useState } from "react";
+
+const DemolitionandRecycling = ({ onClose }) => {
+  const [formData, setFormData] = useState({
+    demolitionCostRate: "10",
+    scrapValueOfStructuralSteel: "50000",
+    structuralSteelScrap: "98"
+  });
+
+  const handleChange = (field, value) => {
+    setFormData({
+      ...formData,
+      [field]: value
+    });
+  };
+
+  // Suggested indicator component
+  const SuggestedTag = () => (
+    <span className="text-xs text-gray-400 ml-2">Suggested</span>
+  );
+
+  return (
+    <div className="w-full max-w-4xl mx-auto mt-6">
+      {/* Title bar */}
+      <div className="flex justify-between items-center bg-[#F0E6E6] px-4 py-2 rounded-sm border border-gray-300 w-fit border-b-[#522828b0] border-b-[0.25rem]">
+        <h3 className="text-lg font-medium">Demolition and Recycling </h3>
+        <button 
+          onClick={onClose} 
+          className="text-gray-500 hover:text-gray-700 ml-4 transition-colors"
+        >
+          ×
+        </button>
+      </div>
+     
+
+      {/* Form content */}
+      <div className="bg-[#FFF9F9] p-6 border border-gray-300 rounded-b-sm">
+        <div className="space-y-6">
+          {/* Demolition Cost Rate */}
+          <div className="flex items-start">
+            <div className="w-1/2">
+              <label className="block text-gray-700 leading-tight">
+                Demolition Cost rate as percentage to total construction cost
+              </label>
+            </div>
+            <div className="w-1/2">
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  value={formData.demolitionCostRate}
+                  onChange={(e) => handleChange("demolitionCostRate", e.target.value)}
+                  className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+                />
+                <span className="ml-2 text-sm text-gray-600">(%)</span>
+                <SuggestedTag />
+              </div>
+            </div>
+          </div>
+
+          {/* Scrap Value of Structural Steel */}
+          <div className="flex items-center">
+            <div className="w-1/2">
+              <label className="block text-gray-700">Scrap Value of Structural Steel</label>
+            </div>
+            <div className="w-1/2">
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  value={formData.scrapValueOfStructuralSteel}
+                  onChange={(e) => handleChange("scrapValueOfStructuralSteel", e.target.value)}
+                  className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+                />
+                <span className="ml-2 text-sm text-gray-600">(INR/MT)</span>
+                <SuggestedTag />
+              </div>
+            </div>
+          </div>
+
+          {/* Structural Steel Scrap */}
+          <div className="flex items-center">
+            <div className="w-1/2">
+              <label className="block text-gray-700">Structural Steel Scrap</label>
+            </div>
+            <div className="w-1/2">
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  value={formData.structuralSteelScrap}
+                  onChange={(e) => handleChange("structuralSteelScrap", e.target.value)}
+                  className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+                />
+                <span className="ml-2 text-sm text-gray-600">(%)</span>
+                <SuggestedTag />
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation buttons */}
+          <div className="flex justify-end gap-4 mt-8">
+            <button className="bg-white border border-gray-300 rounded-md px-8 py-1 text-sm hover:bg-gray-50 transition-colors">
+              Back
+            </button>
+            <button className="bg-white border border-gray-300 rounded-md px-8 py-1 text-sm hover:bg-gray-50 transition-colors">
+              Calculate
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default DemolitionandRecycling;

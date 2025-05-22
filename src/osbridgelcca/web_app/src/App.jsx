@@ -13,11 +13,11 @@ function App() {
 
   const [activeTab, setActiveTab] = useState("Project Details");
   const [showTutorials, setShowTutorials] = useState(true);
-  const [selectedStructureForm, setSelectedStructureForm] = useState(null); // ✅ new state
+  const [SelectedProjectDetailWindow, setSelectedProjectDetailWindow] = useState(null); // ✅ new state
 
   function handleTabChange(tab) {
     setActiveTab(tab);
-    setSelectedStructureForm(null); // Clear structure view on tab switch
+    setSelectedProjectDetailWindow(null); // Clear structure view on tab switch
   }
 
   // function handleTabChange(tab) {
@@ -47,8 +47,8 @@ function App() {
           )}
 
           {activeTab === "Project Details" &&  ( <ProjectDetails 
-              selectedStructureForm={selectedStructureForm} 
-              setSelectedStructureForm={setSelectedStructureForm}
+              SelectedProjectDetailWindow={SelectedProjectDetailWindow} 
+              setSelectedProjectDetailWindow={setSelectedProjectDetailWindow}
               setShowTutorials={setShowTutorials}
             />)}
           {activeTab === "Results" && <Results />}

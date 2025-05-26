@@ -1,8 +1,9 @@
 "use client"
 import Form from "./Form"
+import useFormNavigation from '../UseFormNavigation'
 
 // Foundation form specific configuration
-const FoundationForm = ({ onClose }) => {
+const FoundationForm = ({ onClose, currentForm = 'Foundation', onNavigate }) => {
   // Component options for the foundation form
   const componentOptions = [
     { value: "Earthwork", label: "Earthwork" },
@@ -71,9 +72,13 @@ const FoundationForm = ({ onClose }) => {
         componentOptions={componentOptions}
         materialOptions={materialOptions}
         onClose={onClose || (() => console.log("Close form"))}
+        currentForm={currentForm}
+        onNavigate={onNavigate}
       />
     </div>
   )
 }
 
 export default FoundationForm
+
+

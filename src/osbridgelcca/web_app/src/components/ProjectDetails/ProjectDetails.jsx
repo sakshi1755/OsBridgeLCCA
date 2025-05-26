@@ -14,6 +14,12 @@ import CarbonEmissionData from './CarbonEmissionData';
 import CarbonEmissionCostData from './CarbonEmissionCostData';
 
 const ProjectDetails = ({ SelectedProjectDetailWindow, setSelectedProjectDetailWindow, setShowTutorials }) => {
+  
+  // Navigation handler for forms
+  const handleFormNavigation = (formName) => {
+    setSelectedProjectDetailWindow(formName);
+  };
+
   return (
     <div className="flex gap-4 mx-4">
 
@@ -95,8 +101,6 @@ const ProjectDetails = ({ SelectedProjectDetailWindow, setSelectedProjectDetailW
            {'\u2BC8'}  &nbsp; Maintenance and Repair
            </button>
 
-
-           
            <button 
            onClick={() =>
              {setSelectedProjectDetailWindow('DemolitionandRecycling');
@@ -115,20 +119,81 @@ const ProjectDetails = ({ SelectedProjectDetailWindow, setSelectedProjectDetailW
       {/* Right Panel - Selected Form */}
       {SelectedProjectDetailWindow && (
         <div className="w-3/4  overflow-auto" style={{ maxHeight: '80vh' }}>
-          {SelectedProjectDetailWindow === 'Foundation' && <FoundationForm />}
-          {SelectedProjectDetailWindow === 'Sub-Structure' && <SubStructureForm />}
-          {SelectedProjectDetailWindow === 'Super-Structure' && <SuperStructureForm />}
-          {SelectedProjectDetailWindow === 'FinancialData' && <FinancialData />}
-          {SelectedProjectDetailWindow === 'Miscellaneous' && <MiscellaneousForm />}
-          {SelectedProjectDetailWindow === 'CarbonEmissionData' && < CarbonEmissionData />}
-          {SelectedProjectDetailWindow === 'BridgeandTraffic' && <BridgeandTraffic />}
-          {SelectedProjectDetailWindow === 'MaintenanceandRepairData' && <MaintenanceandRepairData />}
-          {SelectedProjectDetailWindow === 'DemolitionandRecycling' && <DemolitionandRecycling />}
-          {SelectedProjectDetailWindow === 'CarbonEmissionCostData' && <CarbonEmissionCostData />}
+          {SelectedProjectDetailWindow === 'Foundation' && (
+            <FoundationForm 
+              currentForm="Foundation"
+              onNavigate={handleFormNavigation}
+              onClose={() => setSelectedProjectDetailWindow(null)}
+            />
+          )}
+          {SelectedProjectDetailWindow === 'Sub-Structure' && (
+            <SubStructureForm 
+              currentForm="Sub-Structure"
+              onNavigate={handleFormNavigation}
+              onClose={() => setSelectedProjectDetailWindow(null)}
+            />
+          )}
+          {SelectedProjectDetailWindow === 'Super-Structure' && (
+            <SuperStructureForm 
+              currentForm="Super-Structure"
+              onNavigate={handleFormNavigation}
+              onClose={() => setSelectedProjectDetailWindow(null)}
+            />
+          )}
+          {SelectedProjectDetailWindow === 'Miscellaneous' && (
+            <MiscellaneousForm 
+              currentForm="Miscellaneous"
+              onNavigate={handleFormNavigation}
+              onClose={() => setSelectedProjectDetailWindow(null)}
+            />
+          )}
+          {SelectedProjectDetailWindow === 'FinancialData' && (
+            <FinancialData 
+             // currentForm="FinancialData"
+             // onNavigate={handleFormNavigation}
+             // onClose={() => setSelectedProjectDetailWindow(null)}
+            />
+          )}
+          {SelectedProjectDetailWindow === 'CarbonEmissionData' && (
+            <CarbonEmissionData 
+             // currentForm="CarbonEmissionData"
+             // onNavigate={handleFormNavigation}
+              onClose={() => setSelectedProjectDetailWindow(null)}
+            />
+          )}
+          {SelectedProjectDetailWindow === 'CarbonEmissionCostData' && (
+            <CarbonEmissionCostData 
+             // currentForm="CarbonEmissionCostData"
+             // onNavigate={handleFormNavigation}
+              onClose={() => setSelectedProjectDetailWindow(null)}
+            />
+          )}
+          {SelectedProjectDetailWindow === 'BridgeandTraffic' && (
+            <BridgeandTraffic 
+              //currentForm="BridgeandTraffic"
+             // onNavigate={handleFormNavigation}
+              onClose={() => setSelectedProjectDetailWindow(null)}
+            />
+          )}
+          {SelectedProjectDetailWindow === 'MaintenanceandRepairData' && (
+            <MaintenanceandRepairData 
+             // currentForm="MaintenanceandRepairData"
+            //  onNavigate={handleFormNavigation}
+              onClose={() => setSelectedProjectDetailWindow(null)}
+            />
+          )}
+          {SelectedProjectDetailWindow === 'DemolitionandRecycling' && (
+            <DemolitionandRecycling 
+             // currentForm="DemolitionandRecycling"
+             // onNavigate={handleFormNavigation}
+              onClose={() => setSelectedProjectDetailWindow(null)}
+            />
+          )}
         </div>
       )}
     </div>
   );
 };
+
 
 export default ProjectDetails;

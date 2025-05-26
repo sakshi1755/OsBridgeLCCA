@@ -5,7 +5,7 @@ const CarbonEmissionData = ({ onClose }) => {
     {
       name: "",
       materials: [
-        { type: "Concrete", quantity: "", unit: "", embeddedCarbonEnergy: "", carbonEmissionFactor: "" },
+        { type: "Concrete", quantity: "", unit: "m³", embeddedCarbonEnergy: "", carbonEmissionFactor: "" },
         { type: "Steel", quantity: "", unit: "kg", embeddedCarbonEnergy: "", carbonEmissionFactor: "" },
       ],
     },
@@ -24,6 +24,9 @@ const CarbonEmissionData = ({ onClose }) => {
       ],
     },
   ]);
+
+  const materialOptions = ["Concrete", "Steel", "Aluminum", "Wood"];
+  const unitOptions = ["m³", "kg", "tons", "lbs"];
 
   const handleMaterialChange = (
     componentIndex,
@@ -56,18 +59,16 @@ const CarbonEmissionData = ({ onClose }) => {
 
   return (
     <div className="w-full max-w-4xl mx-auto mt-6">
-      {/* Title bar */}
       <div className="flex justify-between items-center bg-[#F0E6E6] px-4 py-2 rounded-sm border border-gray-300 w-fit border-b-[#522828b0] border-b-[0.25rem]">
-        <h3 className="text-lg font-medium">Carbon Emission Data </h3>
-        <button 
-          onClick={onClose} 
+        <h3 className="text-lg font-medium">Carbon Emission Data</h3>
+        <button
+          onClick={onClose}
           className="text-gray-500 hover:text-gray-700 ml-4 transition-colors"
         >
           ×
         </button>
       </div>
 
-      {/* Form content */}
       <div className="bg-[#FFF9F9] p-6 border border-gray-300 rounded-b-sm">
         <div className="space-y-6">
           {components.map((component, componentIndex) => (
@@ -77,7 +78,9 @@ const CarbonEmissionData = ({ onClose }) => {
                 <input
                   type="text"
                   value={component.name}
-                  onChange={(e) => handleComponentNameChange(componentIndex, e.target.value)}
+                  onChange={(e) =>
+                    handleComponentNameChange(componentIndex, e.target.value)
+                  }
                   className="border border-gray-300 rounded-md px-3 py-1 text-sm w-48"
                 />
               </div>
@@ -97,26 +100,23 @@ const CarbonEmissionData = ({ onClose }) => {
                     {component.materials.map((material, materialIndex) => (
                       <tr key={materialIndex} className="align-middle">
                         <td className="pr-2 py-1">
-                          <div className="relative">
-                            <input
-                              type="text"
-                              value={material.type}
-                              onChange={(e) =>
-                                handleMaterialChange(
-                                  componentIndex,
-                                  materialIndex,
-                                  "type",
-                                  e.target.value
-                                )
-                              }
-                              className="border border-gray-300 rounded-md px-3 py-1 text-sm w-full"
-                            />
-                            {material.type && (
-                              <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
-                                ▼
-                              </span>
-                            )}
-                          </div>
+                          <select
+                            value={material.type}
+                            onChange={(e) =>
+                              handleMaterialChange(
+                                componentIndex,
+                                materialIndex,
+                                "type",
+                                e.target.value
+                              )
+                            }
+                            className="border border-gray-300 rounded-md px-3 py-1 text-sm w-full bg-white"
+                          >
+                            <option value="">Select Material</option>
+                            {materialOptions.map((opt, i) => (
+                              <option key={i} value={opt}>{opt}</option>
+                            ))}
+                          </select>
                         </td>
                         <td className="px-2 py-1">
                           <input
@@ -134,8 +134,7 @@ const CarbonEmissionData = ({ onClose }) => {
                           />
                         </td>
                         <td className="px-2 py-1">
-                          <input
-                            type="text"
+                          <select
                             value={material.unit}
                             onChange={(e) =>
                               handleMaterialChange(
@@ -145,8 +144,13 @@ const CarbonEmissionData = ({ onClose }) => {
                                 e.target.value
                               )
                             }
-                            className="border border-gray-300 rounded-md px-3 py-1 text-sm w-full"
-                          />
+                            className="border border-gray-300 rounded-md px-3 py-1 text-sm w-full bg-white"
+                          >
+                            <option value="">Select Unit</option>
+                            {unitOptions.map((unit, idx) => (
+                              <option key={idx} value={unit}>{unit}</option>
+                            ))}
+                          </select>
                         </td>
                         <td className="px-2 py-1">
                           <div className="flex items-center">
@@ -203,7 +207,6 @@ const CarbonEmissionData = ({ onClose }) => {
             </div>
           ))}
 
-          {/* Navigation buttons */}
           <div className="flex justify-end gap-4 mt-8">
             <button className="bg-white border border-gray-300 rounded-md px-8 py-1 text-sm hover:bg-gray-50 transition-colors">
               Back

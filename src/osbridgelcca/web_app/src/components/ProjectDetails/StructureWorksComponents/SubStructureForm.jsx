@@ -2,7 +2,7 @@
 import Form from "./Form"
 
 // Foundation form specific configuration
-const SubStructureForm = ({ onClose }) => {
+const SubStructureForm = ({ onClose,currentForm = 'SubStructure', onNavigate }) => {
   // Component options for the foundation form
   const componentOptions = [
     { value: "Piers", label: "Piers" },
@@ -71,6 +71,8 @@ const SubStructureForm = ({ onClose }) => {
         componentOptions={componentOptions}
         materialOptions={materialOptions}
         onClose={onClose || (() => console.log("Close form"))}
+        currentForm={currentForm}
+        onNavigate={onNavigate}
       />
     </div>
   )

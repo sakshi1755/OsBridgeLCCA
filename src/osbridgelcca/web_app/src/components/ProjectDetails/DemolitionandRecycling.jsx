@@ -1,6 +1,18 @@
 import React, { useState } from "react";
+import {useFormNavigation, ConfirmationModal} from './UseFormNavigation'
 
-const DemolitionandRecycling = ({ onClose }) => {
+// Form sequence constant
+
+ 
+
+
+
+const DemolitionandRecycling = ({currentForm, onNavigate, onClose }) => {
+  const navigation = useFormNavigation(currentForm, onNavigate);
+
+   const [showConfirmation, setShowConfirmation] = useState(false)
+  const [confirmationType, setConfirmationType] = useState(null)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [formData, setFormData] = useState({
     demolitionCostRate: "10",
     scrapValueOfStructuralSteel: "50000",
@@ -13,7 +25,41 @@ const DemolitionandRecycling = ({ onClose }) => {
       [field]: value
     });
   };
+   const handleNext = () => {
+    if (navigation.canGoNext) {
+      setConfirmationType('next');
+      setShowConfirmation(true);
+    }
+  };
 
+  const handleBack = () => {
+    if (navigation.canGoBack) {
+      if (hasUnsavedChanges) {
+        setConfirmationType('back');
+        setShowConfirmation(true);
+      } else {
+        navigation.navigate(navigation.getPreviousForm());
+      }
+    }
+  };
+
+  const handleConfirm = () => {
+    if (confirmationType === 'next') {
+      // Here you would typically save the form data to your context or API
+      console.log('Saving form data:', formData);
+      setHasUnsavedChanges(false);
+      navigation.navigate(navigation.getNextForm());
+    } else if (confirmationType === 'back') {
+      navigation.navigate(navigation.getPreviousForm());
+    }
+    setShowConfirmation(false);
+    setConfirmationType(null);
+  };
+
+  const handleCloseConfirmation = () => {
+    setShowConfirmation(false);
+    setConfirmationType(null);
+  };
   // Suggested indicator component
   const SuggestedTag = () => (
     <span className="text-xs text-gray-400 ml-2">Suggested</span>
@@ -97,7 +143,15 @@ const DemolitionandRecycling = ({ onClose }) => {
 
           {/* Navigation buttons */}
           <div className="flex justify-end gap-4 mt-8">
-            <button className="bg-white border border-gray-300 rounded-md px-8 py-1 text-sm hover:bg-gray-50 transition-colors">
+           <button 
+              onClick={handleBack}
+              disabled={!navigation.canGoBack}
+              className={`px-8 py-1 text-sm rounded-md border ${
+                navigation.canGoBack 
+                  ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700' 
+                  : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+              }`}
+            >
               Back
             </button>
             <button className="bg-white border border-gray-300 rounded-md px-8 py-1 text-sm hover:bg-gray-50 transition-colors">
@@ -106,6 +160,13 @@ const DemolitionandRecycling = ({ onClose }) => {
           </div>
         </div>
       </div>
+        <ConfirmationModal
+              isOpen={showConfirmation}
+              onClose={handleCloseConfirmation}
+              onConfirm={handleConfirm}
+              type={confirmationType}
+              nextForm={confirmationType === 'next' ? navigation.getNextForm() : navigation.getPreviousForm()}
+            />
     </div>
   );
 };

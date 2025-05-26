@@ -17,7 +17,7 @@ const FORM_SEQUENCE = [
 ];
 
 // Navigation Hook
-const useFormNavigation = (currentForm, onNavigate) => {
+export const useFormNavigation = (currentForm, onNavigate) => {
   const getCurrentIndex = () => FORM_SEQUENCE.indexOf(currentForm);
   const canGoNext = () => getCurrentIndex() < FORM_SEQUENCE.length - 1;
   const canGoBack = () => getCurrentIndex() > 0;
@@ -42,7 +42,7 @@ const useFormNavigation = (currentForm, onNavigate) => {
 };
 
 // Confirmation Modal Component
-const ConfirmationModal = ({ isOpen, onClose, onConfirm, type, nextForm }) => {
+export const ConfirmationModal = ({ isOpen, onClose, onConfirm, type, nextForm }) => {
   if (!isOpen) return null;
 
   const isNext = type === 'next';

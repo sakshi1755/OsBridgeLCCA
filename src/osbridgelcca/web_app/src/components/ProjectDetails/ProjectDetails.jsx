@@ -149,43 +149,43 @@ const ProjectDetails = ({ SelectedProjectDetailWindow, setSelectedProjectDetailW
           )}
           {SelectedProjectDetailWindow === 'FinancialData' && (
             <FinancialData 
-             // currentForm="FinancialData"
-             // onNavigate={handleFormNavigation}
-             // onClose={() => setSelectedProjectDetailWindow(null)}
+              currentForm="FinancialData"
+              onNavigate={handleFormNavigation}
+              onClose={() => setSelectedProjectDetailWindow(null)}
             />
           )}
           {SelectedProjectDetailWindow === 'CarbonEmissionData' && (
             <CarbonEmissionData 
-             // currentForm="CarbonEmissionData"
-             // onNavigate={handleFormNavigation}
+              currentForm="CarbonEmissionData"
+              onNavigate={handleFormNavigation}
               onClose={() => setSelectedProjectDetailWindow(null)}
             />
           )}
           {SelectedProjectDetailWindow === 'CarbonEmissionCostData' && (
             <CarbonEmissionCostData 
-             // currentForm="CarbonEmissionCostData"
-             // onNavigate={handleFormNavigation}
+             currentForm="CarbonEmissionCostData"
+              onNavigate={handleFormNavigation}
               onClose={() => setSelectedProjectDetailWindow(null)}
             />
           )}
           {SelectedProjectDetailWindow === 'BridgeandTraffic' && (
             <BridgeandTraffic 
-              //currentForm="BridgeandTraffic"
-             // onNavigate={handleFormNavigation}
+              currentForm="BridgeandTraffic"
+              onNavigate={handleFormNavigation}
               onClose={() => setSelectedProjectDetailWindow(null)}
             />
           )}
           {SelectedProjectDetailWindow === 'MaintenanceandRepairData' && (
             <MaintenanceandRepairData 
-             // currentForm="MaintenanceandRepairData"
-            //  onNavigate={handleFormNavigation}
+              currentForm="MaintenanceandRepairData"
+              onNavigate={handleFormNavigation}
               onClose={() => setSelectedProjectDetailWindow(null)}
             />
           )}
           {SelectedProjectDetailWindow === 'DemolitionandRecycling' && (
             <DemolitionandRecycling 
-             // currentForm="DemolitionandRecycling"
-             // onNavigate={handleFormNavigation}
+              currentForm="DemolitionandRecycling"
+              onNavigate={handleFormNavigation}
               onClose={() => setSelectedProjectDetailWindow(null)}
             />
           )}

@@ -1,8 +1,17 @@
 "use client"
+import {useFormNavigation, ConfirmationModal} from './UseFormNavigation'
+
+// Form sequence constant
+
 
 import { useState } from "react"
 
-const FinancialData = ({ onClose }) => {
+const FinancialData = ({ currentForm, onNavigate,onClose }) => {
+  const navigation = useFormNavigation(currentForm, onNavigate);
+
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  const [confirmationType, setConfirmationType] = useState(null)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   // Initial state for financial data fields
   const [financialData, setFinancialData] = useState({
     realDiscountRate: "4.2500",
@@ -19,6 +28,41 @@ const FinancialData = ({ onClose }) => {
       [field]: value
     })
   }
+    const handleNext = () => {
+    if (navigation.canGoNext) {
+      setConfirmationType('next');
+      setShowConfirmation(true);
+    }
+  };
+
+  const handleBack = () => {
+    if (navigation.canGoBack) {
+      if (hasUnsavedChanges) {
+        setConfirmationType('back');
+        setShowConfirmation(true);
+      } else {
+        navigation.navigate(navigation.getPreviousForm());
+      }
+    }
+  };
+
+  const handleConfirm = () => {
+    if (confirmationType === 'next') {
+      // Here you would typically save the form data to your context or API
+      console.log('Saving form data:', financialData);
+      setHasUnsavedChanges(false);
+      navigation.navigate(navigation.getNextForm());
+    } else if (confirmationType === 'back') {
+      navigation.navigate(navigation.getPreviousForm());
+    }
+    setShowConfirmation(false);
+    setConfirmationType(null);
+  };
+
+  const handleCloseConfirmation = () => {
+    setShowConfirmation(false);
+    setConfirmationType(null);
+  };
 
   // Info tooltip component
   const InfoTooltip = () => (
@@ -153,15 +197,38 @@ const FinancialData = ({ onClose }) => {
 
           {/* Navigation buttons */}
           <div className="flex justify-end gap-4 mt-8">
-            <button className="bg-white border border-gray-300 rounded-md px-8 py-1 text-sm hover:bg-gray-50 transition-colors">
+           <button 
+              onClick={handleBack}
+              disabled={!navigation.canGoBack}
+              className={`px-8 py-1 text-sm rounded-md border ${
+                navigation.canGoBack 
+                  ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700' 
+                  : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+              }`}
+            >
               Back
             </button>
-            <button className="bg-white border border-gray-300 rounded-md px-8 py-1 text-sm hover:bg-gray-50 transition-colors">
+           <button 
+              onClick={handleNext}
+              disabled={!navigation.canGoNext}
+              className={`px-8 py-1 text-sm rounded-md border ${
+                navigation.canGoNext 
+                  ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700' 
+                  : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+              }`}
+            >
               Next
             </button>
           </div>
         </div>
       </div>
+        <ConfirmationModal
+              isOpen={showConfirmation}
+              onClose={handleCloseConfirmation}
+              onConfirm={handleConfirm}
+              type={confirmationType}
+              nextForm={confirmationType === 'next' ? navigation.getNextForm() : navigation.getPreviousForm()}
+            />
     </div>
   )
 }

@@ -1,32 +1,76 @@
 import React, { useState } from "react";
+import {useFormNavigation, ConfirmationModal} from './UseFormNavigation'
 
-const CarbonEmissionData = ({ onClose }) => {
+// Form sequence constant
+
+ 
+const CarbonEmissionData = ({ currentForm, onNavigate,onClose }) => {
+  const navigation = useFormNavigation(currentForm, onNavigate);
+
+   const [showConfirmation, setShowConfirmation] = useState(false)
+  const [confirmationType, setConfirmationType] = useState(null)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [components, setComponents] = useState([
     {
       name: "",
       materials: [
-        { type: "Concrete", quantity: "", unit: "m³", embeddedCarbonEnergy: "", carbonEmissionFactor: "" },
-        { type: "Steel", quantity: "", unit: "kg", embeddedCarbonEnergy: "", carbonEmissionFactor: "" },
+        { type: "Concrete", quantity: "", unit: "m³", embeddedCarbonEnergy: "", carbonEmissionFactor: "", isCustomType: false, isCustomUnit: false },
+        { type: "Steel", quantity: "", unit: "kg", embeddedCarbonEnergy: "", carbonEmissionFactor: "", isCustomType: false, isCustomUnit: false },
       ],
     },
     {
       name: "",
       materials: [
-        { type: "Concrete", quantity: "", unit: "m³", embeddedCarbonEnergy: "", carbonEmissionFactor: "" },
-        { type: "", quantity: "", unit: "kg", embeddedCarbonEnergy: "", carbonEmissionFactor: "" },
+        { type: "Concrete", quantity: "", unit: "m³", embeddedCarbonEnergy: "", carbonEmissionFactor: "", isCustomType: false, isCustomUnit: false },
+        { type: "", quantity: "", unit: "kg", embeddedCarbonEnergy: "", carbonEmissionFactor: "", isCustomType: false, isCustomUnit: false },
       ],
     },
     {
       name: "",
       materials: [
-        { type: "Concrete", quantity: "", unit: "m³", embeddedCarbonEnergy: "", carbonEmissionFactor: "" },
-        { type: "", quantity: "", unit: "kg", embeddedCarbonEnergy: "", carbonEmissionFactor: "" },
+        { type: "Concrete", quantity: "", unit: "m³", embeddedCarbonEnergy: "", carbonEmissionFactor: "", isCustomType: false, isCustomUnit: false },
+        { type: "", quantity: "", unit: "kg", embeddedCarbonEnergy: "", carbonEmissionFactor: "", isCustomType: false, isCustomUnit: false },
       ],
     },
   ]);
 
   const materialOptions = ["Concrete", "Steel", "Aluminum", "Wood"];
   const unitOptions = ["m³", "kg", "tons", "lbs"];
+   const handleNext = () => {
+    if (navigation.canGoNext) {
+      setConfirmationType('next');
+      setShowConfirmation(true);
+    }
+  };
+
+  const handleBack = () => {
+    if (navigation.canGoBack) {
+      if (hasUnsavedChanges) {
+        setConfirmationType('back');
+        setShowConfirmation(true);
+      } else {
+        navigation.navigate(navigation.getPreviousForm());
+      }
+    }
+  };
+
+  const handleConfirm = () => {
+    if (confirmationType === 'next') {
+      // Here you would typically save the form data to your context or API
+      console.log('Saving form data:',components);
+      setHasUnsavedChanges(false);
+      navigation.navigate(navigation.getNextForm());
+    } else if (confirmationType === 'back') {
+      navigation.navigate(navigation.getPreviousForm());
+    }
+    setShowConfirmation(false);
+    setConfirmationType(null);
+  };
+
+  const handleCloseConfirmation = () => {
+    setShowConfirmation(false);
+    setConfirmationType(null);
+  };
 
   const handleMaterialChange = (
     componentIndex,
@@ -35,14 +79,37 @@ const CarbonEmissionData = ({ onClose }) => {
     value
   ) => {
     const updatedComponents = [...components];
-    updatedComponents[componentIndex].materials[materialIndex][field] = value;
+    const material = updatedComponents[componentIndex].materials[materialIndex];
+    
+    if (field === "type") {
+      if (value === "Other") {
+        material.isCustomType = true;
+        material.type = "";
+      } else {
+        material.isCustomType = false;
+        material.type = value;
+      }
+    } else if (field === "unit") {
+      if (value === "Other") {
+        material.isCustomUnit = true;
+        material.unit = "";
+      } else {
+        material.isCustomUnit = false;
+        material.unit = value;
+      }
+    } else {
+      material[field] = value;
+    }
+    
     setComponents(updatedComponents);
+    setHasUnsavedChanges(true);
   };
 
   const handleComponentNameChange = (componentIndex, value) => {
     const updatedComponents = [...components];
     updatedComponents[componentIndex].name = value;
     setComponents(updatedComponents);
+    setHasUnsavedChanges(true);
   };
 
   const addMaterial = (componentIndex) => {
@@ -53,6 +120,8 @@ const CarbonEmissionData = ({ onClose }) => {
       unit: "",
       embeddedCarbonEnergy: "",
       carbonEmissionFactor: "",
+      isCustomType: false,
+      isCustomUnit: false,
     });
     setComponents(updatedComponents);
   };
@@ -100,23 +169,41 @@ const CarbonEmissionData = ({ onClose }) => {
                     {component.materials.map((material, materialIndex) => (
                       <tr key={materialIndex} className="align-middle">
                         <td className="pr-2 py-1">
-                          <select
-                            value={material.type}
-                            onChange={(e) =>
-                              handleMaterialChange(
-                                componentIndex,
-                                materialIndex,
-                                "type",
-                                e.target.value
-                              )
-                            }
-                            className="border border-gray-300 rounded-md px-3 py-1 text-sm w-full bg-white"
-                          >
-                            <option value="">Select Material</option>
-                            {materialOptions.map((opt, i) => (
-                              <option key={i} value={opt}>{opt}</option>
-                            ))}
-                          </select>
+                          {material.isCustomType ? (
+                            <input
+                              type="text"
+                              value={material.type}
+                              onChange={(e) =>
+                                handleMaterialChange(
+                                  componentIndex,
+                                  materialIndex,
+                                  "type",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Enter custom material type"
+                              className="border border-gray-300 rounded-md px-3 py-1 text-sm w-full"
+                            />
+                          ) : (
+                            <select
+                              value={material.type}
+                              onChange={(e) =>
+                                handleMaterialChange(
+                                  componentIndex,
+                                  materialIndex,
+                                  "type",
+                                  e.target.value
+                                )
+                              }
+                              className="border border-gray-300 rounded-md px-3 py-1 text-sm w-full bg-white"
+                            >
+                              <option value="">Select Material</option>
+                              {materialOptions.map((opt, i) => (
+                                <option key={i} value={opt}>{opt}</option>
+                              ))}
+                              <option value="Other">Other</option>
+                            </select>
+                          )}
                         </td>
                         <td className="px-2 py-1">
                           <input
@@ -134,23 +221,41 @@ const CarbonEmissionData = ({ onClose }) => {
                           />
                         </td>
                         <td className="px-2 py-1">
-                          <select
-                            value={material.unit}
-                            onChange={(e) =>
-                              handleMaterialChange(
-                                componentIndex,
-                                materialIndex,
-                                "unit",
-                                e.target.value
-                              )
-                            }
-                            className="border border-gray-300 rounded-md px-3 py-1 text-sm w-full bg-white"
-                          >
-                            <option value="">Select Unit</option>
-                            {unitOptions.map((unit, idx) => (
-                              <option key={idx} value={unit}>{unit}</option>
-                            ))}
-                          </select>
+                          {material.isCustomUnit ? (
+                            <input
+                              type="text"
+                              value={material.unit}
+                              onChange={(e) =>
+                                handleMaterialChange(
+                                  componentIndex,
+                                  materialIndex,
+                                  "unit",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Enter custom unit"
+                              className="border border-gray-300 rounded-md px-3 py-1 text-sm w-full"
+                            />
+                          ) : (
+                            <select
+                              value={material.unit}
+                              onChange={(e) =>
+                                handleMaterialChange(
+                                  componentIndex,
+                                  materialIndex,
+                                  "unit",
+                                  e.target.value
+                                )
+                              }
+                              className="border border-gray-300 rounded-md px-3 py-1 text-sm w-full bg-white"
+                            >
+                              <option value="">Select Unit</option>
+                              {unitOptions.map((unit, idx) => (
+                                <option key={idx} value={unit}>{unit}</option>
+                              ))}
+                              <option value="Other">Other</option>
+                            </select>
+                          )}
                         </td>
                         <td className="px-2 py-1">
                           <div className="flex items-center">
@@ -208,15 +313,39 @@ const CarbonEmissionData = ({ onClose }) => {
           ))}
 
           <div className="flex justify-end gap-4 mt-8">
-            <button className="bg-white border border-gray-300 rounded-md px-8 py-1 text-sm hover:bg-gray-50 transition-colors">
+          <button 
+              onClick={handleBack}
+              disabled={!navigation.canGoBack}
+              className={`px-8 py-1 text-sm rounded-md border ${
+                navigation.canGoBack 
+                  ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700' 
+                  : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+              }`}
+            >
               Back
             </button>
-            <button className="bg-white border border-gray-300 rounded-md px-8 py-1 text-sm hover:bg-gray-50 transition-colors">
+           <button 
+              onClick={handleNext}
+              disabled={!navigation.canGoNext}
+              className={`px-8 py-1 text-sm rounded-md border ${
+                navigation.canGoNext 
+                  ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700' 
+                  : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+              }`}
+            >
               Next
             </button>
           </div>
         </div>
       </div>
+  <ConfirmationModal
+        isOpen={showConfirmation}
+        onClose={handleCloseConfirmation}
+        onConfirm={handleConfirm}
+        type={confirmationType}
+        nextForm={confirmationType === 'next' ? navigation.getNextForm() : navigation.getPreviousForm()}
+      />
+
     </div>
   );
 };

@@ -1,86 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import {useNavigationForm, ConfirmationModal} from '../UseFormNavigation'
-
-// Form sequence constant
-// const FORM_SEQUENCE = [
-//   'Foundation',
-//   'Sub-Structure',
-//   'Super-Structure',
-//   'Miscellaneous',
-//   'FinancialData',
-//   'CarbonEmissionData',
-//   'CarbonEmissionCostData',
-//   'BridgeandTraffic',
-//   'MaintenanceandRepairData',
-//   'DemolitionandRecycling',
-// ];
-
-// // Navigation Hook
-// const useFormNavigation = (currentForm, onNavigate) => {
-//   const getCurrentIndex = () => FORM_SEQUENCE.indexOf(currentForm);
-//   const canGoNext = () => getCurrentIndex() < FORM_SEQUENCE.length - 1;
-//   const canGoBack = () => getCurrentIndex() > 0;
-  
-//   const getNextForm = () => {
-//     const nextIndex = getCurrentIndex() + 1;
-//     return nextIndex < FORM_SEQUENCE.length ? FORM_SEQUENCE[nextIndex] : null;
-//   };
-  
-//   const getPreviousForm = () => {
-//     const prevIndex = getCurrentIndex() - 1;
-//     return prevIndex >= 0 ? FORM_SEQUENCE[prevIndex] : null;
-//   };
-
-//   return {
-//     canGoNext: canGoNext(),
-//     canGoBack: canGoBack(),
-//     getNextForm,
-//     getPreviousForm,
-//     navigate: onNavigate
-//   };
-// };
-
-// // Confirmation Modal Component
-// const ConfirmationModal = ({ isOpen, onClose, onConfirm, type, nextForm }) => {
-//   if (!isOpen) return null;
-
-//   const isNext = type === 'next';
-//   const title = isNext ? 'Save and Continue?' : 'Go Back?';
-//   const message = isNext 
-//     ? `Do you want to save your current progress and navigate to ${nextForm}?`
-//     : 'Are you sure you want to go back? Any unsaved changes will be lost.';
-//   const confirmText = isNext ? 'Save & Continue' : 'Go Back';
-//   const cancelText = 'Cancel';
-
-//   return (
-//     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-//       <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-//         <h3 className="text-lg font-semibold mb-4">{title}</h3>
-//         <p className="text-gray-600 mb-6">{message}</p>
-//         <div className="flex justify-end gap-3">
-//           <button
-//             onClick={onClose}
-//             className="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
-//           >
-//             {cancelText}
-//           </button>
-//           <button
-//             onClick={onConfirm}
-//             className={`px-4 py-2 rounded text-white ${
-//               isNext 
-//                 ? 'bg-blue-600 hover:bg-blue-700' 
-//                 : 'bg-red-600 hover:bg-red-700'
-//             }`}
-//           >
-//             {confirmText}
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+import { useFormNavigation, ConfirmationModal } from '../UseFormNavigation'
 
 const Form = ({ title, initialMaterials, componentOptions, materialOptions, onClose, currentForm, onNavigate }) => {
   const [materials, setMaterials] = useState([])
@@ -88,9 +9,8 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
   const [confirmationType, setConfirmationType] = useState(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
-  const navigation = useFormNavigation(currentForm, onNavigate);
+  const navigation = useFormNavigation(currentForm, onNavigate)
 
-  // Set default values with unit prefilled for first two entries
   useEffect(() => {
     if (materials.length === 0 && initialMaterials?.length > 0) {
       const updated = initialMaterials.map((mat, index) => ({
@@ -101,12 +21,11 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
     }
   }, [initialMaterials, materials.length])
 
-  // Track changes to detect unsaved data
   useEffect(() => {
     if (materials.length > 0) {
-      setHasUnsavedChanges(true);
+      setHasUnsavedChanges(true)
     }
-  }, [materials]);
+  }, [materials])
 
   const groupedMaterials = materials.reduce((acc, material) => {
     if (!acc[material.component]) acc[material.component] = []
@@ -119,6 +38,7 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
       id: Math.max(0, ...materials.map((m) => m.id)) + 1,
       component: componentType,
       materialType: "",
+      customMaterialType: "",
       quantity: "",
       unit: "",
       rate: "",
@@ -128,7 +48,45 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
   }
 
   const handleMaterialChange = (id, field, value) => {
-    setMaterials(materials.map((m) => (m.id === id ? { ...m, [field]: value } : m)))
+    setMaterials(materials.map((m) =>
+      m.id === id ? { ...m, [field]: value } : m
+    ))
+  }
+
+  const handleMaterialTypeChange = (id, value) => {
+    if (value === "Other") {
+      // Mark material as custom and set default custom material
+      setMaterials(materials.map((m) =>
+        m.id === id ? { 
+          ...m, 
+          materialType: "Other",
+          customMaterialType: "Custom Material"
+        } : m
+      ))
+    } else {
+      // Remove custom material flag and update material type
+      setMaterials(materials.map((m) =>
+        m.id === id ? { 
+          ...m, 
+          materialType: value,
+          customMaterialType: ""
+        } : m
+      ))
+    }
+  }
+
+  const handleComponentChange = (oldComponent, newComponent) => {
+    const updatedMaterials = materials.map((mat) =>
+      mat.component === oldComponent ? { ...mat, component: newComponent } : mat
+    )
+    setMaterials(updatedMaterials)
+  }
+
+  const handleCustomComponentChange = (oldComponent, customComponent) => {
+    const updatedMaterials = materials.map((mat) =>
+      mat.component === oldComponent ? { ...mat, component: customComponent, customComponent: customComponent } : mat
+    )
+    setMaterials(updatedMaterials)
   }
 
   const handleAddSubComponent = (parentComponent) => {
@@ -145,6 +103,7 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
       id: Math.max(0, ...materials.map((m) => m.id)) + 1,
       component: newComponentName,
       materialType: "",
+      customMaterialType: "",
       quantity: "",
       unit: "",
       rate: "",
@@ -156,41 +115,46 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
 
   const handleNext = () => {
     if (navigation.canGoNext) {
-      setConfirmationType('next');
-      setShowConfirmation(true);
+      setConfirmationType('next')
+      setShowConfirmation(true)
     }
-  };
+  }
 
   const handleBack = () => {
     if (navigation.canGoBack) {
       if (hasUnsavedChanges) {
-        setConfirmationType('back');
-        setShowConfirmation(true);
+        setConfirmationType('back')
+        setShowConfirmation(true)
       } else {
-        navigation.navigate(navigation.getPreviousForm());
+        navigation.navigate(navigation.getPreviousForm())
       }
     }
-  };
+  }
 
   const handleConfirm = () => {
     if (confirmationType === 'next') {
-      // Here you would typically save the form data to your context or API
-      console.log('Saving form data:', materials);
-      setHasUnsavedChanges(false);
-      navigation.navigate(navigation.getNextForm());
+      console.log('Saving form data:', materials)
+      setHasUnsavedChanges(false)
+      navigation.navigate(navigation.getNextForm())
     } else if (confirmationType === 'back') {
-      navigation.navigate(navigation.getPreviousForm());
+      navigation.navigate(navigation.getPreviousForm())
     }
-    setShowConfirmation(false);
-    setConfirmationType(null);
-  };
+    setShowConfirmation(false)
+    setConfirmationType(null)
+  }
 
   const handleCloseConfirmation = () => {
-    setShowConfirmation(false);
-    setConfirmationType(null);
-  };
+    setShowConfirmation(false)
+    setConfirmationType(null)
+  }
 
   const unitOptions = ["m³", "kg", "litre", "nos"]
+
+  // Check if a component is using "Other" option
+  const isComponentOther = (component) => {
+    const componentMaterials = materials.filter(mat => mat.component === component)
+    return componentMaterials.some(mat => mat.isCustomComponent)
+  }
 
   return (
     <div className="w-full max-w-4xl mx-auto mt-6">
@@ -207,17 +171,48 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-600">Component:</span>
                   <div className="relative">
-                    <select
-                      className="border border-gray-300 rounded-md px-3 py-1 pr-8 text-sm appearance-none bg-white"
-                      value={component}
-                      onChange={(e) => console.log(e.target.value)}
-                    >
-                      {componentOptions.map((option, idx) => (
-                        <option key={idx} value={option.value}>{option.label}</option>
-                      ))}
-                      <option value={component}>{component}</option>
-                    </select>
-                    <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">▼</span>
+                    {/* Check if this component is using "Other" option */}
+                    {componentMaterials[0]?.isCustomComponent ? (
+                      <input
+                        type="text"
+                        placeholder="Enter custom component"
+                        value=""
+                        onChange={(e) => handleCustomComponentChange(component, e.target.value)}
+                        className="border border-gray-300 rounded-md px-3 py-1 text-sm bg-white min-w-[150px]"
+                      />
+                    ) : (
+                      <>
+                        <select
+                          className="border border-gray-300 rounded-md px-3 py-1 pr-8 text-sm appearance-none bg-white"
+                          value={component}
+                          onChange={(e) => {
+                            if (e.target.value === "Other") {
+                              // Mark materials as custom component and set a default name
+                              const updatedMaterials = materials.map((mat) =>
+                                mat.component === component ? { ...mat, component: "Custom Component", isCustomComponent: true } : mat
+                              )
+                              setMaterials(updatedMaterials)
+                            } else {
+                              // Remove custom component flag and update component
+                              const updatedMaterials = materials.map((mat) =>
+                                mat.component === component ? { ...mat, component: e.target.value, isCustomComponent: false } : mat
+                              )
+                              setMaterials(updatedMaterials)
+                            }
+                          }}
+                        >
+                          {componentOptions.map((option, idx) => (
+                            <option key={idx} value={option.value}>{option.label}</option>
+                          ))}
+                          {/* Only show current component if it's not in the options */}
+                          {!componentOptions.find(opt => opt.value === component) && component !== "Other" && (
+                            <option value={component}>{component}</option>
+                          )}
+                          <option value="Other">Other</option>
+                        </select>
+                        <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">▼</span>
+                      </>
+                    )}
                   </div>
                 </div>
                 <button
@@ -239,20 +234,33 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
               {componentMaterials.map((material) => (
                 <div key={material.id} className="grid grid-cols-5 gap-4 mb-3">
                   <div>
-                    <div className="relative">
-                      <select
-                        value={material.materialType}
-                        onChange={(e) => handleMaterialChange(material.id, "materialType", e.target.value)}
-                        className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm appearance-none"
-                      >
-                        <option value="">Select material</option>
-                        {materialOptions[component]?.map((option, idx) => (
-                          <option key={idx} value={option.value}>{option.label}</option>
-                        ))}
-                      </select>
-                      <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">▼</span>
-                    </div>
+                    {/* Check if this material is using "Other" option */}
+                    {material.materialType === "Other" ? (
+                      <input
+                        type="text"
+                        placeholder="Enter custom material"
+                        value= ""
+                        onChange={(e) => handleMaterialChange(material.id, "customMaterialType", e.target.value)}
+                        className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+                      />
+                    ) : (
+                      <div className="relative">
+                        <select
+                          value={material.materialType}
+                          onChange={(e) => handleMaterialTypeChange(material.id, e.target.value)}
+                          className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm appearance-none"
+                        >
+                          <option value="">Select material</option>
+                          {(materialOptions[component] || []).map((option, idx) => (
+                            <option key={idx} value={option.value}>{option.label}</option>
+                          ))}
+                          <option value="Other">Other</option>
+                        </select>
+                        <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">▼</span>
+                      </div>
+                    )}
                   </div>
+
                   <div>
                     <input
                       type="text"
@@ -307,23 +315,23 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
           ))}
 
           <div className="flex justify-end gap-4 mt-8">
-            <button 
+            <button
               onClick={handleBack}
               disabled={!navigation.canGoBack}
               className={`px-8 py-1 text-sm rounded-md border ${
-                navigation.canGoBack 
-                  ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700' 
+                navigation.canGoBack
+                  ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700'
                   : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
               }`}
             >
               Back
             </button>
-            <button 
+            <button
               onClick={handleNext}
               disabled={!navigation.canGoNext}
               className={`px-8 py-1 text-sm rounded-md border ${
-                navigation.canGoNext 
-                  ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700' 
+                navigation.canGoNext
+                  ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700'
                   : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
               }`}
             >
@@ -335,10 +343,10 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
 
       <ConfirmationModal
         isOpen={showConfirmation}
-        onClose={handleCloseConfirmation}
         onConfirm={handleConfirm}
+        onClose={handleCloseConfirmation}
         type={confirmationType}
-        nextForm={confirmationType === 'next' ? navigation.getNextForm() : navigation.getPreviousForm()}
+        nextForm={navigation.getNextForm()}
       />
     </div>
   )

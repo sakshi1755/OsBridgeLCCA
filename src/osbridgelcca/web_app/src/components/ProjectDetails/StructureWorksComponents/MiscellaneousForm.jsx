@@ -2,7 +2,7 @@
 import Form from "./Form"
 
 // Foundation form specific configuration
-const MiscellaneousForm = ({ onClose,currentForm = 'Miscellaneous', onNavigate }) => {
+const MiscellaneousForm = ({ onClose,currentForm = 'Miscellaneous', onNavigate, setActiveTabs,Activetabs,onclicktabs }) => {
   // Component options for the foundation form
   const componentOptions = [
     { value: "Expansion Joint", label: "Expansion Joint" },
@@ -73,6 +73,9 @@ const MiscellaneousForm = ({ onClose,currentForm = 'Miscellaneous', onNavigate }
         onClose={onClose || (() => console.log("Close form"))}
         currentForm={currentForm}
         onNavigate={onNavigate}
+        setActiveTabs={setActiveTabs}
+        Activetabs={Activetabs}
+          onclicktabs={onclicktabs}
       />
     </div>
   )

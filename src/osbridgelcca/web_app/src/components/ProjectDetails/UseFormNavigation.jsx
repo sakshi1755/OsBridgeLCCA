@@ -8,12 +8,12 @@ const FORM_SEQUENCE = [
   'Sub-Structure',
   'Super-Structure',
   'Miscellaneous',
-  'FinancialData',
-  'CarbonEmissionData',
-  'CarbonEmissionCostData',
-  'BridgeandTraffic',
-  'MaintenanceandRepairData',
-  'DemolitionandRecycling',
+  'Financial Data',
+  'Carbon Emission Data',
+  'Carbon Emission Cost Data',
+  'Bridge and Traffic',
+  'Maintenance and Repair Data',
+  'Demolition and Recycling',
 ];
 
 // Navigation Hook
@@ -42,7 +42,7 @@ export const useFormNavigation = (currentForm, onNavigate) => {
 };
 
 // Confirmation Modal Component
-export const ConfirmationModal = ({ isOpen, onClose, onConfirm, type, nextForm }) => {
+export const ConfirmationModal = ({ isOpen, onClosed, onConfirm, type, nextForm }) => {
   if (!isOpen) return null;
 
   const isNext = type === 'next';
@@ -60,7 +60,7 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, type, nextForm }
         <p className="text-gray-600 mb-6">{message}</p>
         <div className="flex justify-end gap-3">
           <button
-            onClick={onClose}
+            onClick={onClosed}
             className="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
           >
             {cancelText}

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {useFormNavigation, ConfirmationModal} from './UseFormNavigation'
 
 // Form sequence constant
-const MaintenanceandRepairData = ({ currentForm, onNavigate, onClose }) => {
+const MaintenanceandRepairData = ({ currentForm, onNavigate, onClose, setActiveTabs,Activetabs, onclicktabs }) => {
   const navigation = useFormNavigation(currentForm, onNavigate);
 
    const [showConfirmation, setShowConfirmation] = useState(false)
@@ -68,15 +68,38 @@ const MaintenanceandRepairData = ({ currentForm, onNavigate, onClose }) => {
   return (
      <div className="w-full max-w-4xl mx-auto mt-6">
       {/* Title bar */}
-      <div className="flex justify-between items-center bg-[#F0E6E6] px-4 py-2 rounded-sm border border-gray-300 w-fit border-b-[#522828b0] border-b-[0.25rem]">
-        <h3 className="text-lg font-medium">Maintenance and Repair Data </h3>
-        <button 
-          onClick={onClose} 
-          className="text-gray-500 hover:text-gray-700 ml-4 transition-colors"
+    <div
+  className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"
+  style={{
+    scrollbarWidth: 'thin', // for Firefox
+  }}
+>
+  <div className="flex  w-fit min-w-full">
+    {Activetabs.map((tab, index) => (
+      <div
+        onClick={() => onclicktabs(tab)}
+        key={index}
+        className={`flex items-center px-4 py-2 rounded-sm border border-gray-300 whitespace-nowrap cursor-pointer
+          ${tab === currentForm ? 'bg-[#F0E6E6] border-b-[#522828b0] border-b-[0.25rem]' : 'bg-[#F0E6E6]'}
+        `}
+        style={{
+          fontSize: Activetabs.length > 5 ? '0.85rem' : '1rem',
+        }}
+      >
+        <span className="font-medium">{tab}</span>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose(tab);
+          }}
+          className="ml-2 text-gray-500 hover:text-gray-700"
         >
           ×
         </button>
       </div>
+    ))}
+  </div>
+</div>
 
       {/* Form content */}
       <div className="bg-[#FFF9F9] p-6 border border-gray-300 rounded-b-sm">

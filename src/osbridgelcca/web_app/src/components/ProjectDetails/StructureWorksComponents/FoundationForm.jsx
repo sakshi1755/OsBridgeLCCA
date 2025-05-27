@@ -3,7 +3,7 @@ import Form from "./Form"
 import useFormNavigation from '../UseFormNavigation'
 
 // Foundation form specific configuration
-const FoundationForm = ({ onClose, currentForm = 'Foundation', onNavigate }) => {
+const FoundationForm = ({ onClose, currentForm = 'Foundation', onNavigate,  setActiveTabs,Activetabs, onclicktabs }) => {
   // Component options for the foundation form
   const componentOptions = [
     { value: "Earthwork", label: "Earthwork" },
@@ -74,6 +74,9 @@ const FoundationForm = ({ onClose, currentForm = 'Foundation', onNavigate }) => 
         onClose={onClose || (() => console.log("Close form"))}
         currentForm={currentForm}
         onNavigate={onNavigate}
+        setActiveTabs={setActiveTabs}
+        Activetabs={Activetabs}
+        onclicktabs={onclicktabs}
       />
     </div>
   )

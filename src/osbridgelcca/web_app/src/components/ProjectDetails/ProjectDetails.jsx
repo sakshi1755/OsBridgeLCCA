@@ -18,8 +18,35 @@ const ProjectDetails = ({ SelectedProjectDetailWindow, setSelectedProjectDetailW
   // Navigation handler for forms
   const handleFormNavigation = (formName) => {
     setSelectedProjectDetailWindow(formName);
+    setActiveTabs(tabs=>[...tabs,formName]);
   };
+  const [Activetabs,setActiveTabs]=useState([]);
 
+  const handleTabClose = (tabToRemove) => {
+  setActiveTabs((prevTabs) => {
+    const index = prevTabs.indexOf(tabToRemove);
+    const newTabs = prevTabs.filter((tab) => tab !== tabToRemove);
+
+    // Choose the next selected tab
+    let nextTab = null;
+    if (newTabs.length > 0) {
+      if (index < newTabs.length) {
+        nextTab = newTabs[index]; // Tab to the right
+      } else {
+        nextTab = newTabs[index - 1]; // Or tab to the left
+      }
+    }
+
+    setSelectedProjectDetailWindow(nextTab);
+    return newTabs;
+  });
+};
+
+ const onclicktabs=(tab)=>{
+  setSelectedProjectDetailWindow(tab);
+ };
+
+  
   return (
     <div className="flex gap-4 mx-4">
 
@@ -39,7 +66,15 @@ const ProjectDetails = ({ SelectedProjectDetailWindow, setSelectedProjectDetailW
           <Accordion title="Input Parameters">
             <Accordion title="Structure Works Data" level={1}>
               <StructureWorksData 
+                setActiveTabs={setActiveTabs}
+                Activetabs={Activetabs}
                 onSelectForm={(formName) => {
+                  setActiveTabs(tabs=>{
+                  if(!tabs.includes(formName)){return  [...tabs,formName];}
+                  return tabs;
+                
+                }
+                );
                   setSelectedProjectDetailWindow(formName);
                   setShowTutorials(false); // close tutorials
                 }}
@@ -47,8 +82,15 @@ const ProjectDetails = ({ SelectedProjectDetailWindow, setSelectedProjectDetailW
             </Accordion>
            <button 
            onClick={() =>
-             {setSelectedProjectDetailWindow('FinancialData');
+             {setSelectedProjectDetailWindow('Financial Data');
               setShowTutorials(false);
+               setActiveTabs(tabs=>{
+                  if(!tabs.includes('Financial Data')){return  [...tabs,'Financial Data'];}
+                  return tabs;
+                
+                }
+                );
+              
            }} 
             className="mb-2 bg-[#F0E6E6] border border-black rounded-sm w-full text-left text-sm px-4 py-2 ml-4"
             >
@@ -60,8 +102,14 @@ const ProjectDetails = ({ SelectedProjectDetailWindow, setSelectedProjectDetailW
               title={
                 <span
                   onClick={() => {
-                    setSelectedProjectDetailWindow('CarbonEmissionData');
+                    setSelectedProjectDetailWindow('Carbon Emission Data');
                     setShowTutorials(false);
+                     setActiveTabs(tabs=>{
+                  if(!tabs.includes('Carbon Emission Data')){return  [...tabs,'Carbon Emission Data'];}
+                  return tabs;
+                
+                }
+                );
                   }}
                  
                 > Carbon Emission Data
@@ -71,8 +119,14 @@ const ProjectDetails = ({ SelectedProjectDetailWindow, setSelectedProjectDetailW
             >
               <button 
                 onClick={() => {
-                  setSelectedProjectDetailWindow('CarbonEmissionCostData');
+                  setSelectedProjectDetailWindow('Carbon Emission Cost Data');
                   setShowTutorials(false);
+                   setActiveTabs(tabs=>{
+                  if(!tabs.includes('Carbon Emission Cost Data')){return  [...tabs,'Carbon Emission Cost Data'];}
+                  return tabs;
+                
+                }
+                );
                 }}
                 className="mb-2 bg-[#F0E6E6] border border-black rounded-sm w-full text-left text-sm px-4 py-2 ml-4"
               >
@@ -83,8 +137,14 @@ const ProjectDetails = ({ SelectedProjectDetailWindow, setSelectedProjectDetailW
             
            <button 
            onClick={() =>
-             {setSelectedProjectDetailWindow('BridgeandTraffic');
+             {setSelectedProjectDetailWindow('Bridge and Traffic');
               setShowTutorials(false);
+               setActiveTabs(tabs=>{
+                  if(!tabs.includes('Bridge and Traffic')){return  [...tabs,'Bridge and Traffic'];}
+                  return tabs;
+                
+                }
+                );
            }} 
             className="mb-2 bg-[#F0E6E6] border border-black rounded-sm w-full text-left text-sm px-4 py-2 ml-4"
             >
@@ -93,8 +153,14 @@ const ProjectDetails = ({ SelectedProjectDetailWindow, setSelectedProjectDetailW
 
            <button 
            onClick={() =>
-             {setSelectedProjectDetailWindow('MaintenanceandRepairData');
+             {setSelectedProjectDetailWindow('Maintenance and Repair Data');
               setShowTutorials(false);
+               setActiveTabs(tabs=>{
+                  if(!tabs.includes('Maintenance and Repair Data')){return  [...tabs,'Maintenance and Repair Data'];}
+                  return tabs;
+                
+                }
+                );
            }} 
             className="mb-2 bg-[#F0E6E6] border border-black rounded-sm w-full text-left text-sm px-4 py-2 ml-4"
             >
@@ -103,8 +169,14 @@ const ProjectDetails = ({ SelectedProjectDetailWindow, setSelectedProjectDetailW
 
            <button 
            onClick={() =>
-             {setSelectedProjectDetailWindow('DemolitionandRecycling');
+             {setSelectedProjectDetailWindow('Demolition and Recycling');
               setShowTutorials(false);
+               setActiveTabs(tabs=>{
+                  if(!tabs.includes('Demolition and Recycling')){return  [...tabs,'Demolition and Recycling'];}
+                  return tabs;
+                
+                }
+                );
            }} 
             className="mb-2 bg-[#F0E6E6] border border-black rounded-sm w-full text-left text-sm px-4 py-2 ml-4"
             >
@@ -121,72 +193,103 @@ const ProjectDetails = ({ SelectedProjectDetailWindow, setSelectedProjectDetailW
         <div className="w-3/4  overflow-auto" style={{ maxHeight: '80vh' }}>
           {SelectedProjectDetailWindow === 'Foundation' && (
             <FoundationForm 
+              setActiveTabs={setActiveTabs}
+              Activetabs={Activetabs}
               currentForm="Foundation"
               onNavigate={handleFormNavigation}
-              onClose={() => setSelectedProjectDetailWindow(null)}
+              onClose={handleTabClose}
+              onclicktabs={onclicktabs}
             />
           )}
           {SelectedProjectDetailWindow === 'Sub-Structure' && (
             <SubStructureForm 
+              setActiveTabs={setActiveTabs}
+              Activetabs={Activetabs}
               currentForm="Sub-Structure"
               onNavigate={handleFormNavigation}
-              onClose={() => setSelectedProjectDetailWindow(null)}
+             onClose={handleTabClose}
+              onclicktabs={onclicktabs}
             />
           )}
           {SelectedProjectDetailWindow === 'Super-Structure' && (
             <SuperStructureForm 
+              setActiveTabs={setActiveTabs}
+              Activetabs={Activetabs}
               currentForm="Super-Structure"
               onNavigate={handleFormNavigation}
-              onClose={() => setSelectedProjectDetailWindow(null)}
+              onClose={handleTabClose}
+              onclicktabs={onclicktabs}
             />
           )}
           {SelectedProjectDetailWindow === 'Miscellaneous' && (
             <MiscellaneousForm 
+              setActiveTabs={setActiveTabs}
+              Activetabs={Activetabs}
               currentForm="Miscellaneous"
               onNavigate={handleFormNavigation}
-              onClose={() => setSelectedProjectDetailWindow(null)}
+              onClose={handleTabClose}
+              onclicktabs={onclicktabs}
             />
           )}
-          {SelectedProjectDetailWindow === 'FinancialData' && (
+          {SelectedProjectDetailWindow === 'Financial Data' && (
             <FinancialData 
-              currentForm="FinancialData"
+              currentForm="Financial Data"
               onNavigate={handleFormNavigation}
-              onClose={() => setSelectedProjectDetailWindow(null)}
+              onClose={handleTabClose}
+              onclicktabs={onclicktabs}
+              setActiveTabs={setActiveTabs}
+              Activetabs={Activetabs}
+
             />
           )}
-          {SelectedProjectDetailWindow === 'CarbonEmissionData' && (
+          {SelectedProjectDetailWindow === 'Carbon Emission Data' && (
             <CarbonEmissionData 
-              currentForm="CarbonEmissionData"
+              currentForm="Carbon Emission Data"
               onNavigate={handleFormNavigation}
-              onClose={() => setSelectedProjectDetailWindow(null)}
+              onClose={handleTabClose}
+              onclicktabs={onclicktabs}
+              setActiveTabs={setActiveTabs}
+              Activetabs={Activetabs}
             />
           )}
-          {SelectedProjectDetailWindow === 'CarbonEmissionCostData' && (
+          {SelectedProjectDetailWindow === 'Carbon Emission Cost Data' && (
             <CarbonEmissionCostData 
-             currentForm="CarbonEmissionCostData"
+             currentForm="Carbon Emission Cost Data"
               onNavigate={handleFormNavigation}
-              onClose={() => setSelectedProjectDetailWindow(null)}
+             onClose={handleTabClose}
+              onclicktabs={onclicktabs}
+              setActiveTabs={setActiveTabs}
+              Activetabs={Activetabs}
             />
           )}
-          {SelectedProjectDetailWindow === 'BridgeandTraffic' && (
+          {SelectedProjectDetailWindow === 'Bridge and Traffic' && (
             <BridgeandTraffic 
-              currentForm="BridgeandTraffic"
+              currentForm="Bridge and Traffic"
               onNavigate={handleFormNavigation}
-              onClose={() => setSelectedProjectDetailWindow(null)}
+             onClose={handleTabClose}
+              onclicktabs={onclicktabs}
+              setActiveTabs={setActiveTabs}
+              Activetabs={Activetabs}
             />
           )}
-          {SelectedProjectDetailWindow === 'MaintenanceandRepairData' && (
+          {SelectedProjectDetailWindow === 'Maintenance and Repair Data' && (
             <MaintenanceandRepairData 
-              currentForm="MaintenanceandRepairData"
+              currentForm="Maintenance and Repair Data"
               onNavigate={handleFormNavigation}
-              onClose={() => setSelectedProjectDetailWindow(null)}
+             onClose={handleTabClose}
+              onclicktabs={onclicktabs}
+              setActiveTabs={setActiveTabs}
+              Activetabs={Activetabs}
             />
           )}
-          {SelectedProjectDetailWindow === 'DemolitionandRecycling' && (
+          {SelectedProjectDetailWindow === 'Demolition and Recycling' && (
             <DemolitionandRecycling 
-              currentForm="DemolitionandRecycling"
+              currentForm="Demolition and Recycling"
               onNavigate={handleFormNavigation}
-              onClose={() => setSelectedProjectDetailWindow(null)}
+            onClose={handleTabClose}
+              onclicktabs={onclicktabs}
+              setActiveTabs={setActiveTabs}
+              Activetabs={Activetabs}
             />
           )}
         </div>

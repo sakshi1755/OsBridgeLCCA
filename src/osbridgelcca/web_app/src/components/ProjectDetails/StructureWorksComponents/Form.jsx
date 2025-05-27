@@ -3,13 +3,14 @@
 import { useState, useEffect } from "react"
 import { useFormNavigation, ConfirmationModal } from '../UseFormNavigation'
 
-const Form = ({ title, initialMaterials, componentOptions, materialOptions, onClose, currentForm, onNavigate }) => {
+const Form = ({ title, initialMaterials, componentOptions, materialOptions, onClose, currentForm, onNavigate,setActiveTabs,Activetabs,onclicktabs  }) => {
   const [materials, setMaterials] = useState([])
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [confirmationType, setConfirmationType] = useState(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   const navigation = useFormNavigation(currentForm, onNavigate)
+  
 
   useEffect(() => {
     if (materials.length === 0 && initialMaterials?.length > 0) {
@@ -158,10 +159,40 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
 
   return (
     <div className="w-full max-w-4xl mx-auto mt-6">
-      <div className="flex justify-between items-center bg-[#F0E6E6] px-4 py-2 rounded-sm border border-gray-300 w-fit border-b-[#522828b0] border-b-[0.25rem]">
-        <h3 className="text-lg font-medium">{title}</h3>
-        <button onClick={onClose} className="text-gray-500 hover:text-gray-700 ml-4">×</button>
+   {/* TABS ROW — scrolls if needed, stays within form width, doesn't stretch or resize anything */}
+<div
+  className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"
+  style={{
+    scrollbarWidth: 'thin', // for Firefox
+  }}
+>
+  <div className="flex  w-fit min-w-full">
+    {Activetabs.map((tab, index) => (
+      <div
+        onClick={() => onclicktabs(tab)}
+        key={index}
+        className={`flex items-center px-4 py-2 rounded-sm border border-gray-300 whitespace-nowrap cursor-pointer
+          ${tab === currentForm ? 'bg-[#F0E6E6] border-b-[#522828b0] border-b-[0.25rem]' : 'bg-[#F0E6E6]'}
+        `}
+        style={{
+          fontSize: Activetabs.length > 5 ? '0.85rem' : '1rem',
+        }}
+      >
+        <span className="font-medium">{tab}</span>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose(tab);
+          }}
+          className="ml-2 text-gray-500 hover:text-gray-700"
+        >
+          ×
+        </button>
       </div>
+    ))}
+  </div>
+</div>
+
 
       <div className="bg-[#FFF9F9] p-6 border border-gray-300 rounded-b-sm">
         <div className="px-6 py-4">
@@ -344,7 +375,7 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
       <ConfirmationModal
         isOpen={showConfirmation}
         onConfirm={handleConfirm}
-        onClose={handleCloseConfirmation}
+        onClosed={handleCloseConfirmation}
         type={confirmationType}
         nextForm={navigation.getNextForm()}
       />

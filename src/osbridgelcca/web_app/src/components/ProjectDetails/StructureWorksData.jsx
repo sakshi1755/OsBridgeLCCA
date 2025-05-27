@@ -6,7 +6,7 @@ import SuperStructureForm from './StructureWorksComponents/SuperStructureForm';
 import SubStructureForm from './StructureWorksComponents/SubStructureForm';
 import MiscellaneousForm from './StructureWorksComponents/MiscellaneousForm';
 
-const StructureWorksData = ({ onSelectForm }) => {
+const StructureWorksData = ({  setActiveTabs,Activetabs, onSelectForm }) => {
   return (
     <div className="flex flex-col gap-2 text-sm">
       <button 

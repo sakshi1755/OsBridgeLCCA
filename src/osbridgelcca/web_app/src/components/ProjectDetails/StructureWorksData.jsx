@@ -8,30 +8,30 @@ import MiscellaneousForm from './StructureWorksComponents/MiscellaneousForm';
 
 const StructureWorksData = ({  setActiveTabs,Activetabs, onSelectForm }) => {
   return (
-    <div className="flex flex-col gap-2 text-sm">
+    <div className="flex flex-col  text-sm">
       <button 
         onClick={() => onSelectForm('Foundation')} 
-        className="mb-2 bg-[#F0E6E6] border border-black rounded-sm w-full text-left text-base px-4 py-2"
+        className=" rounded-sm w-full text-left  ml-20"
       >
-        ► Foundation
+          {"\u2BC8"} &nbsp; Foundation
       </button>
       <button 
         onClick={() => onSelectForm('Sub-Structure')} 
-        className="mb-2 bg-[#F0E6E6] border border-black rounded-sm w-full text-left text-base px-4 py-2"
+        className=" rounded-sm w-full text-left   ml-20"
       >
-        ► Sub-Structure
+          {"\u2BC8"} &nbsp; Sub-Structure
       </button>
       <button 
         onClick={() => onSelectForm('Super-Structure')} 
-        className="mb-2 bg-[#F0E6E6] border border-black rounded-sm w-full text-left text-base px-4 py-2"
+        className=" rounded-sm w-full text-left    ml-20"
       >
-        ► Super-Structure
+          {"\u2BC8"} &nbsp; Super-Structure
       </button>
       <button 
         onClick={() => onSelectForm('Miscellaneous')} 
-        className="mb-2 bg-[#F0E6E6] border border-black rounded-sm w-full text-left text-base px-4 py-2"
+        className=" rounded-sm w-full text-left    ml-20"
       >
-        ► Miscellaneous
+          {"\u2BC8"} &nbsp; Miscellaneous
       </button>
     </div>
   );

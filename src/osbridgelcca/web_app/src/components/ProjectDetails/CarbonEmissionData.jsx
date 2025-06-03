@@ -43,16 +43,21 @@ const CarbonEmissionData = ({ currentForm, onNavigate,onClose, setActiveTabs,Act
     }
   };
 
-  const handleBack = () => {
-    if (navigation.canGoBack) {
-      if (hasUnsavedChanges) {
-        setConfirmationType('back');
-        setShowConfirmation(true);
-      } else {
-        navigation.navigate(navigation.getPreviousForm());
-      }
-    }
-  };
+  // const handleBack = () => {
+  //   if (navigation.canGoBack) {
+  //     if (hasUnsavedChanges) {
+  //       setConfirmationType('back');
+  //       setShowConfirmation(true);
+  //     } else {
+  //       navigation.navigate(navigation.getPreviousForm());
+  //     }
+  //   }
+  // };
+    const handleBack = () => {
+  setConfirmationType('back')
+  setShowConfirmation(true)
+}
+
 
   const handleConfirm = () => {
     if (confirmationType === 'next') {

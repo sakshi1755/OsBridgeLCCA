@@ -121,16 +121,21 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
     }
   }
 
+  // const handleBack = () => {
+  //   if (navigation.canGoBack) {
+  //     if (hasUnsavedChanges) {
+  //       setConfirmationType('back')
+  //       setShowConfirmation(true)
+  //     } else {
+  //       navigation.navigate(navigation.getPreviousForm())
+  //     }
+  //   }
+  // }
   const handleBack = () => {
-    if (navigation.canGoBack) {
-      if (hasUnsavedChanges) {
-        setConfirmationType('back')
-        setShowConfirmation(true)
-      } else {
-        navigation.navigate(navigation.getPreviousForm())
-      }
-    }
-  }
+  setConfirmationType('back')
+  setShowConfirmation(true)
+}
+
 
   const handleConfirm = () => {
     if (confirmationType === 'next') {
@@ -194,7 +199,7 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
 </div>
 
 
-      <div className="bg-[#FFF9F9] p-6 border border-gray-300 rounded-b-sm">
+      <div className="bg-[#FFF9F9]  border border-gray-300 rounded-b-sm">
         <div className="px-6 py-4">
           {Object.entries(groupedMaterials).map(([component, componentMaterials], componentIndex) => (
             <div key={componentIndex} className="mb-8">

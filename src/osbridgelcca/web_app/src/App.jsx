@@ -1,5 +1,5 @@
 import './App.css'
-import { useState } from 'react';
+
 import TabNavigation from './components/TabNavigation';
 import DropDown from './components/DropDown';
 import Tutorials from './components/Tutorials/Tutorials';
@@ -7,6 +7,8 @@ import ProjectDetails from './components/ProjectDetails/ProjectDetails';
 import Results from './components/Results/Results';
 import Compare from './components/Compare/Compare';
 import { FormDataProvider } from './components/FormDataContext';
+import { useState, useEffect } from 'react'; // ✅ correct
+// ← this might already exist
 
 
 function App() {
@@ -19,6 +21,12 @@ function App() {
     setActiveTab(tab);
     setSelectedProjectDetailWindow(null); // Clear structure view on tab switch
   }
+   // ✅ Only reset the detail window when tutorials are shown
+  useEffect(() => {
+    if (showTutorials === true) {
+      setSelectedProjectDetailWindow(null);
+    }
+  }, [showTutorials]);
 
   // function handleTabChange(tab) {
   //   setActiveTab(tab);

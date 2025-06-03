@@ -49,16 +49,21 @@ const BridgeandTraffic = ({ currentForm, onNavigate, onClose, setActiveTabs,Acti
     }
   };
 
-  const handleBack = () => {
-    if (navigation.canGoBack) {
-      if (hasUnsavedChanges) {
-        setConfirmationType('back');
-        setShowConfirmation(true);
-      } else {
-        navigation.navigate(navigation.getPreviousForm());
-      }
-    }
-  };
+  // const handleBack = () => {
+  //   if (navigation.canGoBack) {
+  //     if (hasUnsavedChanges) {
+  //       setConfirmationType('back');
+  //       setShowConfirmation(true);
+  //     } else {
+  //       navigation.navigate(navigation.getPreviousForm());
+  //     }
+  //   }
+  // };
+    const handleBack = () => {
+  setConfirmationType('back')
+  setShowConfirmation(true)
+}
+
 
   const handleConfirm = () => {
     if (confirmationType === 'next') {
@@ -79,7 +84,7 @@ const BridgeandTraffic = ({ currentForm, onNavigate, onClose, setActiveTabs,Acti
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto mt-6">
+    <div className="w-full max-w-4xl mx-auto ">
       {/* Title bar */}
  <div
   className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"

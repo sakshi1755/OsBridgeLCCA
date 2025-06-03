@@ -19,31 +19,55 @@ const ProjectDetails = ({
   setSelectedProjectDetailWindow,
   setShowTutorials,
 }) => {
+  
+  const [tabToClose, setTabToClose] = useState(null);
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  const [structureWorksExpanded, setStructureWorksExpanded] = useState(true);
+  const [carbonEmissionExpanded, setCarbonEmissionExpanded] = useState(false);
+  
   // Navigation handler for forms
-  const handleFormNavigation = (formName) => {
-    setSelectedProjectDetailWindow(formName);
-    setActiveTabs((tabs) => [...tabs, formName]);
-  };
+const handleFormNavigation = (formName) => {
+  setSelectedProjectDetailWindow(formName);
+  setActiveTabs((tabs) => {
+    if (!tabs.includes(formName)) {
+      return [...tabs, formName];
+    }
+    return tabs;
+  });
+};
+
   const [Activetabs, setActiveTabs] = useState([]);
-
-  const handleTabClose = (tabToRemove) => {
+  
+  const cancelTabClose = () => {
+    setShowCloseConfirm(false);
+    setTabToClose(null);
+  };
+  
+  const confirmTabClose = () => {
     setActiveTabs((prevTabs) => {
-      const index = prevTabs.indexOf(tabToRemove);
-      const newTabs = prevTabs.filter((tab) => tab !== tabToRemove);
+      const index = prevTabs.indexOf(tabToClose);
+      const newTabs = prevTabs.filter((tab) => tab !== tabToClose);
 
-      // Choose the next selected tab
       let nextTab = null;
       if (newTabs.length > 0) {
         if (index < newTabs.length) {
-          nextTab = newTabs[index]; // Tab to the right
+          nextTab = newTabs[index];
         } else {
-          nextTab = newTabs[index - 1]; // Or tab to the left
+          nextTab = newTabs[index - 1];
         }
       }
 
       setSelectedProjectDetailWindow(nextTab);
       return newTabs;
     });
+
+    setShowCloseConfirm(false);
+    setTabToClose(null);
+  };
+
+  const handleTabClose = (tab) => {
+    setTabToClose(tab);
+    setShowCloseConfirm(true);
   };
 
   const onclicktabs = (tab) => {
@@ -51,68 +75,289 @@ const ProjectDetails = ({
   };
 
   return (
-    
-    <div className="flex gap-4 mx-4">
+    <div className="flex gap-4 mx-4 ">
       {/* Left Panel - Project Details */}
       <div
-        className={`flex flex-col
-          ${SelectedProjectDetailWindow ? "w-1/4" : "w-full"}`}
+        className={`flex flex-col  ${SelectedProjectDetailWindow ? "w-1/6" : "w-full"}`}
       >
         <span className="bg-[#F0E6E6] border border-black rounded-t-sm px-2 py-2 text-sm font-semibold max-w-[200px]">
           Project Details Window
-          <button className=" ml-3 text-sm font-bold">✕</button>
+          <button className="ml-3 text-sm font-bold">✕</button>
         </span>
 
-        {/* Content only shrinks when a form is selected */}
         <div
-          className={`bg-[#FFf9F9] m-30 rounded-sm overflow-auto  space-y-4  rounded-t-sm border border-black font-semibold text-[13px] p-5 text-smbg-[#FFF9F9]`}
+          className={`"bg-[#FFF9F9] rounded-sm overflow-auto ${SelectedProjectDetailWindow ? "" : "space-y-5"} rounded-t-sm border border-black font-semibold text-[13px] ${SelectedProjectDetailWindow ? "p-0" : "p-5"}`}
           style={{ maxHeight: "80vh" }}
         >
+          {/* Show full layout when no form is selected */}
           {SelectedProjectDetailWindow === null && (
-            <div className="bg-[#F0E6E6]  border border-black">
-              <Accordion title="General Information">
-                <GeneralInfoForm />
-              </Accordion>
-            </div>
+            <>
+              <div className="bg-[#F0E6E6] border border-black">
+                <Accordion title="General Information">
+                  <GeneralInfoForm />
+                </Accordion>
+              </div>
+              
+              <div className="bg-[#F0E6E6] border border-black">
+                <Accordion title="Input Parameters">
+                  <Accordionp title="Structure Works Data" level={1}>
+                    <StructureWorksData
+                      setActiveTabs={setActiveTabs}
+                      Activetabs={Activetabs}
+                      onSelectForm={(formName) => {
+                        setActiveTabs((tabs) => {
+                          if (!tabs.includes(formName)) {
+                            return [...tabs, formName];
+                          }
+                          return tabs;
+                        });
+                        setSelectedProjectDetailWindow(formName);
+                        setShowTutorials(false);
+                      }}
+                    />
+                  </Accordionp>
+
+                  <button
+                    onClick={() => {
+                      setSelectedProjectDetailWindow("Financial Data");
+                      setShowTutorials(false);
+                      setActiveTabs((tabs) => {
+                        if (!tabs.includes("Financial Data")) {
+                          return [...tabs, "Financial Data"];
+                        }
+                        return tabs;
+                      });
+                    }}
+                    className="rounded-sm w-full text-left text-sm ml-12"
+                  >
+                    {"\u2BC8"} &nbsp; Financial Data
+                  </button>
+
+                  <Accordionp
+                    title={
+                      <span
+                        onClick={() => {
+                          setSelectedProjectDetailWindow("Carbon Emission Data");
+                          setShowTutorials(false);
+                          setActiveTabs((tabs) => {
+                            if (!tabs.includes("Carbon Emission Data")) {
+                              return [...tabs, "Carbon Emission Data"];
+                            }
+                            return tabs;
+                          });
+                        }}
+                      >
+                        Carbon Emission Data
+                      </span>
+                    }
+                    level={1}
+                  >
+                    <button
+                      onClick={() => {
+                        setSelectedProjectDetailWindow("Carbon Emission Cost Data");
+                        setShowTutorials(false);
+                        setActiveTabs((tabs) => {
+                          if (!tabs.includes("Carbon Emission Cost Data")) {
+                            return [...tabs, "Carbon Emission Cost Data"];
+                          }
+                          return tabs;
+                        });
+                      }}
+                      className="rounded-sm w-full text-left text-sm ml-20"
+                    >
+                      {"\u2BC8"} &nbsp;Carbon Emission Cost Data
+                    </button>
+                  </Accordionp>
+
+                  <button
+                    onClick={() => {
+                      setSelectedProjectDetailWindow("Bridge and Traffic");
+                      setShowTutorials(false);
+                      setActiveTabs((tabs) => {
+                        if (!tabs.includes("Bridge and Traffic")) {
+                          return [...tabs, "Bridge and Traffic"];
+                        }
+                        return tabs;
+                      });
+                    }}
+                    className="rounded-sm w-full text-left text-sm ml-12"
+                  >
+                    {"\u2BC8"} &nbsp; Bridge and Traffic Data
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setSelectedProjectDetailWindow("Maintenance and Repair Data");
+                      setShowTutorials(false);
+                      setActiveTabs((tabs) => {
+                        if (!tabs.includes("Maintenance and Repair Data")) {
+                          return [...tabs, "Maintenance and Repair Data"];
+                        }
+                        return tabs;
+                      });
+                    }}
+                    className="rounded-sm w-full text-left text-sm ml-12"
+                  >
+                    {"\u2BC8"} &nbsp; Maintenance and Repair
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setSelectedProjectDetailWindow("Demolition and Recycling");
+                      setShowTutorials(false);
+                      setActiveTabs((tabs) => {
+                        if (!tabs.includes("Demolition and Recycling")) {
+                          return [...tabs, "Demolition and Recycling"];
+                        }
+                        return tabs;
+                      });
+                    }}
+                    className="rounded-sm w-full text-left text-sm ml-12"
+                  >
+                    {"\u2BC8"} &nbsp; Disposal and Recycling
+                  </button>
+                </Accordion>
+              </div>
+              
+              <div className="bg-[#F0E6E6] border border-black">
+                <Accordion title="Outputs">
+                  Placeholder content for Outputs.
+                </Accordion>
+              </div>
+            </>
           )}
-          <div className="bg-[#F0E6E6]  border border-black">
-            <Accordion title="Input Parameters">
-              <Accordionp title="Structure Works Data" level={1}>
-                <StructureWorksData
-                  setActiveTabs={setActiveTabs}
-                  Activetabs={Activetabs}
-                  onSelectForm={(formName) => {
+
+          {/* Show compressed layout when a form is selected */}
+          {SelectedProjectDetailWindow !== null && (
+            <>
+            
+            <div className=  "h-12 bg-[#FFF9F9]  border-black"></div>
+            
+              {/* Input Parameters Heading with up arrow */}
+              <div className="bg-[#F0E6E6] px-3 py-2 text-lg w-full font-semibold border border-black flex justify-center
+ items-center">
+                Input Parameters
+               
+              </div>
+              
+              {/* Tree Structure */}
+              <div className=" border-black bg-[#FFF9F9]">
+                {/* Structure Works Data with expand/collapse */}
+                <div>
+                  <div
+                    className="flex items-center px-3 py-0.5 text-sm hover:bg-gray-100 cursor-pointer"
+                    onClick={() => setStructureWorksExpanded(!structureWorksExpanded)}
+                  >
+                    <span className="mr-2">{structureWorksExpanded ? "▼" : "\u2BC8"}</span>
+                    Structure Works Data
+                  </div>
+                  
+                  {structureWorksExpanded && (
+                    <div className="ml-5">
+                      <div
+                        className={`flex items-center px-3 py-0.5 text-sm cursor-pointer ${
+                          SelectedProjectDetailWindow === "Foundation" ? "bg-gray-700 text-white" : "hover:bg-gray-100"
+                        }`}
+                        onClick={() => {
+                          setSelectedProjectDetailWindow("Foundation");
+                          setShowTutorials(false);
+                          setActiveTabs((tabs) => {
+                            if (!tabs.includes("Foundation")) {
+                              return [...tabs, "Foundation"];
+                            }
+                            return tabs;
+                          });
+                        }}
+                      >
+                        <span className="mr-2">{"\u2BC8"}</span>
+                        Foundation
+                      </div>
+                      
+                      <div
+                        className={`flex items-center px-3 py-0.5 text-sm cursor-pointer ${
+                          SelectedProjectDetailWindow === "Super-Structure" ? "bg-gray-700 text-white" : "hover:bg-gray-100"
+                        }`}
+                        onClick={() => {
+                          setSelectedProjectDetailWindow("Super-Structure");
+                          setShowTutorials(false);
+                          setActiveTabs((tabs) => {
+                            if (!tabs.includes("Super-Structure")) {
+                              return [...tabs, "Super-Structure"];
+                            }
+                            return tabs;
+                          });
+                        }}
+                      >
+                        <span className="mr-2">{"\u2BC8"}</span>
+                        Super-Structure
+                      </div>
+                      
+                      <div
+                        className={`flex items-center px-3 py-0.5 text-sm cursor-pointer ${
+                          SelectedProjectDetailWindow === "Sub-Structure" ? "bg-gray-700 text-white" : "hover:bg-gray-100"
+                        }`}
+                        onClick={() => {
+                          setSelectedProjectDetailWindow("Sub-Structure");
+                          setShowTutorials(false);
+                          setActiveTabs((tabs) => {
+                            if (!tabs.includes("Sub-Structure")) {
+                              return [...tabs, "Sub-Structure"];
+                            }
+                            return tabs;
+                          });
+                        }}
+                      >
+                        <span className="mr-2">{"\u2BC8"}</span>
+                        Sub-Structure
+                      </div>
+                      
+                      <div
+                        className={`flex items-center px-3 py-0.5 text-sm cursor-pointer ${
+                          SelectedProjectDetailWindow === "Miscellaneous" ? "bg-gray-700 text-white" : "hover:bg-gray-100"
+                        }`}
+                        onClick={() => {
+                          setSelectedProjectDetailWindow("Miscellaneous");
+                          setShowTutorials(false);
+                          setActiveTabs((tabs) => {
+                            if (!tabs.includes("Miscellaneous")) {
+                              return [...tabs, "Miscellaneous"];
+                            }
+                            return tabs;
+                          });
+                        }}
+                      >
+                        <span className="mr-2">{"\u2BC8"}</span>
+                        Miscellaneous
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Financial Data */}
+                <div
+                  className={`flex items-center px-3 py-0.5 text-sm cursor-pointer ${
+                    SelectedProjectDetailWindow === "Financial Data" ? "bg-gray-700 text-white" : "hover:bg-gray-100"
+                  }`}
+                  onClick={() => {
+                    setSelectedProjectDetailWindow("Financial Data");
+                    setShowTutorials(false);
                     setActiveTabs((tabs) => {
-                      if (!tabs.includes(formName)) {
-                        return [...tabs, formName];
+                      if (!tabs.includes("Financial Data")) {
+                        return [...tabs, "Financial Data"];
                       }
                       return tabs;
                     });
-                    setSelectedProjectDetailWindow(formName);
-                    setShowTutorials(false); // close tutorials
                   }}
-                />
-              </Accordionp>
+                >
+                  Financial Data
+                </div>
 
-              <button
-                onClick={() => {
-                  setSelectedProjectDetailWindow("Financial Data");
-                  setShowTutorials(false);
-                  setActiveTabs((tabs) => {
-                    if (!tabs.includes("Financial Data")) {
-                      return [...tabs, "Financial Data"];
-                    }
-                    return tabs;
-                  });
-                }}
-                className=" rounded-sm w-full text-left text-sm  ml-12"
-              >
-                {"\u2BC8"} &nbsp; Financial Data
-              </button>
-
-              <Accordionp
-                title={
-                  <span
+                {/* Carbon Emission Data with expand/collapse */}
+                <div>
+                  <div
+                    className={`flex items-center px-3 py-0.5 text-sm cursor-pointer ${
+                      SelectedProjectDetailWindow === "Carbon Emission Data" ? "bg-gray-700 text-white" : "hover:bg-gray-100"
+                    }`}
                     onClick={() => {
                       setSelectedProjectDetailWindow("Carbon Emission Data");
                       setShowTutorials(false);
@@ -122,91 +367,111 @@ const ProjectDetails = ({
                         }
                         return tabs;
                       });
+                      setCarbonEmissionExpanded(!carbonEmissionExpanded);
                     }}
                   >
-                    {" "}
+                    <span className="mr-2">{carbonEmissionExpanded ? "▼" : "\u2BC8"}</span>
                     Carbon Emission Data
-                  </span>
-                }
-                level={1}
-              >
-                <button
+                  </div>
+                  
+                  {carbonEmissionExpanded && (
+                    <div className="ml-5">
+                      <div
+                        className={`flex items-center px-3 py-0.5 text-sm cursor-pointer ${
+                          SelectedProjectDetailWindow === "Carbon Emission Cost Data" ? "bg-gray-700 text-white" : "hover:bg-gray-100"
+                        }`}
+                        onClick={() => {
+                          setSelectedProjectDetailWindow("Carbon Emission Cost Data");
+                          setShowTutorials(false);
+                          setActiveTabs((tabs) => {
+                            if (!tabs.includes("Carbon Emission Cost Data")) {
+                              return [...tabs, "Carbon Emission Cost Data"];
+                            }
+                            return tabs;
+                          });
+                        }}
+                      >
+                        <span className="mr-2">{"\u2BC8"}</span>
+                        Carbon Emission Cost Data
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Bridge and Traffic Data */}
+                <div
+                  className={`flex items-center px-3 py-0.5 text-sm cursor-pointer ${
+                    SelectedProjectDetailWindow === "Bridge and Traffic" ? "bg-gray-700 text-white" : "hover:bg-gray-100"
+                  }`}
                   onClick={() => {
-                    setSelectedProjectDetailWindow("Carbon Emission Cost Data");
+                    setSelectedProjectDetailWindow("Bridge and Traffic");
                     setShowTutorials(false);
                     setActiveTabs((tabs) => {
-                      if (!tabs.includes("Carbon Emission Cost Data")) {
-                        return [...tabs, "Carbon Emission Cost Data"];
+                      if (!tabs.includes("Bridge and Traffic")) {
+                        return [...tabs, "Bridge and Traffic"];
                       }
                       return tabs;
                     });
                   }}
-                  className="rounded-sm w-full text-left text-sm  ml-20"
                 >
-                  {"\u2BC8"} &nbsp;Carbon Emission Cost Data
-                </button>
-              </Accordionp>
+                  Bridge and Traffic Data
+                </div>
 
-              <button
-                onClick={() => {
-                  setSelectedProjectDetailWindow("Bridge and Traffic");
-                  setShowTutorials(false);
-                  setActiveTabs((tabs) => {
-                    if (!tabs.includes("Bridge and Traffic")) {
-                      return [...tabs, "Bridge and Traffic"];
-                    }
-                    return tabs;
-                  });
-                }}
-                className=" rounded-sm w-full text-left text-sm  ml-12"
-              >
-                {"\u2BC8"} &nbsp; Bridge and Traffic Data
-              </button>
+                {/* Maintenance and Repair */}
+                <div
+                  className={`flex items-center px-3 py-0.5 text-sm cursor-pointer ${
+                    SelectedProjectDetailWindow === "Maintenance and Repair Data" ? "bg-gray-700 text-white" : "hover:bg-gray-100"
+                  }`}
+                  onClick={() => {
+                    setSelectedProjectDetailWindow("Maintenance and Repair Data");
+                    setShowTutorials(false);
+                    setActiveTabs((tabs) => {
+                      if (!tabs.includes("Maintenance and Repair Data")) {
+                        return [...tabs, "Maintenance and Repair Data"];
+                      }
+                      return tabs;
+                    });
+                  }}
+                >
+                  Maintenance and Repair
+                </div>
 
-              <button
-                onClick={() => {
-                  setSelectedProjectDetailWindow("Maintenance and Repair Data");
-                  setShowTutorials(false);
-                  setActiveTabs((tabs) => {
-                    if (!tabs.includes("Maintenance and Repair Data")) {
-                      return [...tabs, "Maintenance and Repair Data"];
-                    }
-                    return tabs;
-                  });
-                }}
-                className=" rounded-sm w-full text-left text-sm  ml-12"
-              >
-                {"\u2BC8"} &nbsp; Maintenance and Repair
-              </button>
-
-              <button
-                onClick={() => {
-                  setSelectedProjectDetailWindow("Demolition and Recycling");
-                  setShowTutorials(false);
-                  setActiveTabs((tabs) => {
-                    if (!tabs.includes("Demolition and Recycling")) {
-                      return [...tabs, "Demolition and Recycling"];
-                    }
-                    return tabs;
-                  });
-                }}
-                className=" rounded-sm w-full text-left text-sm  ml-12"
-              >
-                {"\u2BC8"} &nbsp; Disposal and Recycling
-              </button>
-            </Accordion>
-          </div>
-          <div className="bg-[#F0E6E6]  border border-black">
-            <Accordion title="Outputs">
-              Placeholder content for Outputs.
-            </Accordion>
-          </div>
+                {/* Demolition and Recycling */}
+                <div
+                  className={`flex items-center px-3 py-0.5 text-sm cursor-pointer ${
+                    SelectedProjectDetailWindow === "Demolition and Recycling" ? "bg-gray-700 text-white" : "hover:bg-gray-100"
+                  }`}
+                  onClick={() => {
+                    setSelectedProjectDetailWindow("Demolition and Recycling");
+                    setShowTutorials(false);
+                    setActiveTabs((tabs) => {
+                      if (!tabs.includes("Demolition and Recycling")) {
+                        return [...tabs, "Demolition and Recycling"];
+                      }
+                      return tabs;
+                    });
+                  }}
+                >
+                  Demolition and Recycling
+                </div>
+              </div>
+            
+              {/* Output Heading with down arrow */}
+              <div className="bg-[#F0E6E6] px-3 py-2  text-lg font-semibold border border-black flex justify-center items-center ">
+                Output
+                
+              </div>
+              <div className=  "h-12 bg-[#FFF9F9]  border-black"></div>
+              {/* Output Items */}
+              
+            </>
+          )}
         </div>
       </div>
 
       {/* Right Panel - Selected Form */}
       {SelectedProjectDetailWindow && (
-        <div className="w-3/4  overflow-auto" style={{ maxHeight: "80vh" }}>
+        <div className="w-3/4 overflow-auto" style={{ maxHeight: "80vh" }}>
           {SelectedProjectDetailWindow === "Foundation" && (
             <FoundationForm
               setActiveTabs={setActiveTabs}
@@ -307,6 +572,38 @@ const ProjectDetails = ({
               Activetabs={Activetabs}
             />
           )}
+        </div>
+      )}
+
+      {showCloseConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded shadow-md w-96">
+            <h2 className="text-xl font-semibold mb-4">Confirm Close</h2>
+            <p className="mb-4">Do you want to save changes before closing this tab?</p>
+            <div className="flex justify-end space-x-2">
+              <button
+                className="px-4 py-2 bg-gray-300 rounded"
+                onClick={cancelTabClose}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-red-500 text-white rounded"
+                onClick={confirmTabClose}
+              >
+                Close Without Saving
+              </button>
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded"
+                onClick={() => {
+                  // optional save logic here if needed
+                  confirmTabClose();
+                }}
+              >
+                Save and Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

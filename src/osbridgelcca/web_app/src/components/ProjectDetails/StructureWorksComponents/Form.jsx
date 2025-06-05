@@ -163,7 +163,7 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto mt-6">
+    <div className="w-full max-w-4xl mx-auto ">
    {/* TABS ROW — scrolls if needed, stays within form width, doesn't stretch or resize anything */}
 <div
   className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"

@@ -71,7 +71,7 @@ const DemolitionandRecycling = ({currentForm, onNavigate, onClose, setActiveTabs
   );
 
   return (
-    <div className="w-full max-w-4xl mx-auto mt-6">
+    <div className="w-full max-w-4xl mx-auto ">
       {/* Title bar */}
        <div
   className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"

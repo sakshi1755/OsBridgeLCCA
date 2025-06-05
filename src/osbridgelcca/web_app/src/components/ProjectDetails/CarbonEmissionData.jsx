@@ -132,7 +132,7 @@ const CarbonEmissionData = ({ currentForm, onNavigate,onClose, setActiveTabs,Act
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto mt-6">
+    <div className="w-full max-w-4xl mx-auto ">
 <div
   className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"
   style={{

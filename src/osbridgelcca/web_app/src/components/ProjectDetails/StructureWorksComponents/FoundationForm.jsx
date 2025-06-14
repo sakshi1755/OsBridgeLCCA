@@ -83,5 +83,3 @@ const FoundationForm = ({ onClose, currentForm = 'Foundation', onNavigate,  setA
 }
 
 export default FoundationForm
-
-

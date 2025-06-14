@@ -29,6 +29,7 @@ const BridgeandTraffic = ({ currentForm, onNavigate, onClose, setActiveTabs,Acti
       ...formData,
       [field]: value
     });
+    
   };
 
   const handleVehicleCompositionChange = (field, value) => {

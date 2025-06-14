@@ -3,42 +3,173 @@
 import { useState, useEffect } from "react"
 import { useFormNavigation, ConfirmationModal } from '../UseFormNavigation'
 
-const Form = ({ title, initialMaterials, componentOptions, materialOptions, onClose, currentForm, onNavigate,setActiveTabs,Activetabs,onclicktabs  }) => {
+const Form = ({ 
+  title, 
+  initialMaterials, 
+  componentOptions, 
+  onClose, 
+  currentForm, 
+  onNavigate, 
+  setActiveTabs, 
+  Activetabs, 
+  onclicktabs 
+}) => {
   const [materials, setMaterials] = useState([])
+  const [formData, setFormData] = useState({})
+  const [materialOptions, setMaterialOptions] = useState({})
+  const [subMaterialOptions, setSubMaterialOptions] = useState({})
+  const [unitOptions, setUnitOptions] = useState({})
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [confirmationType, setConfirmationType] = useState(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   const navigation = useFormNavigation(currentForm, onNavigate)
-  
 
-  useEffect(() => {
-    if (materials.length === 0 && initialMaterials?.length > 0) {
-      const updated = initialMaterials.map((mat, index) => ({
-        ...mat,
-        unit: index === 0 ? "m³" : index === 1 ? "kg" : mat.unit || "",
-      }))
-      setMaterials(updated)
+  // Map form names to API form names
+  const getFormApiName = (formName) => {
+    const mapping = {
+      'Foundation': 'foundation',
+      'Sub-Structure': 'sub-structure', 
+      'Super-Structure': 'super-structure',
+      'Miscellaneous': 'miscellaneous'
     }
-  }, [initialMaterials, materials.length])
+    return mapping[formName] || formName.toLowerCase()
+  }
 
+  // Fetch form data on component mount or when currentForm changes
+  useEffect(() => {
+    const apiFormName = getFormApiName(currentForm)
+    
+    fetch(`http://127.0.0.1:5000/api/form-data/${apiFormName}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setFormData(data)
+        console.log('Form data loaded:', data)
+      })
+      .catch(err => console.error("Error fetching form data:", err))
+  }, [currentForm])
+
+  // Initialize materials from initialMaterials
+  // useEffect(() => {
+  //   if (materials.length === 0 && initialMaterials?.length > 0) {
+  //     const updated = initialMaterials.map((mat, index) => ({
+  //       ...mat,
+  //       unit: index === 0 ? "cum" : index === 1 ? "kg" : mat.unit || "",
+  //     }))
+  //     setMaterials(updated)
+  //   }
+  // }, [initialMaterials, materials.length])
+
+  // Add this new useEffect to initialize with backend data
+useEffect(() => {
+  const initializeFromBackend = async () => {
+    if (materials.length === 0 && Object.keys(formData).length > 0) {
+      const availableComponents = Object.keys(formData)
+      const firstTwoComponents = availableComponents.slice(0, 2)
+      
+      const initialMaterials = []
+      
+      for (let i = 0; i < firstTwoComponents.length; i++) {
+        const component = firstTwoComponents[i]
+        const componentData = formData[component]
+        const firstMaterial = Object.keys(componentData)[0] // Get first material for this component
+        
+        if (firstMaterial) {
+          const materialData = componentData[firstMaterial]
+          const firstUnit = materialData.units?.[0] || ""
+          
+          initialMaterials.push({
+            id: i + 1,
+            component: component,
+            materialType: firstMaterial,
+            subMaterialType: materialData.sub_materials?.[0] || "",
+            customMaterialType: "",
+            quantity: "",
+            unit: firstUnit,
+            rate: "",
+            rateDataSource: "",
+          })
+        }
+      }
+      
+      if (initialMaterials.length > 0) {
+        setMaterials(initialMaterials)
+      }
+    }
+  }
+  
+  initializeFromBackend()
+}, [formData, materials.length])
+
+  // Track unsaved changes
   useEffect(() => {
     if (materials.length > 0) {
       setHasUnsavedChanges(true)
     }
   }, [materials])
 
+  // Fetch materials when component changes
+  const fetchMaterials = async (componentName) => {
+    const apiFormName = getFormApiName(currentForm)
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/materials/${apiFormName}/${encodeURIComponent(componentName)}`)
+      const materials = await response.json()
+      return materials
+    } catch (err) {
+      console.error("Error fetching materials:", err)
+      return []
+    }
+  }
+
+  // Fetch sub-materials when material changes
+  const fetchSubMaterials = async (componentName, materialName) => {
+    const apiFormName = getFormApiName(currentForm)
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/sub-materials/${apiFormName}/${encodeURIComponent(componentName)}/${encodeURIComponent(materialName)}`)
+      const subMaterials = await response.json()
+      return subMaterials
+    } catch (err) {
+      console.error("Error fetching sub-materials:", err)
+      return []
+    }
+  }
+
+  // Fetch units when material changes
+  const fetchUnits = async (componentName, materialName) => {
+    const apiFormName = getFormApiName(currentForm)
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/units/${apiFormName}/${encodeURIComponent(componentName)}/${encodeURIComponent(materialName)}`)
+      const units = await response.json()
+      return units
+    } catch (err) {
+      console.error("Error fetching units:", err)
+      return []
+    }
+  }
+
+  // Group materials by component
   const groupedMaterials = materials.reduce((acc, material) => {
     if (!acc[material.component]) acc[material.component] = []
     acc[material.component].push(material)
     return acc
   }, {})
 
-  const handleAddMaterial = (componentType) => {
+  // Get available components from form data
+  const availableComponents = Object.keys(formData)
+
+  const handleAddMaterial = async (componentType) => {
+    // Fetch materials for this component and cache them
+    const materialsForComponent = await fetchMaterials(componentType)
+    setMaterialOptions(prev => ({
+      ...prev,
+      [componentType]: materialsForComponent
+    }))
+
     const newMaterial = {
       id: Math.max(0, ...materials.map((m) => m.id)) + 1,
       component: componentType,
       materialType: "",
+      subMaterialType: "",
       customMaterialType: "",
       quantity: "",
       unit: "",
@@ -54,63 +185,114 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
     ))
   }
 
-  const handleMaterialTypeChange = (id, value) => {
+  const handleMaterialTypeChange = async (id, value) => {
+    const material = materials.find(m => m.id === id)
+    
     if (value === "Other") {
-      // Mark material as custom and set default custom material
       setMaterials(materials.map((m) =>
-        m.id === id ? { 
-          ...m, 
+        m.id === id ? {
+          ...m,
           materialType: "Other",
-          customMaterialType: "Custom Material"
+          customMaterialType: "Custom Material",
+          subMaterialType: "",
+          unit: ""
         } : m
       ))
     } else {
-      // Remove custom material flag and update material type
+      // Fetch sub-materials and units for this material
+      const subMaterials = await fetchSubMaterials(material.component, value)
+      const units = await fetchUnits(material.component, value)
+      
+      // Update material and cache options
       setMaterials(materials.map((m) =>
-        m.id === id ? { 
-          ...m, 
+        m.id === id ? {
+          ...m,
           materialType: value,
-          customMaterialType: ""
+          customMaterialType: "",
+          subMaterialType: "",
+          unit: units.length > 0 ? units[0] : ""
         } : m
       ))
+      
+      // Cache sub-materials and units
+      setSubMaterialOptions(prev => ({
+        ...prev,
+        [`${material.component}-${value}`]: subMaterials
+      }))
+      
+      setUnitOptions(prev => ({
+        ...prev,
+        [`${material.component}-${value}`]: units
+      }))
     }
   }
 
-  const handleComponentChange = (oldComponent, newComponent) => {
+  const handleSubMaterialTypeChange = (id, value) => {
+    setMaterials(materials.map((m) =>
+      m.id === id ? { ...m, subMaterialType: value } : m
+    ))
+  }
+
+  const handleComponentChange = async (oldComponent, newComponent) => {
+    // Fetch materials for the new component
+    const materialsForComponent = await fetchMaterials(newComponent)
+    
+    // Update materials with new component
     const updatedMaterials = materials.map((mat) =>
-      mat.component === oldComponent ? { ...mat, component: newComponent } : mat
+      mat.component === oldComponent ? { 
+        ...mat, 
+        component: newComponent,
+        materialType: "",
+        subMaterialType: "",
+        unit: ""
+      } : mat
     )
     setMaterials(updatedMaterials)
+    
+    // Cache material options for this component
+    setMaterialOptions(prev => ({
+      ...prev,
+      [newComponent]: materialsForComponent
+    }))
   }
 
   const handleCustomComponentChange = (oldComponent, customComponent) => {
     const updatedMaterials = materials.map((mat) =>
-      mat.component === oldComponent ? { ...mat, component: customComponent, customComponent: customComponent } : mat
+      mat.component === oldComponent ? { 
+        ...mat, 
+        component: customComponent, 
+        customComponent: customComponent,
+        materialType: "",
+        subMaterialType: "",
+        unit: ""
+      } : mat
     )
     setMaterials(updatedMaterials)
   }
 
-  const handleAddSubComponent = (parentComponent) => {
+  const handleAddSubComponent = async (parentComponent) => {
     let baseName = parentComponent + "-Sub"
     let counter = 1
     let newComponentName = baseName
-
     while (materials.some((m) => m.component === newComponentName)) {
       newComponentName = `${baseName}${counter}`
       counter++
     }
 
+    // Since this is a sub-component, we don't fetch materials for it
+    // It will use custom materials
     const newMaterial = {
       id: Math.max(0, ...materials.map((m) => m.id)) + 1,
       component: newComponentName,
       materialType: "",
+      subMaterialType: "",
       customMaterialType: "",
       quantity: "",
       unit: "",
       rate: "",
       rateDataSource: "",
+      isCustomComponent: true,
     }
-
     setMaterials([...materials, newMaterial])
   }
 
@@ -121,21 +303,10 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
     }
   }
 
-  // const handleBack = () => {
-  //   if (navigation.canGoBack) {
-  //     if (hasUnsavedChanges) {
-  //       setConfirmationType('back')
-  //       setShowConfirmation(true)
-  //     } else {
-  //       navigation.navigate(navigation.getPreviousForm())
-  //     }
-  //   }
-  // }
   const handleBack = () => {
-  setConfirmationType('back')
-  setShowConfirmation(true)
-}
-
+    setConfirmationType('back')
+    setShowConfirmation(true)
+  }
 
   const handleConfirm = () => {
     if (confirmationType === 'next') {
@@ -154,52 +325,77 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
     setConfirmationType(null)
   }
 
-  const unitOptions = ["m³", "kg", "litre", "nos"]
-
-  // Check if a component is using "Other" option
-  const isComponentOther = (component) => {
-    const componentMaterials = materials.filter(mat => mat.component === component)
-    return componentMaterials.some(mat => mat.isCustomComponent)
+//handlesave function
+const handleSave = async () => {
+  try {
+    const apiFormName = getFormApiName(currentForm)
+    
+    const formDataToSave = {
+      form_name: currentForm,
+      materials: materials,
+      timestamp: new Date().toISOString()
+    }
+    
+    const response = await fetch(`http://127.0.0.1:5000/api/save-form-data/${apiFormName}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formDataToSave)
+    })
+    
+    if (response.ok) {
+      const result = await response.json()
+      console.log('Form saved successfully:', result)
+      setHasUnsavedChanges(false)
+      
+      // Optionally fetch and display the total cost
+      const costResponse = await fetch('http://127.0.0.1:5000/api/calculate-initial-cost')
+      if (costResponse.ok) {
+        const costData = await costResponse.json()
+        console.log('Total Initial Cost:', costData.total_initial_cost)
+        console.log('Form Breakdown:', costData.breakdown)
+      }
+      
+    } else {
+      console.error('Failed to save form data')
+    }
+  } catch (error) {
+    console.error('Error saving form:', error)
   }
+}
 
   return (
-    <div className="w-full max-w-4xl mx-auto ">
-   {/* TABS ROW — scrolls if needed, stays within form width, doesn't stretch or resize anything */}
-<div
-  className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"
-  style={{
-    scrollbarWidth: 'thin', // for Firefox
-  }}
->
-  <div className="flex  w-fit min-w-full">
-    {Activetabs.map((tab, index) => (
-      <div
-        onClick={() => onclicktabs(tab)}
-        key={index}
-        className={`flex items-center px-4 py-2 rounded-sm border border-gray-300 whitespace-nowrap cursor-pointer
-          ${tab === currentForm ? 'bg-[#F0E6E6] border-b-[#522828b0] border-b-[0.25rem]' : 'bg-[#F0E6E6]'}
-        `}
-        style={{
-          fontSize: Activetabs.length > 5 ? '0.85rem' : '1rem',
-        }}
-      >
-        <span className="font-medium">{tab}</span>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose(tab);
-          }}
-          className="ml-2 text-gray-500 hover:text-gray-700"
-        >
-          ×
-        </button>
+    <div className="w-full max-w-4xl mx-auto">
+      <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
+        <div className="flex w-fit min-w-full">
+          {Activetabs.map((tab, index) => (
+            <div
+              onClick={() => onclicktabs(tab)}
+              key={index}
+              className={`flex items-center px-4 py-2 rounded-sm border border-gray-300 whitespace-nowrap cursor-pointer
+                ${tab === currentForm ? 'bg-[#F0E6E6] border-b-[#522828b0] border-b-[0.25rem]' : 'bg-[#F0E6E6]'}
+              `}
+              style={{
+                fontSize: Activetabs.length > 5 ? '0.85rem' : '1rem',
+              }}
+            >
+              <span className="font-medium">{tab}</span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClose(tab);
+                }}
+                className="ml-2 text-gray-500 hover:text-gray-700"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
-    ))}
-  </div>
-</div>
 
-
-      <div className="bg-[#FFF9F9]  border border-gray-300 rounded-b-sm">
+      <div className="bg-[#FFF9F9] border border-gray-300 rounded-b-sm">
         <div className="px-6 py-4">
           {Object.entries(groupedMaterials).map(([component, componentMaterials], componentIndex) => (
             <div key={componentIndex} className="mb-8">
@@ -207,12 +403,11 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-600">Component:</span>
                   <div className="relative">
-                    {/* Check if this component is using "Other" option */}
                     {componentMaterials[0]?.isCustomComponent ? (
                       <input
                         type="text"
                         placeholder="Enter custom component"
-                        value=""
+                        value={componentMaterials[0]?.customComponent || component}
                         onChange={(e) => handleCustomComponentChange(component, e.target.value)}
                         className="border border-gray-300 rounded-md px-3 py-1 text-sm bg-white min-w-[150px]"
                       />
@@ -223,25 +418,27 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
                           value={component}
                           onChange={(e) => {
                             if (e.target.value === "Other") {
-                              // Mark materials as custom component and set a default name
                               const updatedMaterials = materials.map((mat) =>
-                                mat.component === component ? { ...mat, component: "Custom Component", isCustomComponent: true } : mat
+                                mat.component === component ? { 
+                                  ...mat, 
+                                  component: "Custom Component", 
+                                  isCustomComponent: true,
+                                  customComponent: "Custom Component",
+                                  materialType: "",
+                                  subMaterialType: "",
+                                  unit: ""
+                                } : mat
                               )
                               setMaterials(updatedMaterials)
                             } else {
-                              // Remove custom component flag and update component
-                              const updatedMaterials = materials.map((mat) =>
-                                mat.component === component ? { ...mat, component: e.target.value, isCustomComponent: false } : mat
-                              )
-                              setMaterials(updatedMaterials)
+                              handleComponentChange(component, e.target.value)
                             }
                           }}
                         >
-                          {componentOptions.map((option, idx) => (
-                            <option key={idx} value={option.value}>{option.label}</option>
+                          {availableComponents.map((comp, idx) => (
+                            <option key={idx} value={comp}>{comp}</option>
                           ))}
-                          {/* Only show current component if it's not in the options */}
-                          {!componentOptions.find(opt => opt.value === component) && component !== "Other" && (
+                          {!availableComponents.includes(component) && component !== "Other" && component !== "Custom Component" && (
                             <option value={component}>{component}</option>
                           )}
                           <option value="Other">Other</option>
@@ -259,85 +456,122 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
                 </button>
               </div>
 
-              <div className="grid grid-cols-5 gap-4 mb-2 text-sm font-medium text-gray-600">
-                <div>Material Type and Grade</div>
+              <div className="grid grid-cols-6 gap-4 mb-2 text-sm font-medium text-gray-600">
+                <div>Material Type</div>
+                <div>Grade/Sub-material</div>
                 <div>Quantity</div>
                 <div>Unit</div>
                 <div>Rate</div>
                 <div>Rate Data Source</div>
               </div>
 
-              {componentMaterials.map((material) => (
-                <div key={material.id} className="grid grid-cols-5 gap-4 mb-3">
-                  <div>
-                    {/* Check if this material is using "Other" option */}
-                    {material.materialType === "Other" ? (
-                      <input
-                        type="text"
-                        placeholder="Enter custom material"
-                        value= ""
-                        onChange={(e) => handleMaterialChange(material.id, "customMaterialType", e.target.value)}
-                        className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
-                      />
-                    ) : (
+              {componentMaterials.map((material) => {
+                // Get materials for this component
+                const materialOptionsForComponent = materialOptions[component] || 
+                  (formData[component] ? Object.keys(formData[component]) : [])
+                
+                // Get sub-materials for selected material
+                const subMaterialOptionsForMaterial = subMaterialOptions[`${component}-${material.materialType}`] || 
+                  (formData[component]?.[material.materialType]?.sub_materials || [])
+                
+                // Get units for selected material
+                const unitOptionsForMaterial = unitOptions[`${component}-${material.materialType}`] || 
+                  (formData[component]?.[material.materialType]?.units || [])
+
+                return (
+                  <div key={material.id} className="grid grid-cols-6 gap-4 mb-3">
+                    {/* Material Type Dropdown */}
+                    <div>
+                      {material.materialType === "Other" ? (
+                        <input
+                          type="text"
+                          placeholder="Enter custom material"
+                          value={material.customMaterialType || ""}
+                          onChange={(e) => handleMaterialChange(material.id, "customMaterialType", e.target.value)}
+                          className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+                        />
+                      ) : (
+                        <div className="relative">
+                          <select
+                            value={material.materialType}
+                            onChange={(e) => handleMaterialTypeChange(material.id, e.target.value)}
+                            className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm appearance-none"
+                          >
+                            <option value="">Select material</option>
+                            {materialOptionsForComponent.map((mat, idx) => (
+                              <option key={idx} value={mat}>{mat}</option>
+                            ))}
+                            <option value="Other">Other</option>
+                          </select>
+                          <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">▼</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Sub-material/Grade Dropdown */}
+                    <div>
                       <div className="relative">
                         <select
-                          value={material.materialType}
-                          onChange={(e) => handleMaterialTypeChange(material.id, e.target.value)}
+                          value={material.subMaterialType}
+                          onChange={(e) => handleSubMaterialTypeChange(material.id, e.target.value)}
                           className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm appearance-none"
+                          disabled={!material.materialType || material.materialType === "Other"}
                         >
-                          <option value="">Select material</option>
-                          {(materialOptions[component] || []).map((option, idx) => (
-                            <option key={idx} value={option.value}>{option.label}</option>
+                          <option value="">Select grade</option>
+                          {subMaterialOptionsForMaterial.map((subMat, idx) => (
+                            <option key={idx} value={subMat}>{subMat}</option>
                           ))}
-                          <option value="Other">Other</option>
                         </select>
                         <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">▼</span>
                       </div>
-                    )}
-                  </div>
+                    </div>
 
-                  <div>
-                    <input
-                      type="text"
-                      value={material.quantity}
-                      onChange={(e) => handleMaterialChange(material.id, "quantity", e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+                    {/* Quantity Input */}
+                    <input 
+                      type="text" 
+                      value={material.quantity} 
+                      onChange={(e) => handleMaterialChange(material.id, "quantity", e.target.value)} 
+                      className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm" 
+                      placeholder="Enter quantity"
                     />
-                  </div>
-                  <div>
-                    <select
-                      value={material.unit}
-                      onChange={(e) => handleMaterialChange(material.id, "unit", e.target.value)}
+
+                    {/* Unit Dropdown */}
+                    <select 
+                      value={material.unit} 
+                      onChange={(e) => handleMaterialChange(material.id, "unit", e.target.value)} 
                       className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+                      disabled={!material.materialType || material.materialType === "Other"}
                     >
-                      {unitOptions.map((unit, i) => (
+                      <option value="">Select unit</option>
+                      {unitOptionsForMaterial.map((unit, i) => (
                         <option key={i} value={unit}>{unit}</option>
                       ))}
                     </select>
-                  </div>
-                  <div>
-                    <input
-                      type="text"
-                      value={material.rate}
-                      onChange={(e) => handleMaterialChange(material.id, "rate", e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+
+                    {/* Rate Input */}
+                    <input 
+                      type="text" 
+                      value={material.rate} 
+                      onChange={(e) => handleMaterialChange(material.id, "rate", e.target.value)} 
+                      className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm" 
+                      placeholder="Enter rate"
+                    />
+
+                    {/* Rate Data Source Input */}
+                    <input 
+                      type="text" 
+                      value={material.rateDataSource} 
+                      onChange={(e) => handleMaterialChange(material.id, "rateDataSource", e.target.value)} 
+                      className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm" 
+                      placeholder="Enter source"
                     />
                   </div>
-                  <div>
-                    <input
-                      type="text"
-                      value={material.rateDataSource}
-                      onChange={(e) => handleMaterialChange(material.id, "rateDataSource", e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
-                    />
-                  </div>
-                </div>
-              ))}
+                )
+              })}
 
               <div className="flex justify-center mt-4 mb-4">
-                <button
-                  onClick={() => handleAddMaterial(component)}
+                <button 
+                  onClick={() => handleAddMaterial(component)} 
                   className="bg-white border border-gray-300 rounded-md px-4 py-1 text-sm w-48 text-gray-600 hover:bg-gray-50"
                 >
                   + Add Material
@@ -350,24 +584,51 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
             </div>
           ))}
 
+          {/* Add Component Button */}
+          {availableComponents.length > 0 && (
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      handleAddMaterial(e.target.value)
+                      e.target.value = ""
+                    }
+                  }}
+                  className="bg-white border border-gray-300 rounded-md px-4 py-1 text-sm w-48 text-gray-600 hover:bg-gray-50"
+                >
+                  <option value="">+ Add Component</option>
+                  {availableComponents.filter(comp => !Object.keys(groupedMaterials).includes(comp)).map((comp, idx) => (
+                    <option key={idx} value={comp}>{comp}</option>
+                  ))}
+                </select>
+                <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-white">▼</span>
+              </div>
+            </div>
+          )}
+
           <div className="flex justify-end gap-4 mt-8">
-            <button
-              onClick={handleBack}
-              disabled={!navigation.canGoBack}
+            <button 
+              onClick={handleBack} 
+              disabled={!navigation.canGoBack} 
               className={`px-8 py-1 text-sm rounded-md border ${
-                navigation.canGoBack
-                  ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700'
+                navigation.canGoBack 
+                  ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700' 
                   : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
               }`}
             >
               Back
             </button>
-            <button
-              onClick={handleNext}
-              disabled={!navigation.canGoNext}
+            <button 
+             onClick={() => {
+                  handleSave()
+                  handleNext()
+                }}
+
+              disabled={!navigation.canGoNext} 
               className={`px-8 py-1 text-sm rounded-md border ${
-                navigation.canGoNext
-                  ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700'
+                navigation.canGoNext 
+                  ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700' 
                   : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
               }`}
             >
@@ -377,12 +638,12 @@ const Form = ({ title, initialMaterials, componentOptions, materialOptions, onCl
         </div>
       </div>
 
-      <ConfirmationModal
-        isOpen={showConfirmation}
-        onConfirm={handleConfirm}
-        onClosed={handleCloseConfirmation}
-        type={confirmationType}
-        nextForm={navigation.getNextForm()}
+      <ConfirmationModal 
+        isOpen={showConfirmation} 
+        onConfirm={handleConfirm} 
+        onClosed={handleCloseConfirmation} 
+        type={confirmationType} 
+        nextForm={navigation.getNextForm()} 
       />
     </div>
   )

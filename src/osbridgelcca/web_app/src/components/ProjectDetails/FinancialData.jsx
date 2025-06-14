@@ -8,10 +8,33 @@ import { useState } from "react"
 
 const FinancialData = ({ currentForm, onNavigate,onClose, setActiveTabs,Activetabs, onclicktabs }) => {
   const navigation = useFormNavigation(currentForm, onNavigate);
-
+ //   const [showinterestwarning, setshowinterestwarning] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [confirmationType, setConfirmationType] = useState(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [showInterestWarning, setShowInterestWarning] = useState(false);
+const [pendingInterestRate, setPendingInterestRate] = useState(null);
+
+const handleInterestChange = (value) => {
+  const numericValue = parseFloat(value);
+  if (numericValue > 10) {
+    setPendingInterestRate(value);
+    setShowInterestWarning(true);
+  } else {
+    handleChange("interestRate", value);
+  }
+};
+
+const confirmInterestChange = () => {
+  handleChange("interestRate", pendingInterestRate);
+  setShowInterestWarning(false);
+  setPendingInterestRate(null);
+};
+
+const cancelInterestChange = () => {
+  setShowInterestWarning(false);
+  setPendingInterestRate(null);
+};
   // Initial state for financial data fields
   const [financialData, setFinancialData] = useState({
     realDiscountRate: "4.2500",
@@ -51,7 +74,27 @@ const FinancialData = ({ currentForm, onNavigate,onClose, setActiveTabs,Activeta
   setShowConfirmation(true)
 }
 
-
+const handleSave = async () => {
+  try {
+    const response = await fetch('http://127.0.0.1:5000/api/save-financial-data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(financialData)
+    })
+    
+    if (response.ok) {
+      const result = await response.json()
+      console.log('Financial data saved successfully:', result)
+      setHasUnsavedChanges(false)
+    } else {
+      console.error('Failed to save financial data')
+    }
+  } catch (error) {
+    console.error('Error saving financial data:', error)
+  }
+}
   const handleConfirm = () => {
     if (confirmationType === 'next') {
       // Here you would typically save the form data to your context or API
@@ -151,13 +194,46 @@ const FinancialData = ({ currentForm, onNavigate,onClose, setActiveTabs,Activeta
             </div>
             <div className="w-1/3 flex items-center">
               <div className="relative w-full">
-                <select
-                 // type="text"
+                <input
+                  type="text"
                   value={financialData.interestRate}
-                  onChange={(e) => handleChange("interestRate", e.target.value)}
+                                onChange={(e) => {
+                const value = e.target.value;
+                const numericValue = parseFloat(value);
+
+                if (numericValue > 10) {
+                  setPendingInterestRate(value);
+                  setShowInterestWarning(true);
+                } else {
+                  handleChange("interestRate", value);
+                }
+              }}
+
                   className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm appearance-none"
                 />
-                <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">▼</span>
+                  {showInterestWarning && (
+    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-md shadow-lg w-96">
+        <p className="text-sm text-gray-800 mb-4">
+          Interest rate exceeds the recommended 10%. Are you sure you want to proceed?
+        </p>
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={cancelInterestChange}
+            className="px-3 py-1 text-sm rounded bg-gray-300 hover:bg-gray-400 text-gray-800"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={confirmInterestChange}
+            className="px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            Yes, Proceed
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
               </div>
               <span className="ml-2">(%)</span>
             </div>
@@ -173,13 +249,13 @@ const FinancialData = ({ currentForm, onNavigate,onClose, setActiveTabs,Activeta
             </div>
             <div className="w-1/3">
               <div className="relative w-full">
-                <select
-                 // type="text"
+                <input
+                 type="text"
                   value={financialData.investmentRatio}
                   onChange={(e) => handleChange("investmentRatio", e.target.value)}
                   className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm appearance-none"
                 />
-                <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">▼</span>
+   
               </div>
             </div>
             <div className="w-1/3">
@@ -193,12 +269,15 @@ const FinancialData = ({ currentForm, onNavigate,onClose, setActiveTabs,Activeta
               <label className="text-gray-700">Duration of Study</label>
             </div>
             <div className="w-1/3 flex items-center">
-              <input
-                type="text"
-                value={financialData.durationOfStudy}
+              <select
+          
                 onChange={(e) => handleChange("durationOfStudy", e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
-              />
+              >
+              <option value="50">50</option>
+               <option value="100">100</option>
+                <option value="50,100">50 & 100</option>
+              </select>
               <span className="ml-2">(years)</span>
             </div>
             <div className="w-1/3">
@@ -239,7 +318,11 @@ const FinancialData = ({ currentForm, onNavigate,onClose, setActiveTabs,Activeta
               Back
             </button>
            <button 
-              onClick={handleNext}
+              onClick={() => {
+                  handleSave()
+                  handleNext()
+                }}
+
               disabled={!navigation.canGoNext}
               className={`px-8 py-1 text-sm rounded-md border ${
                 navigation.canGoNext 

@@ -95,18 +95,38 @@ const handleSave = async () => {
     console.error('Error saving financial data:', error)
   }
 }
-  const handleConfirm = () => {
-    if (confirmationType === 'next') {
-      // Here you would typically save the form data to your context or API
-      console.log('Saving form data:', financialData);
-      setHasUnsavedChanges(false);
-      navigation.navigate(navigation.getNextForm());
-    } else if (confirmationType === 'back') {
-      navigation.navigate(navigation.getPreviousForm());
+const handleConfirm = async () => {
+  if (confirmationType === 'next') {
+    console.log('Saving form data:', financialData);
+    
+    try {
+      // Save financial data first
+      await handleSave();
+      
+      // Then calculate and print time cost using the TimeCost class
+      const response = await fetch('http://127.0.0.1:5000/api/calculate-time-cost');
+      if (response.ok) {
+        const result = await response.json();
+        console.log('=== TIME COST CALCULATION RESULT ===');
+        console.log('Time Cost:', result.time_cost);
+        console.log('Construction Cost:', result.construction_cost);
+        console.log('Interest Rate:', result.interest_rate + '%');
+        console.log('Construction Time:', result.construction_time + ' years');
+        console.log('Investment Ratio:', result.investment_ratio);
+        console.log('==================================');
+      }
+    } catch (error) {
+      console.error('Error in time cost calculation:', error);
     }
-    setShowConfirmation(false);
-    setConfirmationType(null);
-  };
+    
+    setHasUnsavedChanges(false);
+    navigation.navigate(navigation.getNextForm());
+  } else if (confirmationType === 'back') {
+    navigation.navigate(navigation.getPreviousForm());
+  }
+  setShowConfirmation(false);
+  setConfirmationType(null);
+};
 
   const handleCloseConfirmation = () => {
     setShowConfirmation(false);

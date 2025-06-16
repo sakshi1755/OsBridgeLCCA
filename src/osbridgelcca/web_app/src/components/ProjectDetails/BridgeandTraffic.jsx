@@ -29,7 +29,7 @@ const BridgeandTraffic = ({ currentForm, onNavigate, onClose, setActiveTabs,Acti
       ...formData,
       [field]: value
     });
-    
+
   };
 
   const handleVehicleCompositionChange = (field, value) => {
@@ -83,7 +83,43 @@ const BridgeandTraffic = ({ currentForm, onNavigate, onClose, setActiveTabs,Acti
     setShowConfirmation(false);
     setConfirmationType(null);
   };
-
+const handleSave = async () => {
+  try {
+    // First save the traffic data
+    const saveResponse = await fetch('http://127.0.0.1:5000/api/save-traffic-data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData)
+    });
+    
+    if (saveResponse.ok) {
+      console.log('Traffic data saved successfully');
+      
+      // Then calculate road user cost
+      const costResponse = await fetch('http://127.0.0.1:5000/api/calculate-road-user-cost', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+      
+      if (costResponse.ok) {
+        const costData = await costResponse.json();
+        console.log('Road User Cost:', costData.road_user_cost);
+        console.log('Calculation Details:', costData.calculation_details);
+      } else {
+        console.error('Failed to calculate road user cost');
+      }
+    } else {
+      console.error('Failed to save traffic data');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
   return (
     <div className="w-full max-w-4xl mx-auto ">
       {/* Title bar */}
@@ -135,7 +171,14 @@ const BridgeandTraffic = ({ currentForm, onNavigate, onClose, setActiveTabs,Acti
                   value={formData.numberOfLanes}
                   onChange={(e) => handleChange("numberOfLanes", e.target.value)}
                   className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
-                />
+                >
+                  <option value="Single lane">Single lane</option>
+                  <option value="Intermediate lane">Intermediate lane</option>
+                  <option value="Two lane">Two lane</option>
+                  <option value="Three lane">Three lane</option>
+                  <option value="Four lane divided roads">Four lane divided roads</option>
+                  <option value="Four lane divided Expressways">Four lane divided Expressways</option>
+                   </select>
                
               </div>
             </div>
@@ -171,7 +214,16 @@ const BridgeandTraffic = ({ currentForm, onNavigate, onClose, setActiveTabs,Acti
                     value={formData.roadRoughness}
                     onChange={(e) => handleChange("roadRoughness", e.target.value)}
                     className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm pr-8"
-                />
+                >
+                  <option value="2000">2000</option>
+                  <option value="3000">3000</option>
+                  <option value="4000">4000</option>
+                  <option value="5000">5000</option>
+                  <option value="6000">6000</option>
+                  <option value="7000">7000</option>
+                  <option value="8000">8000</option>
+                  
+                  </select>
                 <span className="ml-2 text-sm text-gray-600 whitespace-nowrap">
                     (mm/km)
                 </span>
@@ -186,12 +238,24 @@ const BridgeandTraffic = ({ currentForm, onNavigate, onClose, setActiveTabs,Acti
             </div>
             <div className="w-1/2">
               <div className="flex items-center">
-                <input
-                  type="text"
-                  value={formData.roadRiseAndFall}
+                <select
+                  
+                  
                   onChange={(e) => handleChange("roadRiseAndFall", e.target.value)}
                   className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
-                />
+                >
+                <option value="0">0</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="25">25</option>
+                <option value="30">30</option>
+                <option value="35">35</option>
+                <option value="40">40</option>
+                <option value="45">45</option>
+                <option value="50">50</option>
+                </select>
                 <span className="ml-2 text-sm text-gray-600">(m/km)</span>
               </div>
             </div>
@@ -209,32 +273,56 @@ const BridgeandTraffic = ({ currentForm, onNavigate, onClose, setActiveTabs,Acti
                   value={formData.typeOfRoad}
                   onChange={(e) => handleChange("typeOfRoad", e.target.value)}
                   className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
-                />
+                >
+                  <option value="Urban">Urban</option>
+                    <option value="Rural">Rural</option>
+                    </select>
                
               </div>
             </div>
           </div>
 
           {/* Annual Increase in Traffic */}
-          <div className="flex items-start">
-            <div className="w-1/2">
-              <label className="block text-gray-700 leading-tight">
-                Annual Increase in Traffic if Re-Routing duration increases more than a year
-              </label>
-            </div>
-            <div className="w-1/2">
-              <div className="relative flex items-center">
-                <slect
-                //  type="text"
-                  value={formData.annualIncreaseInTraffic}
-                  onChange={(e) => handleChange("annualIncreaseInTraffic", e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
-                />
-               
-                <span className="ml-2 text-sm text-gray-600">(%)</span>
-              </div>
-            </div>
-          </div>
+       <div className="flex items-start">
+  <div className="w-1/2">
+    <label className="block text-gray-700 leading-tight">
+      Annual Increase in Traffic if Re-Routing duration increases more than a year
+    </label>
+  </div>
+  <div className="w-1/2">
+    <div className="relative flex items-center">
+      {formData.annualIncreaseInTraffic === 'custom' ? (
+        <input
+          type="text"
+          value={formData.customTrafficIncrease || ''}
+          onChange={(e) => handleChange("customTrafficIncrease", e.target.value)}
+          onBlur={() => {
+            if (!formData.customTrafficIncrease) {
+              handleChange("annualIncreaseInTraffic", "8");
+            }
+          }}
+          placeholder="Enter custom percentage"
+          className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+          autoFocus
+        />
+      ) : (
+        <select
+          value={formData.annualIncreaseInTraffic}
+          onChange={(e) => handleChange("annualIncreaseInTraffic", e.target.value)}
+          className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+        >
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+          <option value="11">11</option>
+          <option value="12">12</option>
+          <option value="custom">Custom</option>
+        </select>
+      )}
+      <span className="ml-2 text-sm text-gray-600">(%)</span>
+    </div>
+  </div>
+</div>
 
           {/* Composition of Various Vehicles */}
           <div className="flex items-start">
@@ -316,7 +404,10 @@ const BridgeandTraffic = ({ currentForm, onNavigate, onClose, setActiveTabs,Acti
               Back
             </button>
            <button 
-              onClick={handleNext}
+                 onClick={() => {
+                  handleSave()
+                  handleNext()
+                }}
               disabled={!navigation.canGoNext}
               className={`px-8 py-1 text-sm rounded-md border ${
                 navigation.canGoNext 

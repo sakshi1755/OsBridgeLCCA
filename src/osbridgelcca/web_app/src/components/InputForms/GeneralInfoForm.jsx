@@ -47,47 +47,46 @@ export default function GeneralInfoForm({ formData, setFormData }) {
 
       <div className="flex flex-col gap-6">
     
-        <div className="flex flex-row justify-between items-center">
-          <label className=" mb-1 text-sm">Name of Valuer</label>
-          <select
-            name="valuerName"
-            // value={formData.valuerName}
+        <div className="flex flex-row justify-start items-center">
+          <label className="w-1/5  mb-1 text-sm">Name of Valuer</label>
+        <input
+            type="text"
+            name="companyName"
+            // value={formData.companyName}
             // onChange={handleChange}
-            className=" border rounded px-3 py-1"
-          >
-            <option value="">Select Country</option>
-            <option value="India">India</option>
-            <option value="USA">USA</option>
-            <option value="UK">UK</option>
-          </select>
+            className="border rounded px-3 py-1"
+          />
         </div>
-
-        <div className="flex flex-row justify-between items-center">
-          <label className=" mb-1 text-sm">Country</label>
-          <input
-            name="country"
-            // value={formData.country}
-            // onChange={handleChange}
-            className=" border rounded px-3 py-1"
-          >
-          </input>
-        </div>
+<div className="flex flex-row justify-start items-center">
+  <label className="w-1/5 text-sm mb-1">Country</label>
+  <select
+    name="valuerName"
+    // value={formData.valuerName}
+    // onChange={handleChange}
+    className="border rounded px-3 py-1 text-left" // w-40 is about 10rem
+  >
+    <option value="">Select Country</option>
+    <option value="India">India</option>
+    <option value="USA">USA</option>
+    <option value="UK">UK</option>
+  </select>
+</div>
       </div>
 
       <div className="flex flex-col gap-6">
-        <div className="flex flex-row justify-between  items-center">
-          <label className="block mb-1 text-sm">Job Number</label>
+        <div className="flex flex-row j justify-start items-center">
+          <label className="w-1/5 block mb-1 text-sm">Job Number</label>
           <input
             type="text"
             name="jobNumber"
             // value={formData.jobNumber}
             // onChange={handleChange}
-            className=" border rounded px-3 py-1"
+            className=" border stext-left rounded px-3 py-1"
           />
         </div>
 
-        <div className="flex flex-row justify-between items-center">
-          <label className="block mb-1 text-sm">Client</label>
+        <div className="flex flex-row justify-start items-center">
+          <label className="block w-1/5 mb-1 text-sm">Client</label>
           <input
             type="text"
             name="client"
@@ -97,8 +96,8 @@ export default function GeneralInfoForm({ formData, setFormData }) {
           />
         </div>
 
-        <div className="flex flex-row justify-between items-center">
-          <label className="block mb-1 text-sm">Base Year</label>
+        <div className="flex flex-row justify-start items-center">
+          <label className="block w-1/5   mb-1 text-sm">Base Year</label>
           <input
             type="number"
             name="baseYear"

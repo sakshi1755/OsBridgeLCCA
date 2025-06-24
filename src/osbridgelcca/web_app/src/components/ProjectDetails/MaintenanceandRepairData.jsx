@@ -52,23 +52,78 @@ const MaintenanceandRepairData = ({ currentForm, onNavigate, onClose, setActiveT
 }
 
 
-  const handleConfirm = () => {
-    if (confirmationType === 'next') {
-      // Here you would typically save the form data to your context or API
+const handleConfirm = async () => {
+  if (confirmationType === 'next') {
+    try {
+      // Save form data to storage
       console.log('Saving form data:', formData);
+      await saveMaintenanceData(formData);
+      
+      // Calculate maintenance costs
+      console.log('Calculating maintenance costs...');
+      const calculationResult = await calculateMaintenanceCosts(formData);
+      console.log('Maintenance costs calculated:', calculationResult);
+      
       setHasUnsavedChanges(false);
       navigation.navigate(navigation.getNextForm());
-    } else if (confirmationType === 'back') {
-      navigation.navigate(navigation.getPreviousForm());
+    } catch (error) {
+      console.error('Error processing maintenance data:', error);
+      // You might want to show an error message to the user here
+      alert('Error processing maintenance data. Please try again.');
+      return; // Don't navigate if there's an error
     }
-    setShowConfirmation(false);
-    setConfirmationType(null);
-  };
-
+  } else if (confirmationType === 'back') {
+    navigation.navigate(navigation.getPreviousForm());
+  }
+  setShowConfirmation(false);
+  setConfirmationType(null);
+};
   const handleCloseConfirmation = () => {
     setShowConfirmation(false);
     setConfirmationType(null);
   };
+
+const saveMaintenanceData = async (data) => {
+  try {
+    const response = await fetch('http://127.0.0.1:5000/api/save-maintenance-data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error saving maintenance data:', error);
+    throw error;
+  }
+};
+
+const calculateMaintenanceCosts = async (data) => {
+  try {
+    const response = await fetch('http://127.0.0.1:5000/api/calculate-maintenance-costs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error calculating maintenance costs:', error);
+    throw error;
+  }
+};
 
   return (
      <div className="w-full max-w-4xl mx-auto ">

@@ -40,7 +40,7 @@ function App() {
           className="text-md font-semibold flex items-center justify-center h-9 text-white"
           style={{ backgroundColor: '#45913E' }}
         >
-          LCCA Web App
+          3PS-LCC 
         </header>
 
         <DropDown />

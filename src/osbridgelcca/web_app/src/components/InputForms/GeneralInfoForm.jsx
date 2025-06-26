@@ -63,7 +63,7 @@ export default function GeneralInfoForm({ formData, setFormData }) {
     name="valuerName"
     // value={formData.valuerName}
     // onChange={handleChange}
-    className="border rounded px-3 py-1 text-left" // w-40 is about 10rem
+    className="border w-1/5 rounded px-3 py-1 text-center" // w-40 is about 10rem
   >
     <option value="">Select Country</option>
     <option value="India">India</option>

@@ -40,7 +40,7 @@ function App() {
           className="text-md font-semibold flex items-center justify-center h-9 text-white"
           style={{ backgroundColor: '#45913E' }}
         >
-          3PS-LCC 
+        Bridge 3PS-LCC 
         </header>
 
         <DropDown />
@@ -59,7 +59,8 @@ function App() {
               setSelectedProjectDetailWindow={setSelectedProjectDetailWindow}
               setShowTutorials={setShowTutorials}
             />)}
-          {activeTab === "Results" && <Results />}
+          {activeTab === "Results" && <Results   setShowTutorials={setShowTutorials}
+  setSelectedProjectDetailWindow={setSelectedProjectDetailWindow} />}
           {activeTab === "Compare" && <Compare />}
 
         </div>

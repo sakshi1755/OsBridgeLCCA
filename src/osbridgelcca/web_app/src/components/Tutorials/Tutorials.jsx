@@ -17,9 +17,9 @@ const Tutorials = ({ onClose }) => {
       {/* Scrollable Content */}
       <div className="overflow-y-auto py-1 px-1  bg-[#FFF9F9]">
         <div className="text-center text-base  font-bold mt-1">3/4</div>
-        <div className="text-center font-bold text-base mb-2">Welcome to<br/>BLCCA Studio</div>
+        <div className="text-center font-bold text-base mb-2">Welcome to<br/>3PS-LCC </div>
         <p className="text-justify leading-snug text-base px-1">
-          BLCCA Studio has a lot of features to offer. In the next few minutes, you will learn how to use BLCCA Studio efficiently, from setting up and managing projects to navigating the user interface. This tutorial will guide you through essential features, including customization options, shortcuts, and export capabilities, ensuring a seamless workflow. Whether you’re a beginner or an advanced user, this guide will help you unlock the full potential of BLCCA Studio and enhance your productivity.
+         3PS-LCC has a lot of features to offer. In the next few minutes, you will learn how to use 3PS-LCC efficiently, from setting up and managing projects to navigating the user interface. This tutorial will guide you through essential features, including customization options, shortcuts, and export capabilities, ensuring a seamless workflow. Whether you’re a beginner or an advanced user, this guide will help you unlock the full potential of 3PS-LCC and enhance your productivity.
         </p>
         <br>
         </br>

@@ -398,7 +398,7 @@ const handleSave = async () => {
       <div className="bg-[#FFF9F9] border border-gray-300 rounded-b-sm">
         <div className="px-6 py-4">
           {Object.entries(groupedMaterials).map(([component, componentMaterials], componentIndex) => (
-            <div key={componentIndex} className="mb-8">
+            <div key={componentIndex} className="mb-4">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-600">Component:</span>
@@ -569,10 +569,10 @@ const handleSave = async () => {
                 )
               })}
 
-              <div className="flex justify-center mt-4 mb-4">
+              <div className="flex justify-center mt-4 ">
                 <button 
                   onClick={() => handleAddMaterial(component)} 
-                  className="bg-white border border-gray-300 rounded-md px-4 py-1 text-sm w-48 text-gray-600 hover:bg-gray-50"
+                  className="w-full border border-gray-300 rounded-md py-1 text-sm bg-white hover:bg-gray-50 transition-colors mt-2"
                 >
                   + Add Material
                 </button>
@@ -602,7 +602,7 @@ const handleSave = async () => {
                     <option key={idx} value={comp}>{comp}</option>
                   ))}
                 </select>
-                <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-white">▼</span>
+             
               </div>
             </div>
           )}

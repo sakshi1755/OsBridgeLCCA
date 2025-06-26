@@ -1,43 +1,25 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-const EnvironmentalCost100YearsRadialChart = () => {
+const RadialChart = ({ 
+  data, 
+  title, 
+  titleColor, 
+  tooltipClass, 
+  tooltipColorLabel,
+  tooltipColor,
+  showValueInTooltip = false,
+  valueMultiplier = 1,
+  decimalPlaces = 1,
+  width = 500,
+  height = 400,
+  barWidth = 20,
+  spacing = 10,
+  backgroundColor = '#f2e8e7'
+}) => {
   const svgRef = useRef();
 
   useEffect(() => {
-    // Data from the Environmental Cost 100 years graph
-    const environmentalCostData = {
-      initialStage: 5,    // outermost ring (very small)
-      useStage: 12.5,     // second ring
-      endOfLifeStage: 18.5, // third ring
-      beyondLifeStage: 9   // innermost ring
-    };
-
-    // Calculate percentages (already provided from image)
-    const percentage = [
-      environmentalCostData.initialStage,
-      environmentalCostData.useStage,
-      environmentalCostData.endOfLifeStage,
-      environmentalCostData.beyondLifeStage
-    ];
-
-    // Colors with green theme for environmental cost
-const colors = [ '#273B5C', '#961818', '#5A003B','#708090'];
-    const stageLabel = ['Initial Stage', 'Use Stage', 'End of Life Stage', 'Beyond Life Stage'];
-
-    // Data array (same order as original)
-    const data = [
-      { name: stageLabel[3], value: percentage[3] / 100, color: colors[3] },
-      { name: stageLabel[2], value: percentage[2] / 100, color: colors[2] },
-      { name: stageLabel[1], value: percentage[1] / 100, color: colors[1] },
-      { name: stageLabel[0], value: percentage[0] / 100, color: colors[0] }
-    ];
-
-    // Window properties
-    const width = 500;
-    const height = 400;
-    const barWidth = 20;
-    const spacing = 10;
     const center = { x: width / 2, y: height / 2 };
 
     // Clear previous content
@@ -52,11 +34,11 @@ const colors = [ '#273B5C', '#961818', '#5A003B','#708090'];
       .attr("transform", `translate(${center.x},${center.y})`);
 
     // Create tooltip
-    const tooltip = d3.select("body").select(".environmental-100-tooltip");
+    const tooltip = d3.select("body").select(`.${tooltipClass}`);
     let tooltipDiv;
     if (tooltip.empty()) {
       tooltipDiv = d3.select("body").append("div")
-        .attr("class", "environmental-100-tooltip")
+        .attr("class", tooltipClass)
         .style("position", "absolute")
         .style("text-align", "center")
         .style("padding", "8px")
@@ -112,26 +94,44 @@ const colors = [ '#273B5C', '#961818', '#5A003B','#708090'];
         .attr("class", "label")
         .style("font-size", "14px")
         .style("fill", "#333")
-        .text(`${(d.value * 100).toFixed(1)}%`);
+        .text(`${(d.value * 100).toFixed(decimalPlaces)}%`);
 
       // Hover events
       path.on("mouseover", function(event, hoveredData) {
         d3.selectAll(".arc")
           .attr("fill", p => p === hoveredData ? p.color : "#ccc");
 
-        tooltipDiv.style("opacity", 1)
-          .html(`
+        const tooltipContent = showValueInTooltip ? 
+          `
             <div style="text-align:center; font-family:sans-serif;">
               <span style="font-weight: 500;">${hoveredData.name}</span>
               <br>
-              <span style="color: #2E5743; font-size: 13.5px;">
-                Environmental Cost: 
+              <span style="color: ${tooltipColor}; font-size: 13.5px;">
+                ${tooltipColorLabel}: 
                 <span style="font-weight: 600;">
-                  ${(hoveredData.value * 100).toFixed(1)}%
+                  ${(hoveredData.value * 100).toFixed(1)}%;
+                  ${(hoveredData.value * valueMultiplier).toFixed(2)}
+                </span>
+              </span>
+              <br>
+              <span style="font-weight: bold; color: ${tooltipColor};">Lakhs</span>
+            </div>
+          ` :
+          `
+            <div style="text-align:center; font-family:sans-serif;">
+              <span style="font-weight: 500;">${hoveredData.name}</span>
+              <br>
+              <span style="color: ${tooltipColor}; font-size: 13.5px;">
+                ${tooltipColorLabel}: 
+                <span style="font-weight: 600;">
+                  ${(hoveredData.value * 100).toFixed(decimalPlaces)}%
                 </span>
               </span>
             </div>
-          `)
+          `;
+
+        tooltipDiv.style("opacity", 1)
+          .html(tooltipContent)
           .style("left", (event.pageX) + "px")
           .style("top", (event.pageY - 50) + "px");
       })
@@ -146,12 +146,12 @@ const colors = [ '#273B5C', '#961818', '#5A003B','#708090'];
       });
     });
 
-  }, []);
+  }, [data, title, titleColor, tooltipClass, tooltipColorLabel, tooltipColor, showValueInTooltip, valueMultiplier, decimalPlaces, width, height, barWidth, spacing]);
 
   return (
     <div className="w-full h-full">
       <div style={{ 
-        background: '#f2e8e7', 
+        background: backgroundColor, 
         fontFamily: 'sans-serif', 
         display: 'flex', 
         flexDirection: 'column', 
@@ -160,14 +160,13 @@ const colors = [ '#273B5C', '#961818', '#5A003B','#708090'];
         height: '100%',
         margin: 0 
       }}>
-        <h2   className="font-bold" style={{ 
+        <h2 className="font-bold" style={{ 
           marginTop: '20px', 
           marginBottom: '10px', 
-          fontSize: '20px', 
-         // color: '#243f64', 
+          fontSize: '10px', 
           textAlign: 'center'
         }}>
-          <span style={{ color: '#2E5743' }}>Environmental cost</span> distribution across various stages for bridges for 100 years
+          <span style={{ color: titleColor }}>{title.split(' ')[0]} {title.split(' ')[1]}</span> {title.split(' ').slice(2).join(' ')}
         </h2>
         <svg ref={svgRef} className="w-full h-full"></svg>
       </div>
@@ -175,4 +174,4 @@ const colors = [ '#273B5C', '#961818', '#5A003B','#708090'];
   );
 };
 
-export default EnvironmentalCost100YearsRadialChart;
+export default RadialChart;

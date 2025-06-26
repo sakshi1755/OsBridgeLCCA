@@ -4,9 +4,9 @@ import copy
 MATERIAL_COSTS_TEMPLATE = {
     "foundation": {
         "components": {
-            "Foundations": {
+            "Pile": {
                 "materials": {
-                    "concrete": {
+                    "Concrete": {
                         "units": ["cum", "kg"],
                         "sub_materials": {
                             "M15": {"cum": 0.0, "kg": 0.0},
@@ -19,7 +19,7 @@ MATERIAL_COSTS_TEMPLATE = {
                             "M50": {"cum": 0.0, "kg": 0.0},
                         }
                     },
-                    "steel": {
+                    "Steel": {
                         "units": ["MT", "kg"],
                         "sub_materials": {
                             "E 165(Fe 290)": {"MT": 0.0, "kg": 0.0},
@@ -34,9 +34,9 @@ MATERIAL_COSTS_TEMPLATE = {
                     }
                 }
             },
-            "Foundation protection": {
+            "Pile Cap": {
                 "materials": {
-                    "concrete": {
+                    "Concrete": {
                         "units": ["cum", "kg"],
                         "sub_materials": {
                             "M15": {"cum": 0.0, "kg": 0.0},
@@ -45,7 +45,7 @@ MATERIAL_COSTS_TEMPLATE = {
                             "M30": {"cum": 0.0, "kg": 0.0},
                         }
                     },
-                    "steel": {
+                    "Steel": {
                         "units": ["MT", "kg"],
                         "sub_materials": {
                             "E 165(Fe 290)": {"MT": 0.0, "kg": 0.0},
@@ -61,7 +61,7 @@ MATERIAL_COSTS_TEMPLATE = {
         "components": {
             "Abutment": {
                 "materials": {
-                    "concrete": {
+                    "Concrete": {
                         "units": ["cum", "kg"],
                         "sub_materials": {
                             "M15": {"cum": 0.0, "kg": 0.0},
@@ -72,7 +72,7 @@ MATERIAL_COSTS_TEMPLATE = {
                             "M40": {"cum": 0.0, "kg": 0.0},
                         }
                     },
-                    "steel": {
+                    "Steel": {
                         "units": ["MT", "kg"],
                         "sub_materials": {
                             "E 165(Fe 290)": {"MT": 0.0, "kg": 0.0},
@@ -85,7 +85,7 @@ MATERIAL_COSTS_TEMPLATE = {
             },
             "Abutment protection works": {
                 "materials": {
-                    "concrete": {
+                    "Concrete": {
                         "units": ["cum", "kg"],
                         "sub_materials": {
                             "M15": {"cum": 0.0, "kg": 0.0},
@@ -97,7 +97,7 @@ MATERIAL_COSTS_TEMPLATE = {
             },
             "Pier": {
                 "materials": {
-                    "concrete": {
+                    "Concrete": {
                         "units": ["cum", "kg"],
                         "sub_materials": {
                             "M20": {"cum": 0.0, "kg": 0.0},
@@ -107,7 +107,7 @@ MATERIAL_COSTS_TEMPLATE = {
                             "M40": {"cum": 0.0, "kg": 0.0},
                         }
                     },
-                    "steel": {
+                    "Steel": {
                         "units": ["MT", "kg"],
                         "sub_materials": {
                             "E 250(Fe 410W)A": {"MT": 0.0, "kg": 0.0},
@@ -120,7 +120,7 @@ MATERIAL_COSTS_TEMPLATE = {
             },
             "Pier cap": {
                 "materials": {
-                    "concrete": {
+                    "Concrete": {
                         "units": ["cum", "kg"],
                         "sub_materials": {
                             "M25": {"cum": 0.0, "kg": 0.0},
@@ -129,7 +129,7 @@ MATERIAL_COSTS_TEMPLATE = {
                             "M40": {"cum": 0.0, "kg": 0.0},
                         }
                     },
-                    "steel": {
+                    "Steel": {
                         "units": ["MT", "kg"],
                         "sub_materials": {
                             "E 250(Fe 410W)A": {"MT": 0.0, "kg": 0.0},
@@ -145,7 +145,7 @@ MATERIAL_COSTS_TEMPLATE = {
         "components": {
             "Girders/Main beams": {
                 "materials": {
-                    "concrete": {
+                    "Concrete": {
                         "units": ["cum", "kg"],
                         "sub_materials": {
                             "M30": {"cum": 0.0, "kg": 0.0},
@@ -155,7 +155,7 @@ MATERIAL_COSTS_TEMPLATE = {
                             "M50": {"cum": 0.0, "kg": 0.0},
                         }
                     },
-                    "steel": {
+                    "Steel": {
                         "units": ["MT", "kg"],
                         "sub_materials": {
                             "E 300(Fe 440)": {"MT": 0.0, "kg": 0.0},
@@ -168,7 +168,7 @@ MATERIAL_COSTS_TEMPLATE = {
             },
             "Cross beams/diaphragms": {
                 "materials": {
-                    "concrete": {
+                    "Concrete": {
                         "units": ["cum", "kg"],
                         "sub_materials": {
                             "M25": {"cum": 0.0, "kg": 0.0},
@@ -177,7 +177,7 @@ MATERIAL_COSTS_TEMPLATE = {
                             "M40": {"cum": 0.0, "kg": 0.0},
                         }
                     },
-                    "steel": {
+                    "Steel": {
                         "units": ["MT", "kg"],
                         "sub_materials": {
                             "E 250(Fe 410W)A": {"MT": 0.0, "kg": 0.0},
@@ -189,7 +189,7 @@ MATERIAL_COSTS_TEMPLATE = {
             },
             "Deck slab": {
                 "materials": {
-                    "concrete": {
+                    "Concrete": {
                         "units": ["cum", "kg"],
                         "sub_materials": {
                             "M30": {"cum": 0.0, "kg": 0.0},
@@ -197,7 +197,7 @@ MATERIAL_COSTS_TEMPLATE = {
                             "M40": {"cum": 0.0, "kg": 0.0},
                         }
                     },
-                    "steel": {
+                    "Steel": {
                         "units": ["MT", "kg"],
                         "sub_materials": {
                             "E 250(Fe 410W)A": {"MT": 0.0, "kg": 0.0},
@@ -209,7 +209,7 @@ MATERIAL_COSTS_TEMPLATE = {
             },
             "Cantilever slab": {
                 "materials": {
-                    "concrete": {
+                    "Concrete": {
                         "units": ["cum", "kg"],
                         "sub_materials": {
                             "M25": {"cum": 0.0, "kg": 0.0},
@@ -217,7 +217,7 @@ MATERIAL_COSTS_TEMPLATE = {
                             "M35": {"cum": 0.0, "kg": 0.0},
                         }
                     },
-                    "steel": {
+                    "Steel": {
                         "units": ["MT", "kg"],
                         "sub_materials": {
                             "E 250(Fe 410W)A": {"MT": 0.0, "kg": 0.0},
@@ -228,7 +228,7 @@ MATERIAL_COSTS_TEMPLATE = {
             },
             "Joints": {
                 "materials": {
-                    "steel": {
+                    "Steel": {
                         "units": ["MT", "kg"],
                         "sub_materials": {
                             "E 300(Fe 440)": {"MT": 0.0, "kg": 0.0},
@@ -253,7 +253,7 @@ MATERIAL_COSTS_TEMPLATE = {
             },
             "Footpaths": {
                 "materials": {
-                    "concrete": {
+                    "Concrete": {
                         "units": ["cum", "kg"],
                         "sub_materials": {
                             "M15": {"cum": 0.0, "kg": 0.0},
@@ -270,7 +270,7 @@ MATERIAL_COSTS_TEMPLATE = {
             },
             "Expansion joints": {
                 "materials": {
-                    "steel": {
+                    "Steel": {
                         "units": ["MT", "kg"],
                         "sub_materials": {
                             "E 250(Fe 410W)A": {"MT": 0.0, "kg": 0.0},
@@ -294,7 +294,7 @@ MATERIAL_COSTS_TEMPLATE = {
             },
             "Bearings": {
                 "materials": {
-                    "steel": {
+                    "Steel": {
                         "units": ["MT", "kg"],
                         "sub_materials": {
                             "E 350(Fe 490)": {"MT": 0.0, "kg": 0.0},
@@ -403,7 +403,7 @@ def is_valid_unit(form_name, component_name, material_name, unit):
 
 # # Base template for material costs
 # MATERIAL_COSTS_TEMPLATE = {
-#     "concrete": {
+#     "Concrete": {
 #         "units": ["cum", "kg"],
 #         "grades": {
 #             "M15": {"cum": 0.0, "kg": 0.0},
@@ -416,7 +416,7 @@ def is_valid_unit(form_name, component_name, material_name, unit):
 #             "M50": {"cum": 0.0, "kg": 0.0},
 #         }
 #     },
-#     "steel": {
+#     "Steel": {
 #         "units": ["MT", "kg"],
 #         "grades": {
 #             "E 165(Fe 290)": {"MT": 0.0, "kg": 0.0},

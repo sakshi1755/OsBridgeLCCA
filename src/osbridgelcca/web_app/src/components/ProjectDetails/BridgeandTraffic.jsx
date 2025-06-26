@@ -170,7 +170,7 @@ const handleSave = async () => {
                 //   type="text"
                   value={formData.numberOfLanes}
                   onChange={(e) => handleChange("numberOfLanes", e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+                  className="w-5/6 border border-gray-300 rounded-md px-3 py-1 text-sm"
                 >
                   <option value="Single lane">Single lane</option>
                   <option value="Intermediate lane">Intermediate lane</option>
@@ -195,7 +195,7 @@ const handleSave = async () => {
                   type="text"
                   value={formData.additionalReRouteDistance}
                   onChange={(e) => handleChange("additionalReRouteDistance", e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+                  className="w-5/6 border border-gray-300 rounded-md px-3 py-1 text-sm"
                 />
                 <span className="ml-2 text-sm text-gray-600">(km)</span>
               </div>
@@ -213,7 +213,7 @@ const handleSave = async () => {
                     // type="text"
                     value={formData.roadRoughness}
                     onChange={(e) => handleChange("roadRoughness", e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm pr-8"
+                    className="w-5/6 border border-gray-300 rounded-md px-3 py-1 text-sm pr-8"
                 >
                   <option value="2000">2000</option>
                   <option value="3000">3000</option>
@@ -242,7 +242,7 @@ const handleSave = async () => {
                   
                   
                   onChange={(e) => handleChange("roadRiseAndFall", e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+                  className="w-5/6 border border-gray-300 rounded-md px-3 py-1 text-sm"
                 >
                 <option value="0">0</option>
                 <option value="5">5</option>
@@ -272,7 +272,7 @@ const handleSave = async () => {
                 //  type="text"
                   value={formData.typeOfRoad}
                   onChange={(e) => handleChange("typeOfRoad", e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+                  className="w-5/6 border border-gray-300 rounded-md px-3 py-1 text-sm"
                 >
                   <option value="Urban">Urban</option>
                     <option value="Rural">Rural</option>
@@ -302,14 +302,14 @@ const handleSave = async () => {
             }
           }}
           placeholder="Enter custom percentage"
-          className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+          className="w-5/6 border border-gray-300 rounded-md px-3 py-1 text-sm"
           autoFocus
         />
       ) : (
         <select
           value={formData.annualIncreaseInTraffic}
           onChange={(e) => handleChange("annualIncreaseInTraffic", e.target.value)}
-          className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+          className="w-5/6 border border-gray-300 rounded-md px-3 py-1 text-sm"
         >
           <option value="8">8</option>
           <option value="9">9</option>
@@ -325,11 +325,11 @@ const handleSave = async () => {
 </div>
 
           {/* Composition of Various Vehicles */}
-          <div className="flex items-start">
-            <div className="w-1/2">
+          <div className="flex items-start ">
+            <span className="mr-48">
               <label className="block text-gray-700 mb-2">Composition of Various Vehicles</label>
-            </div>
-            <div className="w-1/2">
+            </span>
+            <div className=" bg-white">
               <div className="space-y-2 border border-gray-200 rounded-md p-3">
                 {/* Cars */}
                 <div className="flex items-center">
@@ -362,7 +362,7 @@ const handleSave = async () => {
                     onChange={(e) => handleVehicleCompositionChange("hcv", e.target.value)}
                     className="flex-1 border border-gray-300 rounded-md px-3 py-1 text-sm"
                   />
-                  <span className="ml-2 text-sm text-gray-600">(PCU/D)</span>
+                  
                 </div>
                 
                 {/* MCV */}
@@ -385,9 +385,13 @@ const handleSave = async () => {
                     onChange={(e) => handleVehicleCompositionChange("lcv", e.target.value)}
                     className="flex-1 border border-gray-300 rounded-md px-3 py-1 text-sm"
                   />
+              
                 </div>
+                
               </div>
+              
             </div>
+                <span className="ml-2 text-sm text-gray-600 self-center">(PCU/D)</span>
           </div>
 
           {/* Navigation buttons */}

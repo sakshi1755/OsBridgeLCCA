@@ -1,14 +1,14 @@
 from flask import Blueprint, jsonify, request
 from osbridgelcca.core.material_types_consts import (
     get_forms, get_components, get_materials, get_sub_materials, 
-    get_units, get_material_cost_template, is_valid_form, 
-    is_valid_component, is_valid_material
+    get_units_for_material, get_material_cost_template, is_valid_form, 
+    is_valid_component, is_valid_material_for_form_component, is_valid_material
 )
 
 materials_dropdown_bp = Blueprint('materials_dropdown', __name__)
 material_costs = get_material_cost_template()
 
-# Get all forms (foundation, substructure, superstructure, miscellaneous)
+# Get all forms (foundation, sub-structure, super-structure, miscellaneous)
 @materials_dropdown_bp.route('/forms')
 def forms():
     return jsonify(get_forms())
@@ -22,18 +22,28 @@ def components(form_name):
         return jsonify([])
     return jsonify(get_components(form_name))
 
-# Get materials for a specific form and component
-@materials_dropdown_bp.route('/materials/<form_name>/<component_name>')
-def materials(form_name, component_name):
-    # Handle URL decoding
-    form_name = form_name.replace('%20', ' ').replace('-', '-')
-    component_name = component_name.replace('%20', ' ')
-    
-    if not is_valid_form(form_name) or not is_valid_component(form_name, component_name):
-        return jsonify([])
-    return jsonify(get_materials(form_name, component_name))
+# Get all materials (independent of form/component)
+@materials_dropdown_bp.route('/materials')
+def all_materials():
+    return jsonify(get_materials())
 
-# Get sub-materials (grades) for a specific form, component, and material
+# Get materials for a specific form and component (backward compatibility)
+@materials_dropdown_bp.route('/materials/<form_name>/<component_name>')
+def materials_for_component(form_name, component_name):
+    # Since materials are independent of components, return all materials
+    return jsonify(get_materials())
+
+# Get sub-materials (grades) for a specific material
+@materials_dropdown_bp.route('/sub-materials/<material_name>')
+def sub_materials_for_material(material_name):
+    # Handle URL decoding
+    material_name = material_name.replace('%20', ' ')
+    
+    if not is_valid_material(material_costs, material_name):
+        return jsonify([])
+    return jsonify(get_sub_materials(None, None, material_name))
+
+# Get sub-materials for a specific form, component, and material (backward compatibility)
 @materials_dropdown_bp.route('/sub-materials/<form_name>/<component_name>/<material_name>')
 def sub_materials(form_name, component_name, material_name):
     # Handle URL decoding
@@ -41,11 +51,21 @@ def sub_materials(form_name, component_name, material_name):
     component_name = component_name.replace('%20', ' ')
     material_name = material_name.replace('%20', ' ')
     
-    if not is_valid_material(form_name, component_name, material_name):
+    if not is_valid_material(material_costs, material_name):
         return jsonify([])
     return jsonify(get_sub_materials(form_name, component_name, material_name))
 
-# Get units for a specific form, component, and material
+# Get units for a specific material
+@materials_dropdown_bp.route('/units/<material_name>')
+def units_for_material(material_name):
+    # Handle URL decoding
+    material_name = material_name.replace('%20', ' ')
+    
+    if not is_valid_material(material_costs, material_name):
+        return jsonify([])
+    return jsonify(get_units_for_material(None, None, material_name))
+
+# Get units for a specific form, component, and material (backward compatibility)
 @materials_dropdown_bp.route('/units/<form_name>/<component_name>/<material_name>')
 def units(form_name, component_name, material_name):
     # Handle URL decoding
@@ -53,11 +73,11 @@ def units(form_name, component_name, material_name):
     component_name = component_name.replace('%20', ' ')
     material_name = material_name.replace('%20', ' ')
     
-    if not is_valid_material(form_name, component_name, material_name):
+    if not is_valid_material(material_costs, material_name):
         return jsonify([])
-    return jsonify(get_units(form_name, component_name, material_name))
+    return jsonify(get_units_for_material(form_name, component_name, material_name))
 
-# Get all data for a specific form (components with their materials and sub-materials)
+# Get all data for a specific form (components with all materials and their properties)
 @materials_dropdown_bp.route('/form-data/<form_name>')
 def form_data(form_name):
     # Handle URL decoding and form name normalization
@@ -67,33 +87,34 @@ def form_data(form_name):
         return jsonify({})
     
     form_components = get_components(form_name)
+    all_materials = get_materials()
     result = {}
     
     for component in form_components:
-        component_materials = get_materials(form_name, component)
         result[component] = {}
         
-        for material in component_materials:
+        # Since materials are independent, all materials are available for all components
+        for material in all_materials:
             result[component][material] = {
                 'sub_materials': get_sub_materials(form_name, component, material),
-                'units': get_units(form_name, component, material)
+                'units': get_units_for_material(form_name, component, material)
             }
     
     return jsonify(result)
 
-# Legacy endpoint for backward compatibility - returns all materials from all forms
-@materials_dropdown_bp.route('/materials')
-def all_materials():
-    all_materials_set = set()
-    forms = get_forms()
+# Get material data (grades and units) for a specific material
+@materials_dropdown_bp.route('/material-data/<material_name>')
+def material_data(material_name):
+    # Handle URL decoding
+    material_name = material_name.replace('%20', ' ')
     
-    for form in forms:
-        components = get_components(form)
-        for component in components:
-            materials = get_materials(form, component)
-            all_materials_set.update(materials)
+    if not is_valid_material(material_costs, material_name):
+        return jsonify({})
     
-    return jsonify(list(all_materials_set))
+    return jsonify({
+        'sub_materials': get_sub_materials(None, None, material_name),
+        'units': get_units_for_material(None, None, material_name)
+    })
 
 # Debug endpoint to check form name mappings
 @materials_dropdown_bp.route('/debug/<form_name>')
@@ -103,41 +124,17 @@ def debug_form(form_name):
         'received_form_name': form_name,
         'is_valid': is_valid_form(form_name),
         'available_forms': get_forms(),
-        'components': get_components(form_name) if is_valid_form(form_name) else []
+        'components': get_components(form_name) if is_valid_form(form_name) else [],
+        'all_materials': get_materials()
     })
 
-
-# Updated Flask App Entry Point
-from flask import Flask
-from flask_cors import CORS
-
-app = Flask(__name__)
-CORS(app)  # Enable CORS for all domains on all routes
-
-# Register the blueprint with API prefix
-app.register_blueprint(materials_dropdown_bp, url_prefix='/api')
-
-# Health check endpoint
-@app.route('/health')
-def health_check():
-    return {'status': 'healthy', 'message': 'Materials API is running'}
-
-# Root endpoint
-@app.route('/')
-def root():
-    return {
-        'message': 'Materials Management API',
-        'version': '2.0',
-        'endpoints': {
-            'forms': '/api/forms',
-            'components': '/api/components/<form_name>',
-            'materials': '/api/materials/<form_name>/<component_name>',
-            'sub_materials': '/api/sub-materials/<form_name>/<component_name>/<material_name>',
-            'units': '/api/units/<form_name>/<component_name>/<material_name>',
-            'form_data': '/api/form-data/<form_name>',
-            'debug': '/api/debug/<form_name>'
-        }
-    }
-
-if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1', port=5000)
+# Debug endpoint for material data
+@materials_dropdown_bp.route('/debug/material/<material_name>')
+def debug_material(material_name):
+    material_name = material_name.replace('%20', ' ')
+    return jsonify({
+        'received_material_name': material_name,
+        'is_valid': is_valid_material(material_costs, material_name),
+        'sub_materials': get_sub_materials(None, None, material_name) if is_valid_material(material_costs, material_name) else [],
+        'units': get_units_for_material(None, None, material_name) if is_valid_material(material_costs, material_name) else []
+    })

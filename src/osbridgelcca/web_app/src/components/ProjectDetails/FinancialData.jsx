@@ -1,40 +1,171 @@
+// "use client"
+// import {useFormNavigation, ConfirmationModal} from './UseFormNavigation'
+
+// // Form sequence constant
+
+
+// import { useState } from "react"
+
+// const FinancialData = ({ currentForm, onNavigate,onClose, setActiveTabs,Activetabs, onclicktabs }) => {
+//   const navigation = useFormNavigation(currentForm, onNavigate);
+//  //   const [showinterestwarning, setshowinterestwarning] = useState(false)
+//   const [showConfirmation, setShowConfirmation] = useState(false)
+//   const [confirmationType, setConfirmationType] = useState(null)
+//   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+//   const [showInterestWarning, setShowInterestWarning] = useState(false);
+// const [pendingInterestRate, setPendingInterestRate] = useState(null);
+
+// const handleInterestChange = (value) => {
+//   const numericValue = parseFloat(value);
+//   if (numericValue > 10) {
+//     setPendingInterestRate(value);
+//     setShowInterestWarning(true);
+//   } else {
+//     handleChange("interestRate", value);
+//   }
+// };
+
+// const confirmInterestChange = () => {
+//   handleChange("interestRate", pendingInterestRate);
+//   setShowInterestWarning(false);
+//   setPendingInterestRate(null);
+// };
+
+// const cancelInterestChange = () => {
+//   setShowInterestWarning(false);
+//   setPendingInterestRate(null);
+// };
+//   // Initial state for financial data fields
+//   const [financialData, setFinancialData] = useState({
+//     realDiscountRate: "4.2500",
+//     interestRate: "10",
+//     investmentRatio: "0.5000",
+//     durationOfStudy: "50 & 100",
+//     constructionTime: ""
+//   })
+
+//   // Handle field changes
+//   const handleChange = (field, value) => {
+//     setFinancialData({
+//       ...financialData,
+//       [field]: value
+//     })
+//   }
+//     const handleNext = () => {
+//     if (navigation.canGoNext) {
+//       setConfirmationType('next');
+//       setShowConfirmation(true);
+//     }
+//   };
+
+//   // const handleBack = () => {
+//   //   if (navigation.canGoBack) {
+//   //     if (hasUnsavedChanges) {
+//   //       setConfirmationType('back');
+//   //       setShowConfirmation(true);
+//   //     } else {
+//   //       navigation.navigate(navigation.getPreviousForm());
+//   //     }
+//   //   }
+//   // };
+
+//     const handleBack = () => {
+//   setConfirmationType('back')
+//   setShowConfirmation(true)
+// }
+
+// const handleSave = async () => {
+//   try {
+//     const response = await fetch('http://127.0.0.1:5000/api/save-financial-data', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(financialData)
+//     })
+    
+//     if (response.ok) {
+//       const result = await response.json()
+//       console.log('Financial data saved successfully:', result)
+//       setHasUnsavedChanges(false)
+//     } else {
+//       console.error('Failed to save financial data')
+//     }
+//   } catch (error) {
+//     console.error('Error saving financial data:', error)
+//   }
+// }
+// const handleConfirm = async () => {
+//   if (confirmationType === 'next') {
+//     console.log('Saving form data:', financialData);
+    
+//     try {
+//       // Save financial data first
+//       await handleSave();
+      
+//       // Then calculate and print time cost using the TimeCost class
+//       const response = await fetch('http://127.0.0.1:5000/api/calculate-time-cost');
+//       if (response.ok) {
+//         const result = await response.json();
+//         console.log('=== TIME COST CALCULATION RESULT ===');
+//         console.log('Time Cost:', result.time_cost);
+//         console.log('Construction Cost:', result.construction_cost);
+//         console.log('Interest Rate:', result.interest_rate + '%');
+//         console.log('Construction Time:', result.construction_time + ' years');
+//         console.log('Investment Ratio:', result.investment_ratio);
+//         console.log('==================================');
+//       }
+//     } catch (error) {
+//       console.error('Error in time cost calculation:', error);
+//     }
+    
+//     setHasUnsavedChanges(false);
+//     navigation.navigate(navigation.getNextForm());
+//   } else if (confirmationType === 'back') {
+//     navigation.navigate(navigation.getPreviousForm());
+//   }
+//   setShowConfirmation(false);
+//   setConfirmationType(null);
+// };
+
+//   const handleCloseConfirmation = () => {
+//     setShowConfirmation(false);
+//     setConfirmationType(null);
+//   };
 "use client"
 import {useFormNavigation, ConfirmationModal} from './UseFormNavigation'
-
-// Form sequence constant
-
-
 import { useState } from "react"
 
-const FinancialData = ({ currentForm, onNavigate,onClose, setActiveTabs,Activetabs, onclicktabs }) => {
+const FinancialData = ({ currentForm, onNavigate, onClose, setActiveTabs, Activetabs, onclicktabs }) => {
   const navigation = useFormNavigation(currentForm, onNavigate);
- //   const [showinterestwarning, setshowinterestwarning] = useState(false)
+  
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [confirmationType, setConfirmationType] = useState(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [showInterestWarning, setShowInterestWarning] = useState(false);
-const [pendingInterestRate, setPendingInterestRate] = useState(null);
+  const [pendingInterestRate, setPendingInterestRate] = useState(null);
 
-const handleInterestChange = (value) => {
-  const numericValue = parseFloat(value);
-  if (numericValue > 10) {
-    setPendingInterestRate(value);
-    setShowInterestWarning(true);
-  } else {
-    handleChange("interestRate", value);
-  }
-};
+  const handleInterestChange = (value) => {
+    const numericValue = parseFloat(value);
+    if (numericValue > 10) {
+      setPendingInterestRate(value);
+      setShowInterestWarning(true);
+    } else {
+      handleChange("interestRate", value);
+    }
+  };
 
-const confirmInterestChange = () => {
-  handleChange("interestRate", pendingInterestRate);
-  setShowInterestWarning(false);
-  setPendingInterestRate(null);
-};
+  const confirmInterestChange = () => {
+    handleChange("interestRate", pendingInterestRate);
+    setShowInterestWarning(false);
+    setPendingInterestRate(null);
+  };
 
-const cancelInterestChange = () => {
-  setShowInterestWarning(false);
-  setPendingInterestRate(null);
-};
+  const cancelInterestChange = () => {
+    setShowInterestWarning(false);
+    setPendingInterestRate(null);
+  };
+
   // Initial state for financial data fields
   const [financialData, setFinancialData] = useState({
     realDiscountRate: "4.2500",
@@ -50,61 +181,61 @@ const cancelInterestChange = () => {
       ...financialData,
       [field]: value
     })
+    setHasUnsavedChanges(true);
   }
-    const handleNext = () => {
+
+  const handleNext = () => {
     if (navigation.canGoNext) {
       setConfirmationType('next');
       setShowConfirmation(true);
     }
-  };
-
-  // const handleBack = () => {
-  //   if (navigation.canGoBack) {
-  //     if (hasUnsavedChanges) {
-  //       setConfirmationType('back');
-  //       setShowConfirmation(true);
-  //     } else {
-  //       navigation.navigate(navigation.getPreviousForm());
-  //     }
-  //   }
-  // };
-
-    const handleBack = () => {
-  setConfirmationType('back')
-  setShowConfirmation(true)
-}
-
-const handleSave = async () => {
-  try {
-    const response = await fetch('http://127.0.0.1:5000/api/save-financial-data', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(financialData)
-    })
-    
-    if (response.ok) {
-      const result = await response.json()
-      console.log('Financial data saved successfully:', result)
-      setHasUnsavedChanges(false)
-    } else {
-      console.error('Failed to save financial data')
-    }
-  } catch (error) {
-    console.error('Error saving financial data:', error)
   }
-}
-const handleConfirm = async () => {
-  if (confirmationType === 'next') {
-    console.log('Saving form data:', financialData);
-    
+
+  const handleBack = () => {
+    setConfirmationType('back')
+    setShowConfirmation(true)
+  }
+
+  const handleSave = async () => {
     try {
-      // Save financial data first
-      await handleSave();
-      
-      // Then calculate and print time cost using the TimeCost class
-      const response = await fetch('http://127.0.0.1:5000/api/calculate-time-cost');
+      const response = await fetch('http://127.0.0.1:5000/api/save-financial-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(financialData)
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        console.log('Financial data saved successfully:', result)
+        setHasUnsavedChanges(false)
+        return true;
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to save financial data:', errorData)
+        return false;
+      }
+    } catch (error) {
+      console.error('Error saving financial data:', error)
+      return false;
+    }
+  }
+
+  const calculateTimeCost = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/api/calculate-time-cost', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          interestRate: parseFloat(financialData.interestRate),
+          constructionTime: parseFloat(financialData.constructionTime),
+          investmentRatio: parseFloat(financialData.investmentRatio)
+        })
+      });
+
       if (response.ok) {
         const result = await response.json();
         console.log('=== TIME COST CALCULATION RESULT ===');
@@ -113,26 +244,60 @@ const handleConfirm = async () => {
         console.log('Interest Rate:', result.interest_rate + '%');
         console.log('Construction Time:', result.construction_time + ' years');
         console.log('Investment Ratio:', result.investment_ratio);
+        console.log('Formula Used:', result.formula_used);
         console.log('==================================');
+        return result;
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to calculate time cost:', errorData);
+        return null;
       }
     } catch (error) {
       console.error('Error in time cost calculation:', error);
+      return null;
     }
-    
-    setHasUnsavedChanges(false);
-    navigation.navigate(navigation.getNextForm());
-  } else if (confirmationType === 'back') {
-    navigation.navigate(navigation.getPreviousForm());
   }
-  setShowConfirmation(false);
-  setConfirmationType(null);
-};
+
+  const handleConfirm = async () => {
+    if (confirmationType === 'next') {
+      console.log('Saving form data:', financialData);
+      
+      // Validate required fields
+      if (!financialData.constructionTime || financialData.constructionTime === "") {
+        alert('Please fill in the construction time before proceeding.');
+        setShowConfirmation(false);
+        setConfirmationType(null);
+        return;
+      }
+
+      try {
+        // Save financial data first
+        const saveSuccess = await handleSave();
+        
+        if (saveSuccess) {
+          // Then calculate time cost
+          await calculateTimeCost();
+          
+          setHasUnsavedChanges(false);
+          navigation.navigate(navigation.getNextForm());
+        } else {
+          alert('Failed to save financial data. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error in form submission:', error);
+        alert('An error occurred while saving the data. Please try again.');
+      }
+    } else if (confirmationType === 'back') {
+      navigation.navigate(navigation.getPreviousForm());
+    }
+    setShowConfirmation(false);
+    setConfirmationType(null);
+  };
 
   const handleCloseConfirmation = () => {
     setShowConfirmation(false);
     setConfirmationType(null);
   };
-
   // Info tooltip component
   const InfoTooltip = () => (
     <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-gray-200 text-gray-500 text-xs ml-1 cursor-help">

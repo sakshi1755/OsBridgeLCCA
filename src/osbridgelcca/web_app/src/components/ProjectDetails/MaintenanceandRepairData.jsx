@@ -1,3 +1,129 @@
+// import React, { useState } from "react";
+// import {useFormNavigation, ConfirmationModal} from './UseFormNavigation'
+
+// // Form sequence constant
+// const MaintenanceandRepairData = ({ currentForm, onNavigate, onClose, setActiveTabs,Activetabs, onclicktabs }) => {
+//   const navigation = useFormNavigation(currentForm, onNavigate);
+
+//    const [showConfirmation, setShowConfirmation] = useState(false)
+//   const [confirmationType, setConfirmationType] = useState(null)
+//   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+//   const [formData, setFormData] = useState({
+//     periodicMaintenanceCost: "0.5500",
+//     annualRoutineInspectionCost: "1",
+//     repairRehabilitationCost: "10",
+//     frequencyOfPeriodicMaintenance: "5",
+//     frequencyOfRoutineInspection: "1"
+//   });
+
+//   const handleChange = (field, value) => {
+//     setFormData({
+//       ...formData,
+//       [field]: value
+//     });
+//   };
+
+//   // Suggested indicator component
+//   const SuggestedTag = () => (
+//     <span className="text-xs text-gray-400 ml-2">Suggested</span>
+//   );
+
+  
+//   const handleNext = () => {
+//     if (navigation.canGoNext) {
+//       setConfirmationType('next');
+//       setShowConfirmation(true);
+//     }
+//   };
+
+//   // const handleBack = () => {
+//   //   if (navigation.canGoBack) {
+//   //     if (hasUnsavedChanges) {
+//   //       setConfirmationType('back');
+//   //       setShowConfirmation(true);
+//   //     } else {
+//   //       navigation.navigate(navigation.getPreviousForm());
+//   //     }
+//   //   }
+//   // };
+//     const handleBack = () => {
+//   setConfirmationType('back')
+//   setShowConfirmation(true)
+// }
+
+
+// const handleConfirm = async () => {
+//   if (confirmationType === 'next') {
+//     try {
+//       // Save form data to storage
+//       console.log('Saving form data:', formData);
+//       await saveMaintenanceData(formData);
+      
+//       // Calculate maintenance costs
+//       console.log('Calculating maintenance costs...');
+//       const calculationResult = await calculateMaintenanceCosts(formData);
+//       console.log('Maintenance costs calculated:', calculationResult);
+      
+//       setHasUnsavedChanges(false);
+//       navigation.navigate(navigation.getNextForm());
+//     } catch (error) {
+//       console.error('Error processing maintenance data:', error);
+//       // You might want to show an error message to the user here
+//       alert('Error processing maintenance data. Please try again.');
+//       return; // Don't navigate if there's an error
+//     }
+//   } else if (confirmationType === 'back') {
+//     navigation.navigate(navigation.getPreviousForm());
+//   }
+//   setShowConfirmation(false);
+//   setConfirmationType(null);
+// };
+//   const handleCloseConfirmation = () => {
+//     setShowConfirmation(false);
+//     setConfirmationType(null);
+//   };
+
+// const saveMaintenanceData = async (data) => {
+//   try {
+//     const response = await fetch('http://127.0.0.1:5000/api/save-maintenance-data', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(data),
+//     });
+    
+//     if (!response.ok) {
+//       throw new Error(`HTTP error! status: ${response.status}`);
+//     }
+    
+//     return await response.json();
+//   } catch (error) {
+//     console.error('Error saving maintenance data:', error);
+//     throw error;
+//   }
+// };
+
+// const calculateMaintenanceCosts = async (data) => {
+//   try {
+//     const response = await fetch('http://127.0.0.1:5000/api/calculate-maintenance-costs', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(data),
+//     });
+    
+//     if (!response.ok) {
+//       throw new Error(`HTTP error! status: ${response.status}`);
+//     }
+    
+//     return await response.json();
+//   } catch (error) {
+//     console.error('Error calculating maintenance costs:', error);
+//     throw error;
+//   }
+// };
 import React, { useState } from "react";
 import {useFormNavigation, ConfirmationModal} from './UseFormNavigation'
 
@@ -21,6 +147,7 @@ const MaintenanceandRepairData = ({ currentForm, onNavigate, onClose, setActiveT
       ...formData,
       [field]: value
     });
+    setHasUnsavedChanges(true);
   };
 
   // Suggested indicator component
@@ -36,16 +163,7 @@ const MaintenanceandRepairData = ({ currentForm, onNavigate, onClose, setActiveT
     }
   };
 
-  // const handleBack = () => {
-  //   if (navigation.canGoBack) {
-  //     if (hasUnsavedChanges) {
-  //       setConfirmationType('back');
-  //       setShowConfirmation(true);
-  //     } else {
-  //       navigation.navigate(navigation.getPreviousForm());
-  //     }
-  //   }
-  // };
+ 
     const handleBack = () => {
   setConfirmationType('back')
   setShowConfirmation(true)
@@ -56,13 +174,30 @@ const handleConfirm = async () => {
   if (confirmationType === 'next') {
     try {
       // Save form data to storage
-      console.log('Saving form data:', formData);
-      await saveMaintenanceData(formData);
+      console.log('Saving maintenance form data:', formData);
+      const saveResult = await saveMaintenanceData(formData);
+      console.log('Maintenance data saved successfully:', saveResult);
       
       // Calculate maintenance costs
       console.log('Calculating maintenance costs...');
       const calculationResult = await calculateMaintenanceCosts(formData);
-      console.log('Maintenance costs calculated:', calculationResult);
+      console.log('Maintenance costs calculated successfully:', calculationResult);
+      
+      // Log the detailed cost breakdown
+      if (calculationResult.results) {
+        console.log('=== MAINTENANCE COST BREAKDOWN ===');
+        console.log('Initial Construction Cost:', calculationResult.results.initial_construction_cost);
+        console.log('Periodic Maintenance Cost:', calculationResult.results.periodic_maintenance_cost);
+        console.log('Routine Inspection Cost:', calculationResult.results.routine_inspection_cost);
+        console.log('Repair & Rehabilitation Cost:', calculationResult.results.repair_rehabilitation_cost);
+        console.log('Annual Periodic Cost:', calculationResult.results.annual_periodic_cost);
+        console.log('Annual Routine Cost:', calculationResult.results.annual_routine_cost);
+        console.log('Annual Repair Cost:', calculationResult.results.annual_repair_cost);
+        console.log('Total Annual Maintenance Cost:', calculationResult.results.total_annual_maintenance_cost);
+        console.log('Frequencies:', calculationResult.results.frequencies);
+        console.log('Rates Used:', calculationResult.results.rates_used);
+        console.log('=====================================');
+      }
       
       setHasUnsavedChanges(false);
       navigation.navigate(navigation.getNextForm());
@@ -78,6 +213,7 @@ const handleConfirm = async () => {
   setShowConfirmation(false);
   setConfirmationType(null);
 };
+
   const handleCloseConfirmation = () => {
     setShowConfirmation(false);
     setConfirmationType(null);
@@ -94,7 +230,8 @@ const saveMaintenanceData = async (data) => {
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
     }
     
     return await response.json();
@@ -115,7 +252,8 @@ const calculateMaintenanceCosts = async (data) => {
     });
     
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
     }
     
     return await response.json();
@@ -124,7 +262,6 @@ const calculateMaintenanceCosts = async (data) => {
     throw error;
   }
 };
-
   return (
      <div className="w-full max-w-4xl mx-auto ">
       {/* Title bar */}

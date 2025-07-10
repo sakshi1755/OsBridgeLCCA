@@ -1,125 +1,309 @@
-import React, { useState } from "react";
-import {useFormNavigation, ConfirmationModal} from './UseFormNavigation'
+// import React, { useState } from "react";
+// import {useFormNavigation, ConfirmationModal} from './UseFormNavigation'
 
-// Form sequence constant
-const BridgeandTraffic = ({ currentForm, onNavigate, onClose, setActiveTabs,Activetabs, onclicktabs }) => {
-  const navigation = useFormNavigation(currentForm, onNavigate);
+// // Form sequence constant
+// const BridgeandTraffic = ({ currentForm, onNavigate, onClose, setActiveTabs,Activetabs, onclicktabs }) => {
+//   const navigation = useFormNavigation(currentForm, onNavigate);
 
-   const [showConfirmation, setShowConfirmation] = useState(false)
-  const [confirmationType, setConfirmationType] = useState(null)
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
-  const [formData, setFormData] = useState({
-    numberOfLanes: "",
-    additionalReRouteDistance: "",
-    roadRoughness: "",
-    roadRiseAndFall: "",
-    typeOfRoad: "",
-    annualIncreaseInTraffic: "",
-    vehicleComposition: {
-      cars: "",
-      buses: "",
-      hcv: "",
-      mcv: "",
-      lcv: ""
-    }
-  });
+//    const [showConfirmation, setShowConfirmation] = useState(false)
+//   const [confirmationType, setConfirmationType] = useState(null)
+//   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+//   const [formData, setFormData] = useState({
+//     numberOfLanes: "",
+//     additionalReRouteDistance: "",
+//     roadRoughness: "",
+//     roadRiseAndFall: "",
+//     typeOfRoad: "",
+//     annualIncreaseInTraffic: "",
+//     vehicleComposition: {
+//       cars: "",
+//       buses: "",
+//       hcv: "",
+//       mcv: "",
+//       lcv: ""
+//     }
+//   });
 
-  const handleChange = (field, value) => {
-    setFormData({
-      ...formData,
-      [field]: value
-    });
+//   const handleChange = (field, value) => {
+//     setFormData({
+//       ...formData,
+//       [field]: value
+//     });
 
-  };
+//   };
 
-  const handleVehicleCompositionChange = (field, value) => {
-    setFormData({
-      ...formData,
-      vehicleComposition: {
-        ...formData.vehicleComposition,
-        [field]: value
-      }
-    });
-  };
+//   const handleVehicleCompositionChange = (field, value) => {
+//     setFormData({
+//       ...formData,
+//       vehicleComposition: {
+//         ...formData.vehicleComposition,
+//         [field]: value
+//       }
+//     });
+//   };
 
   
-  const handleNext = () => {
-    if (navigation.canGoNext) {
-      setConfirmationType('next');
-      setShowConfirmation(true);
-    }
-  };
+//   const handleNext = () => {
+//     if (navigation.canGoNext) {
+//       setConfirmationType('next');
+//       setShowConfirmation(true);
+//     }
+//   };
 
-  // const handleBack = () => {
-  //   if (navigation.canGoBack) {
-  //     if (hasUnsavedChanges) {
-  //       setConfirmationType('back');
-  //       setShowConfirmation(true);
-  //     } else {
-  //       navigation.navigate(navigation.getPreviousForm());
-  //     }
-  //   }
-  // };
-    const handleBack = () => {
-  setConfirmationType('back')
-  setShowConfirmation(true)
-}
+//   // const handleBack = () => {
+//   //   if (navigation.canGoBack) {
+//   //     if (hasUnsavedChanges) {
+//   //       setConfirmationType('back');
+//   //       setShowConfirmation(true);
+//   //     } else {
+//   //       navigation.navigate(navigation.getPreviousForm());
+//   //     }
+//   //   }
+//   // };
+//     const handleBack = () => {
+//   setConfirmationType('back')
+//   setShowConfirmation(true)
+// }
 
 
-  const handleConfirm = () => {
-    if (confirmationType === 'next') {
-      // Here you would typically save the form data to your context or API
-      console.log('Saving form data:', formData);
-      setHasUnsavedChanges(false);
-      navigation.navigate(navigation.getNextForm());
-    } else if (confirmationType === 'back') {
-      navigation.navigate(navigation.getPreviousForm());
-    }
-    setShowConfirmation(false);
-    setConfirmationType(null);
-  };
+//   const handleConfirm = () => {
+//     if (confirmationType === 'next') {
+//       // Here you would typically save the form data to your context or API
+//       console.log('Saving form data:', formData);
+//       setHasUnsavedChanges(false);
+//       navigation.navigate(navigation.getNextForm());
+//     } else if (confirmationType === 'back') {
+//       navigation.navigate(navigation.getPreviousForm());
+//     }
+//     setShowConfirmation(false);
+//     setConfirmationType(null);
+//   };
 
-  const handleCloseConfirmation = () => {
-    setShowConfirmation(false);
-    setConfirmationType(null);
-  };
-const handleSave = async () => {
-  try {
-    // First save the traffic data
-    const saveResponse = await fetch('http://127.0.0.1:5000/api/save-traffic-data', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData)
-    });
+//   const handleCloseConfirmation = () => {
+//     setShowConfirmation(false);
+//     setConfirmationType(null);
+//   };
+// const handleSave = async () => {
+//   try {
+//     // First save the traffic data
+//     const saveResponse = await fetch('http://127.0.0.1:5000/api/save-traffic-data', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(formData)
+//     });
     
-    if (saveResponse.ok) {
-      console.log('Traffic data saved successfully');
+//     if (saveResponse.ok) {
+//       console.log('Traffic data saved successfully');
       
-      // Then calculate road user cost
-      const costResponse = await fetch('http://127.0.0.1:5000/api/calculate-road-user-cost', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
+//       // Then calculate road user cost
+//       const costResponse = await fetch('http://127.0.0.1:5000/api/calculate-road-user-cost', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(formData)
+//       });
+      
+//       if (costResponse.ok) {
+//         const costData = await costResponse.json();
+//         console.log('Road User Cost:', costData.road_user_cost);
+//         console.log('Calculation Details:', costData.calculation_details);
+//       } else {
+//         console.error('Failed to calculate road user cost');
+//       }
+//     } else {
+//       console.error('Failed to save traffic data');
+//     }
+//   } catch (error) {
+//     console.error('Error:', error);
+//   }
+// };
+import React, { useState } from "react"; 
+import {useFormNavigation, ConfirmationModal} from './UseFormNavigation' 
+ 
+// Form sequence constant 
+const BridgeandTraffic = ({ currentForm, onNavigate, onClose, setActiveTabs,Activetabs, onclicktabs }) => { 
+  const navigation = useFormNavigation(currentForm, onNavigate); 
+ 
+  const [showConfirmation, setShowConfirmation] = useState(false) 
+  const [confirmationType, setConfirmationType] = useState(null) 
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false) 
+  const [formData, setFormData] = useState({ 
+    numberOfLanes: "", 
+    additionalReRouteDistance: "", 
+    roadRoughness: "", 
+    roadRiseAndFall: "", 
+    typeOfRoad: "", 
+    annualIncreaseInTraffic: "", 
+    vehicleComposition: { 
+      cars: "", 
+      buses: "", 
+      hcv: "", 
+      mcv: "", 
+      lcv: "" 
+    } 
+  }); 
+ 
+  const handleChange = (field, value) => { 
+    setFormData({ 
+      ...formData, 
+      [field]: value 
+    }); 
+    setHasUnsavedChanges(true);
+  }; 
+ 
+  const handleVehicleCompositionChange = (field, value) => { 
+    setFormData({ 
+      ...formData, 
+      vehicleComposition: { 
+        ...formData.vehicleComposition, 
+        [field]: value 
+      } 
+    }); 
+    setHasUnsavedChanges(true);
+  }; 
+ 
+  const handleNext = () => { 
+    if (navigation.canGoNext) { 
+      setConfirmationType('next'); 
+      setShowConfirmation(true); 
+    } 
+  }; 
+ 
+  const handleBack = () => { 
+    setConfirmationType('back') 
+    setShowConfirmation(true) 
+  } 
+ 
+  const handleConfirm = () => { 
+    if (confirmationType === 'next') { 
+      // Save form data before navigating
+      handleSave().then(() => {
+        setHasUnsavedChanges(false); 
+        navigation.navigate(navigation.getNextForm()); 
       });
+    } else if (confirmationType === 'back') { 
+      navigation.navigate(navigation.getPreviousForm()); 
+    } 
+    setShowConfirmation(false); 
+    setConfirmationType(null); 
+  }; 
+ 
+  const handleCloseConfirmation = () => { 
+    setShowConfirmation(false); 
+    setConfirmationType(null); 
+  }; 
+
+  // Transform form data to match backend expected format
+  const transformDataForBackend = () => {
+    return {
+      road_user_inputs: {
+        Lane_Type: formData.numberOfLanes || "2", // Default to 2 lanes if empty
+        Roughness: formData.roadRoughness || "Good", // Default to Good if empty
+        RF: formData.roadRiseAndFall || "Rolling", // Default to Rolling if empty
+        Vehicles: [
+          {
+            Vehicle_Type: "Car",
+            Count: parseInt(formData.vehicleComposition.cars) || 0
+          },
+          {
+            Vehicle_Type: "Bus",
+            Count: parseInt(formData.vehicleComposition.buses) || 0
+          },
+          {
+            Vehicle_Type: "HCV",
+            Count: parseInt(formData.vehicleComposition.hcv) || 0
+          },
+          {
+            Vehicle_Type: "MCV",
+            Count: parseInt(formData.vehicleComposition.mcv) || 0
+          },
+          {
+            Vehicle_Type: "LCV",
+            Count: parseInt(formData.vehicleComposition.lcv) || 0
+          }
+        ].filter(vehicle => vehicle.Count > 0) // Only include vehicles with count > 0
+      },
+      financial_inputs: {
+        construction_time: 12, // Default value, you can make this configurable
+        reroute_distance: parseFloat(formData.additionalReRouteDistance) || 0
+      },
+      // Include other form data for reference
+      typeOfRoad: formData.typeOfRoad,
+      annualIncreaseInTraffic: formData.annualIncreaseInTraffic
+    };
+  };
+
+  const handleSave = async () => { 
+    try { 
+      console.log('Saving traffic data...');
       
-      if (costResponse.ok) {
-        const costData = await costResponse.json();
-        console.log('Road User Cost:', costData.road_user_cost);
-        console.log('Calculation Details:', costData.calculation_details);
-      } else {
-        console.error('Failed to calculate road user cost');
-      }
-    } else {
-      console.error('Failed to save traffic data');
-    }
-  } catch (error) {
-    console.error('Error:', error);
-  }
-};
+      // Transform data to backend format
+      const backendData = transformDataForBackend();
+      console.log('Transformed data for backend:', backendData);
+      
+      // Save traffic data first
+      const saveResponse = await fetch('http://127.0.0.1:5000/api/save-traffic-data', { 
+        method: 'POST', 
+        headers: { 
+          'Content-Type': 'application/json', 
+        }, 
+        body: JSON.stringify(backendData) 
+      }); 
+       
+      if (saveResponse.ok) { 
+        const saveResult = await saveResponse.json();
+        console.log('Traffic data saved successfully:', saveResult); 
+         
+        // Then calculate road user cost using the new endpoint
+        const costResponse = await fetch('http://127.0.0.1:5000/api/calculate-road-user-cost', { 
+          method: 'POST', 
+          headers: { 
+            'Content-Type': 'application/json', 
+          }, 
+          body: JSON.stringify(backendData) 
+        }); 
+         
+        if (costResponse.ok) { 
+          const costData = await costResponse.json(); 
+          console.log('=== ROAD USER COST CALCULATION RESULT ===');
+          console.log('Road User Cost:', costData.road_user_cost); 
+          console.log('Success:', costData.success);
+          console.log('Message:', costData.message);
+          
+          // Set unsaved changes to false after successful save
+          setHasUnsavedChanges(false);
+          
+          return costData; // Return the result for potential chaining
+        } else { 
+          const errorData = await costResponse.json();
+          console.error('Failed to calculate road user cost:', errorData); 
+          throw new Error('Failed to calculate road user cost');
+        } 
+      } else { 
+        const errorData = await saveResponse.json();
+        console.error('Failed to save traffic data:', errorData); 
+        throw new Error('Failed to save traffic data');
+      } 
+    } catch (error) { 
+      console.error('Error in handleSave:', error); 
+      throw error; // Re-throw so calling code can handle it
+    } 
+  };
+
+  // Add a manual save button handler if needed
+  const handleManualSave = () => {
+    handleSave().catch(error => {
+      console.error('Manual save failed:', error);
+    });
+  };
+
+  // Rest of your component remains the same...
+  // Your existing JSX return statement goes here
+  
+
   return (
     <div className="w-full max-w-4xl mx-auto ">
       {/* Title bar */}

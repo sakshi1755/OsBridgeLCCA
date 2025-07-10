@@ -408,7 +408,6 @@ const CarbonEmissionData = ({
       setLoading(true);
       setError(null);
       
-      // Fix: Use the correct Flask route
       const response = await fetch('http://127.0.0.1:5000/api/get-carbon-materials');
       
       if (!response.ok) {
@@ -442,71 +441,6 @@ const CarbonEmissionData = ({
     setHasUnsavedChanges(true);
   };
 
-  const handleSave = async () => {
-    try {
-      setLoading(true);
-      
-      const response = await fetch('http://127.0.0.1:5000/api/save-carbon-emission-data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          materials: materials,
-          timestamp: new Date().toISOString()
-        })
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Carbon emission data saved successfully:', result);
-        setHasUnsavedChanges(false);
-        alert('Carbon emission data saved successfully!');
-      } else {
-        throw new Error('Failed to save carbon emission data');
-      }
-    } catch (error) {
-      console.error('Error saving carbon emission data:', error);
-      alert('Failed to save carbon emission data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCalculate = async () => {
-    try {
-      setLoading(true);
-      
-      const response = await fetch('http://127.0.0.1:5000/api/calculate-carbon-emissions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          materials: materials
-        })
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Carbon emission calculation results:', result);
-        
-        if (result.success) {
-          alert(`Total Carbon Emission: ${result.total_carbon_emission.toFixed(2)} kg CO₂e`);
-        } else {
-          alert('Failed to calculate carbon emissions');
-        }
-      } else {
-        throw new Error('Failed to calculate carbon emissions');
-      }
-    } catch (error) {
-      console.error('Error calculating carbon emissions:', error);
-      alert('Failed to calculate carbon emissions');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleNext = () => {
     if (navigation.canGoNext) {
       setConfirmationType('next');
@@ -519,33 +453,11 @@ const CarbonEmissionData = ({
     setShowConfirmation(true);
   };
 
-  const handleConfirm = async () => {
+  const handleConfirm = () => {
     if (confirmationType === 'next') {
-      // Save carbon emission data before navigating
-      try {
-        const response = await fetch('http://127.0.0.1:5000/api/save-carbon-emission-data', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            materials: materials,
-            timestamp: new Date().toISOString()
-          })
-        });
-
-        if (response.ok) {
-          console.log('Carbon emission data saved successfully');
-          setHasUnsavedChanges(false);
-          navigation.navigate(navigation.getNextForm());
-        } else {
-          throw new Error('Failed to save carbon emission data');
-        }
-      } catch (error) {
-        console.error('Error saving carbon emission data:', error);
-        alert('Failed to save carbon emission data');
-        return;
-      }
+      console.log('Carbon emission data:', materials);
+      setHasUnsavedChanges(false);
+      navigation.navigate(navigation.getNextForm());
     } else if (confirmationType === 'back') {
       navigation.navigate(navigation.getPreviousForm());
     }
@@ -639,26 +551,12 @@ const CarbonEmissionData = ({
 
       <div className="bg-[#FFF9F9] p-6 border border-gray-300 rounded-b-sm">
         <div className="space-y-6">
-          {/* Action buttons */}
-          <div className="flex gap-4 mb-6">
-            <button
-              onClick={handleSave}
-              disabled={loading}
-              className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
-            >
-              {loading ? 'Saving...' : 'Save Data'}
-            </button>
-            <button
-              onClick={handleCalculate}
-              disabled={loading || materials.length === 0}
-              className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
-            >
-              {loading ? 'Calculating...' : 'Calculate Emissions'}
-            </button>
+          {/* Refresh button */}
+          <div className="flex justify-end mb-4">
             <button
               onClick={loadMaterialsFromForms}
               disabled={loading}
-              className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 disabled:opacity-50"
+              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 disabled:opacity-50"
             >
               {loading ? 'Loading...' : 'Refresh Materials'}
             </button>
@@ -719,7 +617,6 @@ const CarbonEmissionData = ({
                           <td className="p-2 border">
                             <input
                               type="number"
-                              step="0.01"
                               value={material.embedded_carbon_energy || ''}
                               onChange={(e) =>
                                 handleMaterialChange(
@@ -735,7 +632,6 @@ const CarbonEmissionData = ({
                           <td className="p-2 border">
                             <input
                               type="number"
-                              step="0.01"
                               value={material.carbon_emission_factor || ''}
                               onChange={(e) =>
                                 handleMaterialChange(

@@ -1,3 +1,4 @@
+
 from flask import Flask
 from flask_cors import CORS
 import sys
@@ -11,7 +12,6 @@ from api.routes.financial_data import financial_bp
 from api.routes.traffic_analysis import traffic_analysis_bp
 from api.routes.maintenance_data import maintenance_data_bp
 from api.routes.demolition_recycling import demolition_recycling_bp
-
 
 # Import new cost calculations blueprint
 from api.routes.cost_calculations import cost_calculations_bp
@@ -67,6 +67,7 @@ def root():
             
             # Data management endpoints
             'save_form': '/api/save-form-data/<form_name>',
+            'get_carbon_materials': '/api/get-carbon-materials',  # NEW - Added this line
             'calculate_cost': '/api/calculate-initial-cost',
             'save_financial': '/api/save-financial-data',
             'calculate_time_cost': '/api/calculate-time-cost',

@@ -363,15 +363,118 @@ const Form = ({
   // Add this function to your existing Form.js component
 // This should replace or enhance your existing handleSave function
 
+// const handleSave = async () => {
+//   try {
+//     setIsCalculating(true)
+//     const apiFormName = getFormApiName(currentForm)
+    
+//     // Prepare form data for saving - ensure materials array is properly formatted
+//     const formDataToSave = {
+//       form_name: currentForm,
+//       materials: materials.map(material => ({
+//         id: material.id,
+//         component: material.component,
+//         materialType: material.materialType,
+//         customMaterialType: material.customMaterialType,
+//         subMaterialType: material.subMaterialType,
+//         quantity: material.quantity,
+//         unit: material.unit,
+//         rate: material.rate,
+//         rateDataSource: material.rateDataSource
+//       })),
+//       timestamp: new Date().toISOString()
+//     }
+    
+//     // Save form data to backend
+//     const response = await fetch(`http://127.0.0.1:5000/api/save-form-data/${apiFormName}`, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(formDataToSave)
+//     })
+    
+//     if (response.ok) {
+//       const result = await response.json()
+//       console.log('Form saved successfully:', result)
+//       setHasUnsavedChanges(false)
+      
+//       // Calculate initial construction cost for current form
+//       await calculateAndLogInitialCost()
+      
+//       // Display success message
+//       alert('Form saved successfully!')
+      
+//     } else {
+//       console.error('Failed to save form data')
+//       alert('Failed to save form data')
+//     }
+//   } catch (error) {
+//     console.error('Error saving form:', error)
+//     alert('Error saving form')
+//   } finally {
+//     setIsCalculating(false)
+//   }
+// }
 const handleSave = async () => {
   try {
     setIsCalculating(true)
     const apiFormName = getFormApiName(currentForm)
     
-    // Prepare form data for saving
+    // Function to check if a material has any empty required fields
+    const isValidMaterial = (material) => {
+      const requiredFields = [
+        'component',
+        'materialType',
+        'quantity',
+        'unit',
+        'rate'
+      ]
+      
+      return requiredFields.every(field => {
+        const value = material[field]
+        return value !== null && 
+               value !== undefined && 
+               value !== '' && 
+               String(value).trim() !== ''
+      })
+    }
+    
+    // Filter out materials with empty columns - only save complete materials
+    const validMaterials = materials.filter(material => {
+      const isValid = isValidMaterial(material)
+      if (!isValid) {
+        console.log(`Skipping material with ID ${material.id} due to empty fields`)
+      }
+      return isValid
+    })
+    
+    // Check if there are any valid materials to save
+    if (validMaterials.length === 0) {
+      alert('No complete materials to save. Please fill in all required fields for at least one material.')
+      return
+    }
+    
+    // Log info about filtered materials
+    if (validMaterials.length < materials.length) {
+      const skippedCount = materials.length - validMaterials.length
+      console.log(`Saving ${validMaterials.length} complete materials. Skipped ${skippedCount} materials with empty fields.`)
+    }
+    
+    // Prepare form data for saving - ensure materials array is properly formatted
     const formDataToSave = {
       form_name: currentForm,
-      materials: materials,
+      materials: validMaterials.map(material => ({
+        id: material.id,
+        component: material.component,
+        materialType: material.materialType,
+        customMaterialType: material.customMaterialType,
+        subMaterialType: material.subMaterialType,
+        quantity: material.quantity,
+        unit: material.unit,
+        rate: material.rate,
+        rateDataSource: material.rateDataSource
+      })),
       timestamp: new Date().toISOString()
     }
     
@@ -392,8 +495,12 @@ const handleSave = async () => {
       // Calculate initial construction cost for current form
       await calculateAndLogInitialCost()
       
-      // Display success message
-      alert('Form saved successfully!')
+      // Display success message with info about saved materials
+      const successMessage = validMaterials.length < materials.length 
+        ? `Form saved successfully! ${validMaterials.length} complete materials saved. ${materials.length - validMaterials.length} incomplete materials were skipped.`
+        : 'Form saved successfully!'
+      
+      alert(successMessage)
       
     } else {
       console.error('Failed to save form data')

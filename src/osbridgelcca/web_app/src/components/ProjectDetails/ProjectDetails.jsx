@@ -6,7 +6,7 @@ import { useState } from "react";
 import Accordion from "../Accordion";
 import GeneralInfoForm from "../InputForms/GeneralInfoForm";
 import StructureWorksData from "./StructureWorksData";
-import FinancialData from "./FinancialData";
+import EconomicParameter  from "./EconomicParameter";
 import MaintenanceandRepairData from "./MaintenanceandRepairData";
 import BridgeandTraffic from "./BridgeandTraffic";
 import DemolitionandRecycling from "./DemolitionandRecycling";
@@ -138,18 +138,18 @@ const ProjectDetails = ({
 
                   <button
                     onClick={() => {
-                      setSelectedProjectDetailWindow("Financial Data");
+                      setSelectedProjectDetailWindow("Economic Parameter");
                       setShowTutorials(false);
                       setActiveTabs((tabs) => {
-                        if (!tabs.includes("Financial Data")) {
-                          return [...tabs, "Financial Data"];
+                        if (!tabs.includes("Economic Parameter")) {
+                          return [...tabs, "Economic Parameter"];
                         }
                         return tabs;
                       });
                     }}
                     className="rounded-sm w-full text-left text-sm ml-12"
                   >
-                    {"\u2BC8"} &nbsp; Financial Data
+                    {"\u2BC8"} &nbsp; Economic Parameter
                   </button>
 
                   <Accordionp
@@ -309,26 +309,6 @@ const ProjectDetails = ({
                         Foundation
                       </div>
 
-                      <div
-                        className={`flex items-center px-3 py-0.5 text-[13] cursor-pointer ${
-                          SelectedProjectDetailWindow === "Super-Structure"
-                            ? "bg-gray-700 text-white"
-                            : "hover:bg-gray-100"
-                        }`}
-                        onClick={() => {
-                          setSelectedProjectDetailWindow("Super-Structure");
-                          setShowTutorials(false);
-                          setActiveTabs((tabs) => {
-                            if (!tabs.includes("Super-Structure")) {
-                              return [...tabs, "Super-Structure"];
-                            }
-                            return tabs;
-                          });
-                        }}
-                      >
-                        <span className="mr-2">{"\u2BC8"}</span>
-                        Super-Structure
-                      </div>
 
                       <div
                         className={`flex items-center px-3 py-0.5 text-[13] cursor-pointer ${
@@ -350,7 +330,27 @@ const ProjectDetails = ({
                         <span className="mr-2">{"\u2BC8"}</span>
                         Sub-Structure
                       </div>
-
+                      
+                      <div
+                        className={`flex items-center px-3 py-0.5 text-[13] cursor-pointer ${
+                          SelectedProjectDetailWindow === "Super-Structure"
+                            ? "bg-gray-700 text-white"
+                            : "hover:bg-gray-100"
+                        }`}
+                        onClick={() => {
+                          setSelectedProjectDetailWindow("Super-Structure");
+                          setShowTutorials(false);
+                          setActiveTabs((tabs) => {
+                            if (!tabs.includes("Super-Structure")) {
+                              return [...tabs, "Super-Structure"];
+                            }
+                            return tabs;
+                          });
+                        }}
+                      >
+                        <span className="mr-2">{"\u2BC8"}</span>
+                        Super-Structure
+                      </div>
                       <div
                         className={`flex items-center px-3 py-0.5 text-[13] cursor-pointer ${
                           SelectedProjectDetailWindow === "Miscellaneous"
@@ -375,25 +375,25 @@ const ProjectDetails = ({
                   )}
                 </div>
 
-                {/* Financial Data */}
+                {/* Economic Parameter  */}
                 <div
                   className={`flex items-center px-3 py-0.5 text-[13] cursor-pointer ${
-                    SelectedProjectDetailWindow === "Financial Data"
+                    SelectedProjectDetailWindow === "Economic Parameter"
                       ? "bg-gray-700 text-white"
                       : "hover:bg-gray-100"
                   }`}
                   onClick={() => {
-                    setSelectedProjectDetailWindow("Financial Data");
+                    setSelectedProjectDetailWindow("Economic Parameter");
                     setShowTutorials(false);
                     setActiveTabs((tabs) => {
-                      if (!tabs.includes("Financial Data")) {
-                        return [...tabs, "Financial Data"];
+                      if (!tabs.includes("Economic Parameter")) {
+                        return [...tabs, "Economic Parameter"];
                       }
                       return tabs;
                     });
                   }}
                 >
-                  Financial Data
+                  Economic Parameter
                 </div>
 
                 {/* Carbon Emission Data with expand/collapse */}
@@ -604,9 +604,9 @@ const ProjectDetails = ({
               onclicktabs={onclicktabs}
             />
           )}
-          {SelectedProjectDetailWindow === "Financial Data" && (
-            <FinancialData
-              currentForm="Financial Data"
+          {SelectedProjectDetailWindow === "Economic Parameter" && (
+            <EconomicParameter 
+              currentForm="Economic Parameter"
               onNavigate={handleFormNavigation}
               onClose={handleTabClose}
               onclicktabs={onclicktabs}

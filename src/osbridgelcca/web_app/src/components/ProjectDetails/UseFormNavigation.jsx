@@ -8,7 +8,7 @@ const FORM_SEQUENCE = [
   'Sub-Structure',
   'Super-Structure',
   'Miscellaneous',
-  'Financial Data',
+  'Economic Parameter',
   'Carbon Emission Data',
   'Carbon Emission Cost Data',
   'Bridge and Traffic',

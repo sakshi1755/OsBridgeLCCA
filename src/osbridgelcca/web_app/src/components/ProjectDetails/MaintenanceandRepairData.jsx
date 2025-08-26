@@ -420,7 +420,7 @@ const calculateMaintenanceCosts = async (data) => {
               disabled={!navigation.canGoNext}
               className={`px-8 py-1 text-sm rounded-md border ${
                 navigation.canGoNext 
-                  ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700' 
+                  ?  'bg-[#522828b0] border-black hover:bg-[#814040] text-black' 
                   : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
               }`}
             >

@@ -10,7 +10,7 @@ sys.path.insert(0, project_root)
 
 financial_bp = Blueprint('financial', __name__)
 
-# Global storage for financial data
+# Global storage for Economic Parameter 
 financial_data_storage = {}
 
 class TimeCost:
@@ -85,7 +85,7 @@ def fetch_initial_construction_cost():
 @financial_bp.route('/api/save-financial-data', methods=['POST'])
 def save_financial_data():
     """
-    Save financial data to storage
+    Save Economic Parameter  to storage
     """
     try:
         data = request.json
@@ -97,7 +97,7 @@ def save_financial_data():
             if field not in data:
                 return jsonify({'error': f'Missing required field: {field}'}), 400
         
-        # Store the financial data
+        # Store the Economic Parameter 
         financial_data_storage.update(data)
         
         # Also save to file for persistence (optional)
@@ -108,7 +108,7 @@ def save_financial_data():
             print(f"Warning: Could not save to file: {e}")
         
         return jsonify({
-            'message': 'Financial data saved successfully',
+            'message': 'Economic Parameter  saved successfully',
             'saved_data': financial_data_storage
         }), 200
         
@@ -118,7 +118,7 @@ def save_financial_data():
 @financial_bp.route('/api/calculate-time-cost', methods=['POST'])
 def calculate_time_cost():
     """
-    Calculate time cost based on financial data
+    Calculate time cost based on Economic Parameter 
     """
     try:
         # Get data from request body
@@ -130,7 +130,7 @@ def calculate_time_cost():
             construction_time = float(request_data.get('constructionTime', financial_data_storage.get('constructionTime', 1)))
             investment_ratio = float(request_data.get('investmentRatio', financial_data_storage.get('investmentRatio', 0.5)))
         else:
-            # Use stored financial data
+            # Use stored Economic Parameter 
             interest_rate = float(financial_data_storage.get('interestRate', 10))
             construction_time = float(financial_data_storage.get('constructionTime', 1))
             investment_ratio = float(financial_data_storage.get('investmentRatio', 0.5))
@@ -161,7 +161,7 @@ def calculate_time_cost():
 @financial_bp.route('/api/get-financial-data', methods=['GET'])
 def get_financial_data():
     """
-    Get stored financial data
+    Get stored Economic Parameter 
     """
     try:
         # Try to load from file first

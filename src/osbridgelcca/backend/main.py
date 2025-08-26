@@ -43,6 +43,64 @@ def health_check():
     return {'status': 'healthy', 'message': 'LCC Analysis API is running'}
 
 # Root endpoint
+# @app.route('/')
+# def root():
+#     return {
+#         'message': 'Life Cycle Cost Analysis API',
+#         'version': '2.0',
+#         'endpoints': {
+#             # Form endpoints
+#             'forms': '/api/forms',
+#             'components': '/api/components/<form_name>',
+#             'form_data': '/api/form-data/<form_name>',
+            
+#             # Material endpoints (independent)
+#             'all_materials': '/api/materials',
+#             'material_data': '/api/material-data/<material_name>',
+#             'sub_materials': '/api/sub-materials/<material_name>',
+#             'units': '/api/units/<material_name>',
+            
+#             # Backward compatibility endpoints
+#             'materials_for_component': '/api/materials/<form_name>/<component_name>',
+#             'sub_materials_legacy': '/api/sub-materials/<form_name>/<component_name>/<material_name>',
+#             'units_legacy': '/api/units/<form_name>/<component_name>/<material_name>',
+            
+#             # Data management endpoints
+#             'save_form': '/api/save-form-data/<form_name>',
+#             'get_carbon_materials': '/api/get-carbon-materials',  # NEW - Added this line
+#             'calculate_cost': '/api/calculate-initial-cost',
+#             'save_financial': '/api/save-financial-data',
+#             'calculate_time_cost': '/api/calculate-time-cost',
+#             'save_traffic': '/api/save-traffic-data',
+#             'calculate_road_user_cost': '/api/calculate-road-user-cost',
+#             'save_maintenance': '/api/save-maintenance-data',
+#             'calculate_maintenance_costs': '/api/calculate-maintenance-costs',
+#             'get_maintenance_data': '/api/get-maintenance-data',
+#             'save_demolition_recycling': '/api/save-demolition-recycling-data',
+#             'calculate_demolition_recycling_costs': '/api/calculate-demolition-recycling-costs',
+#             'get_demolition_recycling_data': '/api/get-demolition-recycling-data',
+            
+#             # NEW LCC Cost Calculation endpoints
+#             'calculate_all_costs': '/api/calculate-all-costs',
+#             'calculate_initial_construction_cost': '/api/calculate-initial-construction-cost',
+#             'calculate_carbon_emission_cost': '/api/calculate-carbon-emission-cost',
+#             'calculate_time_cost_new': '/api/calculate-time-cost',
+#             'calculate_road_user_cost_new': '/api/calculate-road-user-cost',
+#             'calculate_maintenance_costs_new': '/api/calculate-maintenance-costs',
+#             'calculate_demolition_recycling_costs_new': '/api/calculate-demolition-recycling-costs',
+#             'get_calculation_results': '/api/get-calculation-results/<project_id>',
+#             'get_all_stored_results': '/api/get-all-stored-results',
+#             'clear_calculation_storage': '/api/clear-calculation-storage',
+            
+#             # Debug endpoints
+#             'debug_form': '/api/debug/<form_name>',
+#             'debug_material': '/api/debug/material/<material_name>'
+#         }
+#     }
+
+
+# Update your main.py endpoints section to include the new validation endpoints:
+
 @app.route('/')
 def root():
     return {
@@ -67,7 +125,8 @@ def root():
             
             # Data management endpoints
             'save_form': '/api/save-form-data/<form_name>',
-            'get_carbon_materials': '/api/get-carbon-materials',  # NEW - Added this line
+            'get_form_data': '/api/get-form-data/<form_name>',  # NEW
+            'get_carbon_materials': '/api/get-carbon-materials',
             'calculate_cost': '/api/calculate-initial-cost',
             'save_financial': '/api/save-financial-data',
             'calculate_time_cost': '/api/calculate-time-cost',
@@ -80,7 +139,11 @@ def root():
             'calculate_demolition_recycling_costs': '/api/calculate-demolition-recycling-costs',
             'get_demolition_recycling_data': '/api/get-demolition-recycling-data',
             
-            # NEW LCC Cost Calculation endpoints
+            # Form validation endpoints - NEW
+            'check_form_completion': '/api/check-form-completion',
+            'validate_form_sequence': '/api/validate-form-sequence',
+            
+            # LCC Cost Calculation endpoints
             'calculate_all_costs': '/api/calculate-all-costs',
             'calculate_initial_construction_cost': '/api/calculate-initial-construction-cost',
             'calculate_carbon_emission_cost': '/api/calculate-carbon-emission-cost',
@@ -94,7 +157,8 @@ def root():
             
             # Debug endpoints
             'debug_form': '/api/debug/<form_name>',
-            'debug_material': '/api/debug/material/<material_name>'
+            'debug_material': '/api/debug/material/<material_name>',
+            'debug_form_storage': '/api/debug-form-storage'  # NEW
         }
     }
 

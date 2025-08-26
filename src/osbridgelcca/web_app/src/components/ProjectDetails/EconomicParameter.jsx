@@ -1,142 +1,9 @@
-// "use client"
-// import {useFormNavigation, ConfirmationModal} from './UseFormNavigation'
 
-// // Form sequence constant
-
-
-// import { useState } from "react"
-
-// const FinancialData = ({ currentForm, onNavigate,onClose, setActiveTabs,Activetabs, onclicktabs }) => {
-//   const navigation = useFormNavigation(currentForm, onNavigate);
-//  //   const [showinterestwarning, setshowinterestwarning] = useState(false)
-//   const [showConfirmation, setShowConfirmation] = useState(false)
-//   const [confirmationType, setConfirmationType] = useState(null)
-//   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
-//   const [showInterestWarning, setShowInterestWarning] = useState(false);
-// const [pendingInterestRate, setPendingInterestRate] = useState(null);
-
-// const handleInterestChange = (value) => {
-//   const numericValue = parseFloat(value);
-//   if (numericValue > 10) {
-//     setPendingInterestRate(value);
-//     setShowInterestWarning(true);
-//   } else {
-//     handleChange("interestRate", value);
-//   }
-// };
-
-// const confirmInterestChange = () => {
-//   handleChange("interestRate", pendingInterestRate);
-//   setShowInterestWarning(false);
-//   setPendingInterestRate(null);
-// };
-
-// const cancelInterestChange = () => {
-//   setShowInterestWarning(false);
-//   setPendingInterestRate(null);
-// };
-//   // Initial state for financial data fields
-//   const [financialData, setFinancialData] = useState({
-//     realDiscountRate: "4.2500",
-//     interestRate: "10",
-//     investmentRatio: "0.5000",
-//     durationOfStudy: "50 & 100",
-//     constructionTime: ""
-//   })
-
-//   // Handle field changes
-//   const handleChange = (field, value) => {
-//     setFinancialData({
-//       ...financialData,
-//       [field]: value
-//     })
-//   }
-//     const handleNext = () => {
-//     if (navigation.canGoNext) {
-//       setConfirmationType('next');
-//       setShowConfirmation(true);
-//     }
-//   };
-
-//   // const handleBack = () => {
-//   //   if (navigation.canGoBack) {
-//   //     if (hasUnsavedChanges) {
-//   //       setConfirmationType('back');
-//   //       setShowConfirmation(true);
-//   //     } else {
-//   //       navigation.navigate(navigation.getPreviousForm());
-//   //     }
-//   //   }
-//   // };
-
-//     const handleBack = () => {
-//   setConfirmationType('back')
-//   setShowConfirmation(true)
-// }
-
-// const handleSave = async () => {
-//   try {
-//     const response = await fetch('http://127.0.0.1:5000/api/save-financial-data', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify(financialData)
-//     })
-    
-//     if (response.ok) {
-//       const result = await response.json()
-//       console.log('Financial data saved successfully:', result)
-//       setHasUnsavedChanges(false)
-//     } else {
-//       console.error('Failed to save financial data')
-//     }
-//   } catch (error) {
-//     console.error('Error saving financial data:', error)
-//   }
-// }
-// const handleConfirm = async () => {
-//   if (confirmationType === 'next') {
-//     console.log('Saving form data:', financialData);
-    
-//     try {
-//       // Save financial data first
-//       await handleSave();
-      
-//       // Then calculate and print time cost using the TimeCost class
-//       const response = await fetch('http://127.0.0.1:5000/api/calculate-time-cost');
-//       if (response.ok) {
-//         const result = await response.json();
-//         console.log('=== TIME COST CALCULATION RESULT ===');
-//         console.log('Time Cost:', result.time_cost);
-//         console.log('Construction Cost:', result.construction_cost);
-//         console.log('Interest Rate:', result.interest_rate + '%');
-//         console.log('Construction Time:', result.construction_time + ' years');
-//         console.log('Investment Ratio:', result.investment_ratio);
-//         console.log('==================================');
-//       }
-//     } catch (error) {
-//       console.error('Error in time cost calculation:', error);
-//     }
-    
-//     setHasUnsavedChanges(false);
-//     navigation.navigate(navigation.getNextForm());
-//   } else if (confirmationType === 'back') {
-//     navigation.navigate(navigation.getPreviousForm());
-//   }
-//   setShowConfirmation(false);
-//   setConfirmationType(null);
-// };
-
-//   const handleCloseConfirmation = () => {
-//     setShowConfirmation(false);
-//     setConfirmationType(null);
-//   };
 "use client"
 import {useFormNavigation, ConfirmationModal} from './UseFormNavigation'
 import { useState } from "react"
 
-const FinancialData = ({ currentForm, onNavigate, onClose, setActiveTabs, Activetabs, onclicktabs }) => {
+const EconomicParameter  = ({ currentForm, onNavigate, onClose, setActiveTabs, Activetabs, onclicktabs }) => {
   const navigation = useFormNavigation(currentForm, onNavigate);
   
   const [showConfirmation, setShowConfirmation] = useState(false)
@@ -166,19 +33,19 @@ const FinancialData = ({ currentForm, onNavigate, onClose, setActiveTabs, Active
     setPendingInterestRate(null);
   };
 
-  // Initial state for financial data fields
-  const [financialData, setFinancialData] = useState({
-    realDiscountRate: "4.2500",
-    interestRate: "10",
-    investmentRatio: "0.5000",
-    durationOfStudy: "50 & 100",
+  // Initial state for Economic Parameter  fields
+  const [EconomicParameter , setFinancialData] = useState({
+    realDiscountRate: "",
+    interestRate: "",
+    investmentRatio: "",
+    durationOfStudy: "",
     constructionTime: ""
   })
 
   // Handle field changes
   const handleChange = (field, value) => {
     setFinancialData({
-      ...financialData,
+      ...EconomicParameter ,
       [field]: value
     })
     setHasUnsavedChanges(true);
@@ -203,21 +70,21 @@ const FinancialData = ({ currentForm, onNavigate, onClose, setActiveTabs, Active
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(financialData)
+        body: JSON.stringify(EconomicParameter )
       })
 
       if (response.ok) {
         const result = await response.json()
-        console.log('Financial data saved successfully:', result)
+        console.log('Economic Parameter  saved successfully:', result)
         setHasUnsavedChanges(false)
         return true;
       } else {
         const errorData = await response.json();
-        console.error('Failed to save financial data:', errorData)
+        console.error('Failed to save Economic Parameter :', errorData)
         return false;
       }
     } catch (error) {
-      console.error('Error saving financial data:', error)
+      console.error('Error saving Economic Parameter :', error)
       return false;
     }
   }
@@ -230,9 +97,9 @@ const FinancialData = ({ currentForm, onNavigate, onClose, setActiveTabs, Active
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          interestRate: parseFloat(financialData.interestRate),
-          constructionTime: parseFloat(financialData.constructionTime),
-          investmentRatio: parseFloat(financialData.investmentRatio)
+          interestRate: parseFloat(EconomicParameter .interestRate),
+          constructionTime: parseFloat(EconomicParameter .constructionTime),
+          investmentRatio: parseFloat(EconomicParameter .investmentRatio)
         })
       });
 
@@ -260,10 +127,10 @@ const FinancialData = ({ currentForm, onNavigate, onClose, setActiveTabs, Active
 
   const handleConfirm = async () => {
     if (confirmationType === 'next') {
-      console.log('Saving form data:', financialData);
+      console.log('Saving form data:', EconomicParameter );
       
       // Validate required fields
-      if (!financialData.constructionTime || financialData.constructionTime === "") {
+      if (!EconomicParameter .constructionTime || EconomicParameter .constructionTime === "") {
         alert('Please fill in the construction time before proceeding.');
         setShowConfirmation(false);
         setConfirmationType(null);
@@ -271,7 +138,7 @@ const FinancialData = ({ currentForm, onNavigate, onClose, setActiveTabs, Active
       }
 
       try {
-        // Save financial data first
+        // Save Economic Parameter  first
         const saveSuccess = await handleSave();
         
         if (saveSuccess) {
@@ -280,8 +147,9 @@ const FinancialData = ({ currentForm, onNavigate, onClose, setActiveTabs, Active
           
           setHasUnsavedChanges(false);
           navigation.navigate(navigation.getNextForm());
+          
         } else {
-          alert('Failed to save financial data. Please try again.');
+          alert('Failed to save Economic Parameter . Please try again.');
         }
       } catch (error) {
         console.error('Error in form submission:', error);
@@ -354,14 +222,15 @@ const FinancialData = ({ currentForm, onNavigate, onClose, setActiveTabs, Active
           <div className="flex items-center">
             <div className="w-1/3">
               <label className="flex items-center text-gray-700">
-                Real Discount Rate
+                Discount Rate(Inflation Adjusted)
                 <InfoTooltip />
               </label>
             </div>
             <div className="w-1/3 flex items-center">
               <input
                 type="text"
-                value={financialData.realDiscountRate}
+                placeholder='4.2500'
+                value={EconomicParameter.realDiscountRate}
                 onChange={(e) => handleChange("realDiscountRate", e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
               />
@@ -373,6 +242,7 @@ const FinancialData = ({ currentForm, onNavigate, onClose, setActiveTabs, Active
           </div>
 
           {/* Interest Rate */}
+{/* Interest Rate */}
           <div className="flex items-center">
             <div className="w-1/3">
               <label className="text-gray-700">Interest Rate</label>
@@ -381,46 +251,46 @@ const FinancialData = ({ currentForm, onNavigate, onClose, setActiveTabs, Active
               <div className="relative w-full">
                 <input
                   type="text"
-                  value={financialData.interestRate}
-                                onChange={(e) => {
-                const value = e.target.value;
-                const numericValue = parseFloat(value);
+                  placeholder="7.5"
+                  value={EconomicParameter.interestRate}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const numericValue = parseFloat(value);
 
-                if (numericValue > 10) {
-                  setPendingInterestRate(value);
-                  setShowInterestWarning(true);
-                } else {
-                  handleChange("interestRate", value);
-                }
-              }}
-
+                    if (numericValue > 10) {
+                      setPendingInterestRate(value);
+                      setShowInterestWarning(true);
+                    } else {
+                      handleChange("interestRate", value);
+                    }
+                  }}
                   className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm appearance-none"
                 />
-                  {showInterestWarning && (
-    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-md shadow-lg w-96">
-        <p className="text-sm text-gray-800 mb-4">
-          Interest rate exceeds the recommended 10%. Are you sure you want to proceed?
-        </p>
-        <div className="flex justify-end gap-3">
-          <button
-            onClick={cancelInterestChange}
-            className="px-3 py-1 text-sm rounded bg-gray-300 hover:bg-gray-400 text-gray-800"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={confirmInterestChange}
-            className="px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            Yes, Proceed
-          </button>
-        </div>
-      </div>
-    </div>
-  )}
+                {showInterestWarning && (
+                  <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-md shadow-lg w-96">
+                      <p className="text-sm text-gray-800 mb-4">
+                        Interest rate exceeds the recommended 10%. Are you sure you want to proceed?
+                      </p>
+                      <div className="flex justify-end gap-3">
+                        <button
+                          onClick={cancelInterestChange}
+                          className="px-3 py-1 text-sm rounded bg-gray-300 hover:bg-gray-400 text-gray-800"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={confirmInterestChange}
+                          className="px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                          Yes, Proceed
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-              <span className="ml-2">(%)</span>
+              <span className="ml-2">(RBI repo rate +2%)</span>
             </div>
             <div className="w-1/3">
               <SuggestedTag />
@@ -436,7 +306,8 @@ const FinancialData = ({ currentForm, onNavigate, onClose, setActiveTabs, Active
               <div className="relative w-full">
                 <input
                  type="text"
-                  value={financialData.investmentRatio}
+                 placeholder='0.5000'
+                  value={EconomicParameter .investmentRatio}
                   onChange={(e) => handleChange("investmentRatio", e.target.value)}
                   className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm appearance-none"
                 />
@@ -451,18 +322,17 @@ const FinancialData = ({ currentForm, onNavigate, onClose, setActiveTabs, Active
           {/* Duration of Study */}
           <div className="flex items-center">
             <div className="w-1/3">
-              <label className="text-gray-700">Duration of Study</label>
+              <label className="text-gray-700">Life Cycle Duration</label>
             </div>
             <div className="w-1/3 flex items-center">
-              <select
-          
+              <input
+                type="text"
+                value={EconomicParameter.durationOfStudy}
+                placeholder="50 & 100"
                 onChange={(e) => handleChange("durationOfStudy", e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
-              >
-              <option value="50">50</option>
-               <option value="100">100</option>
-                <option value="50,100">50 & 100</option>
-              </select>
+              />
+              
               <span className="ml-2">(years)</span>
             </div>
             <div className="w-1/3">
@@ -474,17 +344,17 @@ const FinancialData = ({ currentForm, onNavigate, onClose, setActiveTabs, Active
           <div className="flex items-center">
             <div className="w-1/3">
               <label className="text-gray-700 leading-tight">
-                Time for construction of Base Project
+                Duration of Initial Construction
               </label>
             </div>
             <div className="w-1/3 flex items-center">
               <input
                 type="text"
-                value={financialData.constructionTime}
+                value={EconomicParameter .constructionTime}
                 onChange={(e) => handleChange("constructionTime", e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
               />
-              <span className="ml-2">(years)</span>
+              { <span className="ml-2">(months)</span>/* make sure you change it to year in backend */}
             </div>
             <div className="w-1/3"></div>
           </div>
@@ -511,7 +381,7 @@ const FinancialData = ({ currentForm, onNavigate, onClose, setActiveTabs, Active
               disabled={!navigation.canGoNext}
               className={`px-8 py-1 text-sm rounded-md border ${
                 navigation.canGoNext 
-                  ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700' 
+                  ?  'bg-[#522828b0] border-black hover:bg-[#814040] text-black' 
                   : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
               }`}
             >
@@ -531,4 +401,4 @@ const FinancialData = ({ currentForm, onNavigate, onClose, setActiveTabs, Active
   )
 }
 
-export default FinancialData
+export default EconomicParameter 

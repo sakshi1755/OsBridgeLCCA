@@ -106,16 +106,16 @@ const ReusableSidebar = ({
             )}
           </div>
 
-          {/* Financial Data */}
+          {/* Economic Parameter  */}
           <div
             className={`flex items-center px-3 py-0.5 text-[13px] cursor-pointer ${
-              selectedWindow === "Financial Data"
+              selectedWindow === "Economic Parameter "
                 ? "bg-gray-700 text-white"
                 : "hover:bg-gray-100"
             }`}
-            onClick={() => handleItemClick("Financial Data")}
+            onClick={() => handleItemClick("Economic Parameter ")}
           >
-            Financial Data
+            Economic Parameter 
           </div>
 
           {/* Carbon Emission Data with expand/collapse */}

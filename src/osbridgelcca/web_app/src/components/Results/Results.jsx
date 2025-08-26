@@ -547,7 +547,7 @@ import FoundationForm from "../ProjectDetails/StructureWorksComponents/Foundatio
 import SuperStructureForm from "../ProjectDetails/StructureWorksComponents/SuperStructureForm";
 import SubStructureForm from "../ProjectDetails/StructureWorksComponents/SubStructureForm";
 import MiscellaneousForm from "../ProjectDetails/StructureWorksComponents/MiscellaneousForm";
-import FinancialData from "../ProjectDetails/FinancialData";
+import EconomicParameter  from "../ProjectDetails/EconomicParameter";
 import CarbonEmissionData from "../ProjectDetails/CarbonEmissionData";
 import CarbonEmissionCostData from "../ProjectDetails/CarbonEmissionCostData";
 import BridgeandTraffic from "../ProjectDetails/BridgeandTraffic";
@@ -801,25 +801,25 @@ const Results = ({ setSelectedProjectDetailWindow, setShowTutorials }) => {
               )}
             </div>
 
-            {/* Financial Data */}
+            {/* Economic Parameter  */}
             <div
               className={`flex items-center px-3 py-0.5 text-[13px] cursor-pointer ${
-                selectedForm === "Financial Data"
+                selectedForm === "Economic Parameter "
                   ? "bg-gray-700 text-white"
                   : "hover:bg-gray-100"
               }`}
               onClick={() => {
-                setSelectedForm("Financial Data");
+                setSelectedForm("Economic Parameter ");
                 setShowTutorials(false);
                 setActiveTabs((tabs) => {
-                  if (!tabs.includes("Financial Data")) {
-                    return [...tabs, "Financial Data"];
+                  if (!tabs.includes("Economic Parameter ")) {
+                    return [...tabs, "Economic Parameter "];
                   }
                   return tabs;
                 });
               }}
             >
-              Financial Data
+              Economic Parameter 
             </div>
 
             {/* Carbon Emission Data with expand/collapse */}
@@ -1008,9 +1008,9 @@ const Results = ({ setSelectedProjectDetailWindow, setShowTutorials }) => {
                 onclicktabs={onClickTabs}
               />
             )}
-            {selectedForm === "Financial Data" && (
-              <FinancialData
-                currentForm="Financial Data"
+            {selectedForm === "Economic Parameter " && (
+              <EconomicParameter 
+                currentForm="Economic Parameter "
                 onNavigate={handleFormNavigation}
                 onClose={handleTabClose}
                 onclicktabs={onClickTabs}

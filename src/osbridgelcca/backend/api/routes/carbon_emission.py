@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 import json
 import os
 from datetime import datetime
+import sqlite3
 
 carbon_emission_bp = Blueprint('carbon_emission', __name__)
 
@@ -93,46 +94,7 @@ def load_carbon_emission_data_from_file():
         print(f"Error loading carbon emission data: {e}")
     return {}
 
-@carbon_emission_bp.route('/get-carbon-materials', methods=['GET'])
-def get_carbon_materials():
-    """Get all materials from saved forms for carbon emission calculation"""
-    try:
-        saved_forms = load_saved_forms_data()
-        materials_list = []
-        
-        # Form names mapping
-        form_names = ['foundation', 'sub-structure', 'super-structure', 'miscellaneous']
-        
-        for form_name in form_names:
-            if form_name in saved_forms:
-                form_data = saved_forms[form_name]
-                if 'materials' in form_data:
-                    for material in form_data['materials']:
-                        material_entry = {
-                            'id': len(materials_list) + 1,
-                            'form_name': form_name,
-                            'component': material.get('component', ''),
-                            'material_type': material.get('materialType', material.get('customMaterialType', '')),
-                            'sub_material_type': material.get('subMaterialType', ''),
-                            'quantity': material.get('quantity', ''),
-                            'unit': material.get('unit', ''),
-                            'embedded_carbon_energy': '',
-                            'carbon_emission_factor': '',
-                            'total_carbon_emission': 0
-                        }
-                        materials_list.append(material_entry)
-        
-        return jsonify({
-            'success': True,
-            'materials': materials_list,
-            'total_count': len(materials_list)
-        })
-    
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+
 
 @carbon_emission_bp.route('/get-carbon-emission-factors/<material_name>', methods=['GET'])
 def get_carbon_emission_factors(material_name):
@@ -162,9 +124,10 @@ def get_carbon_emission_factors(material_name):
             'error': str(e)
         }), 500
 
+# In emissions.py, modify save_carbon_emission_data function:
 @carbon_emission_bp.route('/save-carbon-emission-data', methods=['POST'])
 def save_carbon_emission_data():
-    """Save carbon emission data"""
+    """Save carbon emission data to database"""
     try:
         data = request.get_json()
         
@@ -176,26 +139,27 @@ def save_carbon_emission_data():
         
         # Add timestamp
         data['timestamp'] = datetime.now().isoformat()
-        data['last_updated'] = datetime.now().isoformat()
         
-        # Save to memory
-        carbon_emission_storage['current_data'] = data
+        # Save to database instead of file
+        db_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'databases', 'project_data.db')
+        db_path = os.path.abspath(db_path)
         
-        # Save to file
-        save_success = save_carbon_emission_data_to_file(data)
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT OR REPLACE INTO calculation_results (calculation_type, result_data, created_at)
+                VALUES (?, ?, ?)
+            ''', ('carbon_emission_data', json.dumps(data), datetime.now().isoformat()))
+            conn.commit()
         
-        if save_success:
-            return jsonify({
-                'success': True,
-                'message': 'Carbon emission data saved successfully',
-                'data': data
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'error': 'Failed to save data to file'
-            }), 500
-    
+        print("Carbon emission data saved to database:", data)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Carbon emission data saved to database successfully',
+            'data': data
+        })
+        
     except Exception as e:
         return jsonify({
             'success': False,
@@ -318,6 +282,45 @@ def get_carbon_calculation_results():
             'success': False,
             'error': str(e)
         }), 500
+@carbon_emission_bp.route('/save-carbon-emission-materials', methods=['POST'])
+def save_carbon_emission_materials():
+    """Save carbon emission materials data to database"""
+    try:
+        data = request.get_json()
+        data['timestamp'] = datetime.now().isoformat()
+        
+        db_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'databases', 'project_data.db')
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT OR REPLACE INTO calculation_results (calculation_type, result_data, created_at)
+                VALUES (?, ?, ?)
+            ''', ('carbon_emission_materials', json.dumps(data), datetime.now().isoformat()))
+            conn.commit()
+        
+        return jsonify({'success': True, 'message': 'Materials saved to database'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@carbon_emission_bp.route('/save-carbon-cost-parameters', methods=['POST'])
+def save_carbon_cost_parameters():
+    """Save carbon cost parameters to database"""
+    try:
+        data = request.get_json()
+        data['timestamp'] = datetime.now().isoformat()
+        
+        db_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'databases', 'project_data.db')
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT OR REPLACE INTO calculation_results (calculation_type, result_data, created_at)
+                VALUES (?, ?, ?)
+            ''', ('carbon_cost_parameters', json.dumps(data), datetime.now().isoformat()))
+            conn.commit()
+        
+        return jsonify({'success': True, 'message': 'Cost parameters saved to database'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @carbon_emission_bp.route('/update-carbon-emission-factors', methods=['POST'])
 def update_carbon_emission_factors():

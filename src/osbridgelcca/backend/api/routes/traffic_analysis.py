@@ -150,7 +150,7 @@ def calculate_road_user_cost():
         vehicles = road_user_inputs.get('Vehicles', [])
         
         print(f"=== ROAD USER COST CALCULATION START ===")
-        print(f"Parameters: Lane_Type={lane_type}, Roughness={roughness}, RF={rf}")
+        print(f"Original Parameters: Lane_Type={lane_type}, Roughness={roughness}, RF={rf}")
         print(f"Construction Time: {construction_time}, Reroute Distance: {reroute_distance}")
         print(f"Vehicles: {vehicles}")
         
@@ -169,9 +169,29 @@ def calculate_road_user_cost():
             roughness = "Good"  # Default to Good
             print(f"Warning: Roughness was empty, using default: {roughness}")
         
-        if not rf:
+        # FIX: Convert RF value to proper format
+        if not rf or rf in ['', '0', 0]:
             rf = "Rolling"  # Default to Rolling
             print(f"Warning: RF was empty, using default: {rf}")
+        else:
+            # Convert numeric RF to text format
+            try:
+                rf_num = float(rf)
+                if rf_num <= 3:
+                    rf = "Rolling"
+                else:
+                    rf = "Hilly"
+                print(f"Converted RF from {rf_num} to: {rf}")
+            except (ValueError, TypeError):
+                # If RF is already text, validate it
+                if rf.lower() not in ['rolling', 'hilly']:
+                    rf = "Rolling"  # Default fallback
+                    print(f"Invalid RF value, using default: {rf}")
+                else:
+                    rf = rf.title()  # Capitalize first letter
+                    print(f"Using RF: {rf}")
+        
+        print(f"Final Parameters: Lane_Type={lane_type}, Roughness={roughness}, RF={rf}")
         
         total_cost = 0
         calculation_details = []
@@ -221,7 +241,7 @@ def calculate_road_user_cost():
                     'available_options': available_options
                 })
         
-        # Store calculation result
+        # Store calculation result in memory
         calculation_result = {
             'total_road_user_cost': total_cost,
             'calculation_details': calculation_details,
@@ -236,6 +256,68 @@ def calculate_road_user_cost():
         
         timestamp = datetime.now().isoformat()
         traffic_data_storage[f"calculation_{timestamp}"] = calculation_result
+        
+        # SAVE TO DATABASE
+        try:
+            import sqlite3
+            import os
+            
+            db_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'databases', 'project_data.db')
+            db_path = os.path.abspath(db_path)
+            
+            # Ensure directory exists
+            os.makedirs(os.path.dirname(db_path), exist_ok=True)
+            
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                
+                # Create table if it doesn't exist
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS calculation_results (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        calculation_type TEXT NOT NULL,
+                        result_data TEXT NOT NULL,
+                        created_at TEXT NOT NULL
+                    )
+                ''')
+                
+                # Delete existing road user cost calculation
+                cursor.execute('''
+                    DELETE FROM calculation_results 
+                    WHERE calculation_type = 'road_user_cost_calculated'
+                ''')
+                
+                # Save new calculation result
+                result_data = {
+                    'road_user_cost': total_cost,
+                    'calculation_details': calculation_details,
+                    'parameters': {
+                        'lane_type': lane_type,
+                        'roughness': roughness,
+                        'rf': rf,
+                        'construction_time': construction_time,
+                        'reroute_distance': reroute_distance
+                    },
+                    'calculated_at': timestamp
+                }
+                
+                cursor.execute('''
+                    INSERT INTO calculation_results (calculation_type, result_data, created_at)
+                    VALUES (?, ?, ?)
+                ''', ('road_user_cost_calculated', json.dumps(result_data), timestamp))
+                
+                conn.commit()
+                
+                print(f"=== ROAD USER COST SAVED TO DATABASE ===")
+                print(f"Total Cost: ₹{total_cost:.2f}")
+                print(f"Database Path: {db_path}")
+                print("=======================================")
+                
+        except Exception as db_error:
+            print(f"Error saving road user cost to database: {db_error}")
+            import traceback
+            traceback.print_exc()
+            # Don't fail the main operation if database save fails
         
         print(f"=== ROAD USER COST CALCULATION COMPLETE ===")
         print(f"Total Road User Cost: {total_cost}")
@@ -272,6 +354,23 @@ def get_traffic_data():
             'success': False,
             'error': str(e)
         }), 500
+# In save_traffic_data function, add database storage:
+def save_to_database(data):
+    db_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'databases', 'project_data.db')
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT OR REPLACE INTO calculation_results (calculation_type, result_data, created_at)
+            VALUES (?, ?, ?)
+        ''', ('traffic_data', json.dumps(data), datetime.now().isoformat()))
+        
+        # Also store road user cost calculation
+        cursor.execute('''
+            INSERT OR REPLACE INTO calculation_results (calculation_type, result_data, created_at)
+            VALUES (?, ?, ?)
+        ''', ('road_user_cost', json.dumps({'road_user_cost': total_cost}), datetime.now().isoformat()))
+        
+        conn.commit()
 
 @traffic_analysis_bp.route('/api/clear-traffic-data', methods=['DELETE'])
 def clear_traffic_data():

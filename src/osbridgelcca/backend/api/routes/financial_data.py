@@ -2,7 +2,8 @@ from flask import Blueprint, request, jsonify
 import json
 import os
 import sys
-
+from datetime import datetime
+from api.models.database import get_db_session, get_or_create_project, FormData, CalculationResults
 # Add the parent directory to Python path to access core modules
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.join(current_dir, '..', '..', '..')
@@ -43,24 +44,32 @@ class TimeCost:
             return {'error': str(e)}
 
 def get_initial_construction_cost():
-    """
-    Get the initial construction cost from the API
-    This function should fetch the calculated initial construction cost
-    """
+    """Get the initial construction cost from database"""
     try:
-        # First, try to get the stored construction cost
-        response = fetch_initial_construction_cost()
-        if response and 'total_cost' in response:
-            return response['total_cost']
-        
-        # If no stored cost, return a default value or calculate it
-        # You might want to call the calculate-initial-cost endpoint here
-        print("Warning: No initial construction cost found, using default value")
-        return 1000000  # Default value - you should replace this with actual calculation
-        
+        session = get_db_session()
+        try:
+            project = get_or_create_project(session, "default")
+            
+            # Get the latest auto-calculated construction cost
+            calc_result = session.query(CalculationResults).filter_by(
+                project_id=project.id,
+                calculation_type='initial_construction_cost_auto'
+            ).order_by(CalculationResults.created_at.desc()).first()
+            
+            if calc_result and 'total_initial_cost' in calc_result.result_data:
+                cost = calc_result.result_data['total_initial_cost']
+                print(f"Retrieved initial construction cost from database: ₹{cost:,.2f}")
+                return cost
+            else:
+                print("No initial construction cost found in database")
+                return 0
+                
+        finally:
+            session.close()
+            
     except Exception as e:
         print(f"Error getting initial construction cost: {e}")
-        return 1000000  # Default fallback value
+        return 0
 
 def fetch_initial_construction_cost():
     """
@@ -84,9 +93,7 @@ def fetch_initial_construction_cost():
 
 @financial_bp.route('/api/save-financial-data', methods=['POST'])
 def save_financial_data():
-    """
-    Save Economic Parameter  to storage
-    """
+    """Save Economic Parameter to both storage and database"""
     try:
         data = request.json
         
@@ -97,18 +104,46 @@ def save_financial_data():
             if field not in data:
                 return jsonify({'error': f'Missing required field: {field}'}), 400
         
-        # Store the Economic Parameter 
+        # Store in memory
         financial_data_storage.update(data)
         
-        # Also save to file for persistence (optional)
+        # Store in database
+        session = get_db_session()
         try:
-            with open('financial_data.json', 'w') as f:
-                json.dump(financial_data_storage, f, indent=2)
-        except Exception as e:
-            print(f"Warning: Could not save to file: {e}")
+            project = get_or_create_project(session, "default")
+            
+            # Check if financial data already exists
+            existing_form = session.query(FormData).filter_by(
+                project_id=project.id, 
+                form_name='economic_parameter'
+            ).first()
+            
+            if existing_form:
+                existing_form.materials = [data]  # Store as single item array
+                existing_form.saved_at = datetime.now()
+            else:
+                form_data = FormData(
+                    project_id=project.id,
+                    form_name='economic_parameter',
+                    materials=[data]
+                )
+                session.add(form_data)
+            
+            session.commit()
+            
+            print(f"=== ECONOMIC PARAMETER SAVED ===")
+            print(f"Real Discount Rate: {data.get('realDiscountRate')}")
+            print(f"Interest Rate: {data.get('interestRate')}")
+            print(f"Investment Ratio: {data.get('investmentRatio')}")
+            print(f"Duration of Study: {data.get('durationOfStudy')}")
+            print(f"Construction Time: {data.get('constructionTime')}")
+            print("================================")
+            
+        finally:
+            session.close()
         
         return jsonify({
-            'message': 'Economic Parameter  saved successfully',
+            'message': 'Economic Parameter saved successfully',
             'saved_data': financial_data_storage
         }), 200
         
@@ -118,7 +153,7 @@ def save_financial_data():
 @financial_bp.route('/api/calculate-time-cost', methods=['POST'])
 def calculate_time_cost():
     """
-    Calculate time cost based on Economic Parameter 
+    Calculate time cost based on Economic Parameter and SAVE to database
     """
     try:
         # Get data from request body
@@ -150,6 +185,38 @@ def calculate_time_cost():
         
         if 'error' in result:
             return jsonify({'error': result['error']}), 400
+        
+        # SAVE TO DATABASE - ADD THIS SECTION
+        try:
+            session = get_db_session()
+            try:
+                project = get_or_create_project(session, "default")
+                
+                # Delete existing time cost calculation
+                session.query(CalculationResults).filter_by(
+                    project_id=project.id,
+                    calculation_type='time_cost'
+                ).delete()
+                
+                # Save new calculation result
+                calc_result = CalculationResults(
+                    project_id=project.id,
+                    calculation_type='time_cost',
+                    result_data=result
+                )
+                session.add(calc_result)
+                session.commit()
+                
+                print("=== TIME COST SAVED TO DATABASE ===")
+                print(f"Time Cost: ₹{result['time_cost']:.2f}")
+                print("==================================")
+                
+            finally:
+                session.close()
+                
+        except Exception as db_error:
+            print(f"Error saving time cost to database: {db_error}")
+            # Still return the result even if database save fails
         
         return jsonify(result), 200
         
@@ -193,7 +260,34 @@ def get_initial_cost():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
+@financial_bp.route('/api/get-stored-time-cost', methods=['GET'])
+def get_stored_time_cost():
+    """Get stored time cost calculation from database"""
+    try:
+        session = get_db_session()
+        try:
+            project = get_or_create_project(session, "default")
+            
+            calc_result = session.query(CalculationResults).filter_by(
+                project_id=project.id,
+                calculation_type='time_cost'
+            ).order_by(CalculationResults.created_at.desc()).first()
+            
+            if calc_result:
+                return jsonify({
+                    'success': True,
+                    'result': calc_result.result_data
+                })
+            else:
+                return jsonify({
+                    'success': True,
+                    'result': None,
+                    'message': 'No time cost calculation found'
+                })
+        finally:
+            session.close()
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 # Initialize storage with default values
 financial_data_storage = {
     'realDiscountRate': '4.2500',

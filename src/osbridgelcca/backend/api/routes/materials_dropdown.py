@@ -17,6 +17,7 @@ def forms():
 @materials_dropdown_bp.route('/components/<form_name>')
 def components(form_name):
     # Handle URL decoding and form name normalization
+    
     form_name = form_name.replace('%20', ' ').replace('-', '-')
     if not is_valid_form(form_name):
         return jsonify([])

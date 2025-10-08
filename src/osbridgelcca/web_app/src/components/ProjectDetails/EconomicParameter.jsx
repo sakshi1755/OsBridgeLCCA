@@ -125,43 +125,77 @@ const EconomicParameter  = ({ currentForm, onNavigate, onClose, setActiveTabs, A
     }
   }
 
-  const handleConfirm = async () => {
-    if (confirmationType === 'next') {
-      console.log('Saving form data:', EconomicParameter );
+const handleConfirm = async () => {
+  if (confirmationType === 'next') {
+    console.log('Saving form data:', EconomicParameter);
+    
+    // ADD VALIDATION HERE - Show warning but still allow saving
+    try {
+      const validationResponse = await fetch('http://127.0.0.1:5000/api/validate-form-sequence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target_form: 'economic parameter' })
+      });
       
-      // Validate required fields
-      if (!EconomicParameter .constructionTime || EconomicParameter .constructionTime === "") {
-        alert('Please fill in the construction time before proceeding.');
+      const validationResult = await validationResponse.json();
+      
+      if (!validationResult.can_navigate) {
+        // Show warning but allow user to continue
+        const userConfirm = window.confirm(
+          `Warning: ${validationResult.message}\n\nDo you want to continue anyway? Your data will be saved but calculations may be incomplete.`
+        );
+        
+        if (!userConfirm) {
+          setShowConfirmation(false);
+          setConfirmationType(null);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Validation error:', error);
+      const userConfirm = window.confirm(
+        'Warning: Could not validate form completion. Some structure forms may be incomplete.\n\nDo you want to continue anyway?'
+      );
+      
+      if (!userConfirm) {
         setShowConfirmation(false);
         setConfirmationType(null);
         return;
       }
-
-      try {
-        // Save Economic Parameter  first
-        const saveSuccess = await handleSave();
-        
-        if (saveSuccess) {
-          // Then calculate time cost
-          await calculateTimeCost();
-          
-          setHasUnsavedChanges(false);
-          navigation.navigate(navigation.getNextForm());
-          
-        } else {
-          alert('Failed to save Economic Parameter . Please try again.');
-        }
-      } catch (error) {
-        console.error('Error in form submission:', error);
-        alert('An error occurred while saving the data. Please try again.');
-      }
-    } else if (confirmationType === 'back') {
-      navigation.navigate(navigation.getPreviousForm());
     }
-    setShowConfirmation(false);
-    setConfirmationType(null);
-  };
+    
+    // Validate required fields (existing validation)
+    if (!EconomicParameter.constructionTime || EconomicParameter.constructionTime === "") {
+      alert('Please fill in the construction time before proceeding.');
+      setShowConfirmation(false);
+      setConfirmationType(null);
+      return;
+    }
 
+    try {
+      // Save Economic Parameter first
+      const saveSuccess = await handleSave();
+      
+      if (saveSuccess) {
+        // Then calculate time cost
+        await calculateTimeCost();
+        
+        setHasUnsavedChanges(false);
+        navigation.navigate(navigation.getNextForm());
+        
+      } else {
+        alert('Failed to save Economic Parameter. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error in form submission:', error);
+      alert('An error occurred while saving the data. Please try again.');
+    }
+  } else if (confirmationType === 'back') {
+    navigation.navigate(navigation.getPreviousForm());
+  }
+  setShowConfirmation(false);
+  setConfirmationType(null);
+};
   const handleCloseConfirmation = () => {
     setShowConfirmation(false);
     setConfirmationType(null);

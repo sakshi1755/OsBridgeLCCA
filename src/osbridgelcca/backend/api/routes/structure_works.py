@@ -616,6 +616,22 @@ from sqlalchemy import text
 
 # Import database models
 from api.models.database import get_db_session, get_or_create_project, FormData, CalculationResults
+def initialize_database():
+    """Initialize/reset the database - called manually or on server restart"""
+    try:
+        session = get_db_session()
+        try:
+            project = get_or_create_project(session, "default")
+            # Clear all existing calculation results
+            session.query(CalculationResults).filter_by(project_id=project.id).delete()
+            session.commit()
+            print("=== DATABASE CALCULATIONS CLEARED ===")
+        finally:
+            session.close()
+    except Exception as e:
+        print(f"Error clearing database calculations: {e}")
+
+# Call this when the blueprint is loaded
 
 structure_works_bp = Blueprint('structure_works', __name__)
 
@@ -683,19 +699,46 @@ def get_carbon_materials():
         try:
             project = get_or_create_project(session, "default")
             
-            # Get all form data for this project
-            form_data_list = session.query(FormData).filter_by(project_id=project.id).all()
+            # ONLY get these 4 specific structure forms - exclude economic_parameter
+            structure_forms = ['foundation', 'sub-structure', 'super-structure', 'miscellaneous']
+            
+            # Get form data only for structure forms
+            form_data_list = session.query(FormData).filter(
+                FormData.project_id == project.id,
+                FormData.form_name.in_(structure_forms)
+            ).all()
             
             all_materials = []
             forms_found = []
+            processed_materials = set()  # Track to avoid duplicates
             
             for form_data in form_data_list:
                 forms_found.append(form_data.form_name)
                 materials = form_data.materials or []
                 
-                for material in materials:
+                print(f"Processing form: {form_data.form_name} with {len(materials)} materials")
+                
+                for material_index, material in enumerate(materials):
+                    # Create a unique key to prevent duplicates
+                    material_key = (
+                        form_data.form_name,
+                        material.get('component', ''),
+                        material.get('materialType', ''),
+                        material.get('subMaterialType', ''),
+                        material.get('quantity', ''),
+                        material.get('unit', ''),
+                        material_index
+                    )
+                    
+                    # Skip if already processed
+                    if material_key in processed_materials:
+                        print(f"  Skipping duplicate material: {material.get('materialType', 'Unknown')}")
+                        continue
+                    
+                    processed_materials.add(material_key)
+                    
                     material_with_form = {
-                        'id': f"{form_data.form_name}_{material.get('id', len(all_materials))}",
+                        'id': f"{form_data.form_name}_{material_index}_{len(all_materials)}",
                         'form_name': form_data.form_name,
                         'component': material.get('component', ''),
                         'material_type': material.get('materialType', ''),
@@ -709,8 +752,9 @@ def get_carbon_materials():
                     all_materials.append(material_with_form)
             
             print(f"=== CARBON MATERIALS RETRIEVED FROM DATABASE ===")
-            print(f"Total materials: {len(all_materials)}")
-            print(f"From forms: {forms_found}")
+            print(f"Structure forms processed: {forms_found}")
+            print(f"Total unique materials: {len(all_materials)}")
+            print(f"Excluded forms: economic_parameter (and any others not in structure forms)")
             print("===============================================")
             
             return jsonify({
@@ -729,7 +773,6 @@ def get_carbon_materials():
             'success': False,
             'error': str(e)
         }), 500
-
 @structure_works_bp.route('/api/calculate-initial-cost', methods=['POST'])
 def calculate_initial_cost():
     """Calculate initial construction cost for submitted materials and save to database"""
@@ -1106,8 +1149,195 @@ def clear_form_data():
             'success': False,
             'error': str(e)
         }), 500
+    
+@structure_works_bp.route('/api/calculate-and-save-initial-cost', methods=['POST'])
+def calculate_and_save_initial_cost():
+    """Calculate initial construction cost from all saved forms and save result"""
+    try:
+        session = get_db_session()
+        try:
+            project = get_or_create_project(session, "default")
+            
+            # Get all form data for structure forms
+            structure_forms = ['foundation', 'sub-structure', 'super-structure', 'miscellaneous']
+            all_materials = []
+            forms_included = []
+            
+            for form_name in structure_forms:
+                form_data = session.query(FormData).filter_by(
+                    project_id=project.id, 
+                    form_name=form_name
+                ).first()
+                
+                if form_data and form_data.materials:
+                    valid_materials = [
+                        material for material in form_data.materials 
+                        if all([
+                            material.get('quantity'),
+                            material.get('rate'),
+                            material.get('materialType'),
+                            material.get('subMaterialType'),
+                            material.get('unit')
+                        ])
+                    ]
+                    
+                    if valid_materials:
+                        all_materials.extend(valid_materials)
+                        forms_included.append(form_name)
+            
+            if not all_materials:
+                print("=== NO VALID MATERIALS FOUND FOR CALCULATION ===")
+                return jsonify({
+                    'success': False,
+                    'error': 'No valid materials found for calculation'
+                })
+            
+            # Calculate total cost
+            total_cost = 0
+            cost_breakdown = []
+            
+            print(f"")
+            print(f"=== CALCULATING INITIAL CONSTRUCTION COST FROM DATABASE ===")
+            print(f"Server restart: Database cleared and recalculating...")
+            print(f"Forms included: {', '.join(forms_included)}")
+            print(f"Total materials to process: {len(all_materials)}")
+            print(f"")
+            
+            for i, material in enumerate(all_materials, 1):
+                try:
+                    quantity = float(material.get('quantity', 0))
+                    rate = float(material.get('rate', 0))
+                    material_cost = quantity * rate
+                    total_cost += material_cost
+                    
+                    cost_item = {
+                        'form': material.get('form_name', 'unknown'),
+                        'component': material.get('component', ''),
+                        'material': material.get('materialType', ''),
+                        'grade': material.get('subMaterialType', ''),
+                        'quantity': quantity,
+                        'unit': material.get('unit', ''),
+                        'rate': rate,
+                        'total_cost': material_cost
+                    }
+                    cost_breakdown.append(cost_item)
+                    
+                    print(f"  {i:2d}. {material.get('materialType', 'Unknown'):20} ({material.get('subMaterialType', 'N/A'):15})")
+                    print(f"      {quantity:8.2f} {material.get('unit', ''):6} @ ₹{rate:10.2f} = ₹{material_cost:12.2f}")
+                    
+                except (ValueError, TypeError) as e:
+                    print(f"  ERROR processing material {i}: {str(e)}")
+                    continue
+            
+            print(f"")
+            print(f"TOTAL INITIAL CONSTRUCTION COST: ₹{total_cost:,.2f}")
+            print(f"Cost saved to database successfully")
+            print(f"===============================================================")
+            print(f"")
+            
+            # Save calculation result (remove previous auto calculations first)
+            session.query(CalculationResults).filter_by(
+                project_id=project.id,
+                calculation_type='initial_construction_cost_auto'
+            ).delete()
+            
+            calculation_result = {
+                'calculation_type': 'initial_construction_cost_auto',
+                'total_initial_cost': total_cost,
+                'cost_breakdown': cost_breakdown,
+                'forms_included': forms_included,
+                'materials_count': len(all_materials),
+                'calculated_at': datetime.now().isoformat()
+            }
+            
+            calc_result = CalculationResults(
+                project_id=project.id,
+                calculation_type='initial_construction_cost_auto',
+                result_data=calculation_result
+            )
+            session.add(calc_result)
+            session.commit()
+            
+            return jsonify({
+                'success': True,
+                'total_initial_cost': total_cost,
+                'cost_breakdown': cost_breakdown,
+                'forms_included': forms_included,
+                'materials_count': len(all_materials),
+                'calculated_at': datetime.now().isoformat()
+            })
+            
+        finally:
+            session.close()
+            
+    except Exception as e:
+        print(f"ERROR calculating initial construction cost: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+@structure_works_bp.route('/api/get-initial-construction-cost', methods=['GET'])
+def get_initial_construction_cost():
+    """Get the latest calculated initial construction cost"""
+    try:
+        session = get_db_session()
+        try:
+            project = get_or_create_project(session, "default")
+            
+            calc_result = session.query(CalculationResults).filter_by(
+                project_id=project.id,
+                calculation_type='initial_construction_cost_auto'
+            ).order_by(CalculationResults.created_at.desc()).first()
+            
+            if calc_result:
+                return jsonify({
+                    'success': True,
+                    'result': calc_result.result_data
+                })
+            else:
+                return jsonify({
+                    'success': True,
+                    'result': None,
+                    'message': 'No calculation found'
+                })
+                
+        finally:
+            session.close()
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
-@structure_works_bp.route('/api/debug-form-storage', methods=['GET'])
+@structure_works_bp.route('/api/clear-database-calculations', methods=['DELETE'])
+def clear_database_calculations():
+    """Clear all calculation results AND form data from database"""
+    try:
+        session = get_db_session()
+        try:
+            project = get_or_create_project(session, "default")
+            
+            calc_deleted = session.query(CalculationResults).filter_by(project_id=project.id).count()
+            form_deleted = session.query(FormData).filter_by(project_id=project.id).count()
+            
+            session.query(CalculationResults).filter_by(project_id=project.id).delete()
+            session.query(FormData).filter_by(project_id=project.id).delete()  # ADD THIS LINE
+            
+            session.commit()
+            
+            print(f"=== MANUALLY CLEARED {calc_deleted} CALCULATIONS & {form_deleted} FORM DATA ===")
+            
+            return jsonify({
+                'success': True,
+                'message': f'Cleared {calc_deleted} calculations and {form_deleted} form data',
+                'calculations_deleted': calc_deleted,
+                'form_data_deleted': form_deleted
+            })
+        finally:
+            session.close()
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 def debug_form_storage():
     """Debug endpoint to check what's stored in database"""
     try:

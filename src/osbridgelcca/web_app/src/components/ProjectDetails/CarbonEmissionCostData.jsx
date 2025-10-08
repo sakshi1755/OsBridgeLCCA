@@ -50,18 +50,37 @@ const CarbonEmissionCostData = ({currentForm, onNavigate, onClose, setActiveTabs
 }
 
 
-  const handleConfirm = () => {
-    if (confirmationType === 'next') {
-      // Here you would typically save the form data to your context or API
+const handleConfirm = () => {
+  if (confirmationType === 'next') {
+    // Save cost parameters to database
+    saveCostParametersToDatabase().then(() => {
       console.log('Saving form data:', formData);
       setHasUnsavedChanges(false);
       navigation.navigate(navigation.getNextForm());
-    } else if (confirmationType === 'back') {
-      navigation.navigate(navigation.getPreviousForm());
+    });
+  } else if (confirmationType === 'back') {
+    navigation.navigate(navigation.getPreviousForm());
+  }
+  setShowConfirmation(false);
+  setConfirmationType(null);
+};
+
+// Add this new function:
+const saveCostParametersToDatabase = async () => {
+  try {
+    const response = await fetch('http://127.0.0.1:5000/api/save-carbon-cost-parameters', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    });
+    
+    if (response.ok) {
+      console.log('Carbon cost parameters saved to database');
     }
-    setShowConfirmation(false);
-    setConfirmationType(null);
-  };
+  } catch (error) {
+    console.error('Error saving carbon cost parameters:', error);
+  }
+};
 
   const handleCloseConfirmation = () => {
     setShowConfirmation(false);

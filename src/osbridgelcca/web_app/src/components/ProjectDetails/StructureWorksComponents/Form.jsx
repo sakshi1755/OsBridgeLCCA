@@ -2322,36 +2322,63 @@ const Form = ({
     setMaterials([...materials, newMaterial])
   }
 
-  const handleNext = async () => {
-    // Validate required fields
-    const requiredFields = ['materialType', 'subMaterialType', 'rate', 'quantity', 'unit']
-    const invalidMaterials = materials.filter(material => {
-      return requiredFields.some(field => {
-        const value = material[field]
-        return !value || String(value).trim() === ''
-      })
+const handleNext = async () => {
+  // Validate required fields
+  const requiredFields = ['materialType', 'subMaterialType', 'rate', 'quantity', 'unit']
+  const invalidMaterials = materials.filter(material => {
+    return requiredFields.some(field => {
+      const value = material[field]
+      return !value || String(value).trim() === ''
     })
+  })
 
-    if (invalidMaterials.length > 0) {
-      alert('Please fill all required fields (marked with *) before proceeding.')
+  if (invalidMaterials.length > 0) {
+    alert('Please fill all required fields (marked with *) before proceeding.')
+    return
+  }
+
+  // Save current form and calculate cost (this now does both)
+  await handleSave()
+  
+  // Trigger calculation and save to database
+  try {
+    console.log('=== CALCULATING & SAVING INITIAL CONSTRUCTION COST ===')
+    
+    const response = await fetch('http://127.0.0.1:5000/api/calculate-and-save-initial-cost', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    
+    if (response.ok) {
+      const result = await response.json()
+      if (result.success) {
+        console.log('Initial construction cost calculated and saved to database')
+        console.log(`Total Cost: ₹${result.total_initial_cost.toFixed(2)}`)
+        console.log(`Forms: ${result.forms_included.join(', ')}`)
+        console.log('===========================================================')
+      }
+    }
+  } catch (error) {
+    console.error('Error calculating initial cost:', error)
+  }
+
+  // Navigate to next form
+  if (navigation.canGoNext) {
+    const nextForm = navigation.getNextForm()
+    const validation = await validateNavigation(nextForm)
+    
+    if (validation.success && !validation.can_navigate) {
+      setValidationError(validation.message)
+      setShowValidationModal(true)
       return
     }
-
-    // Validate navigation to next form
-    if (navigation.canGoNext) {
-      const nextForm = navigation.getNextForm()
-      const validation = await validateNavigation(nextForm)
-      
-      if (validation.success && !validation.can_navigate) {
-        setValidationError(validation.message)
-        setShowValidationModal(true)
-        return
-      }
-      
-      setConfirmationType('next')
-      setShowConfirmation(true)
-    }
+    
+    setConfirmationType('next')
+    setShowConfirmation(true)
   }
+}
 
   const handleBack = () => {
     setConfirmationType('back')

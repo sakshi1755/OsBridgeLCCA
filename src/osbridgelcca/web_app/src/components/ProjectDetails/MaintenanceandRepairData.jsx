@@ -173,38 +173,38 @@ const MaintenanceandRepairData = ({ currentForm, onNavigate, onClose, setActiveT
 const handleConfirm = async () => {
   if (confirmationType === 'next') {
     try {
-      // Save form data to storage
-      console.log('Saving maintenance form data:', formData);
-      const saveResult = await saveMaintenanceData(formData);
-      console.log('Maintenance data saved successfully:', saveResult);
+      // Calculate and store maintenance costs using the new endpoint
+      console.log('Calculating and storing maintenance costs...');
+      const response = await fetch('http://127.0.0.1:5000/api/calculate-and-store-maintenance-costs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
       
-      // Calculate maintenance costs
-      console.log('Calculating maintenance costs...');
-      const calculationResult = await calculateMaintenanceCosts(formData);
-      console.log('Maintenance costs calculated successfully:', calculationResult);
-      
-      // Log the detailed cost breakdown
-      if (calculationResult.results) {
-        console.log('=== MAINTENANCE COST BREAKDOWN ===');
-        console.log('Initial Construction Cost:', calculationResult.results.initial_construction_cost);
-        console.log('Periodic Maintenance Cost:', calculationResult.results.periodic_maintenance_cost);
-        console.log('Routine Inspection Cost:', calculationResult.results.routine_inspection_cost);
-        console.log('Repair & Rehabilitation Cost:', calculationResult.results.repair_rehabilitation_cost);
-        console.log('Annual Periodic Cost:', calculationResult.results.annual_periodic_cost);
-        console.log('Annual Routine Cost:', calculationResult.results.annual_routine_cost);
-        console.log('Annual Repair Cost:', calculationResult.results.annual_repair_cost);
-        console.log('Total Annual Maintenance Cost:', calculationResult.results.total_annual_maintenance_cost);
-        console.log('Frequencies:', calculationResult.results.frequencies);
-        console.log('Rates Used:', calculationResult.results.rates_used);
-        console.log('=====================================');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
+      
+      const result = await response.json();
+      console.log('✅ Maintenance costs calculated successfully:', result.results);
+      
+      // Log detailed breakdown
+      console.log('=== MAINTENANCE COST BREAKDOWN ===');
+      console.log('Periodic Maintenance Cost:', result.results.periodic_maintenance_cost);
+      console.log('Periodic Maintenance Carbon Cost:', result.results.periodic_maintenance_carbon_cost);
+      console.log('Routine Inspection Cost:', result.results.routine_inspection_cost);
+      console.log('Repair & Rehabilitation Cost:', result.results.repair_rehabilitation_cost);
+      console.log('Total Maintenance Cost:', result.results.total_maintenance_cost);
+      console.log('=====================================');
       
       setHasUnsavedChanges(false);
       navigation.navigate(navigation.getNextForm());
     } catch (error) {
-      console.error('Error processing maintenance data:', error);
-      // You might want to show an error message to the user here
-      alert('Error processing maintenance data. Please try again.');
+      console.error('❌ Error processing maintenance data:', error);
+      alert('Error processing maintenance data: ' + error.message);
       return; // Don't navigate if there's an error
     }
   } else if (confirmationType === 'back') {
@@ -214,7 +214,7 @@ const handleConfirm = async () => {
   setConfirmationType(null);
 };
 
-  const handleCloseConfirmation = () => {
+const handleCloseConfirmation = () => {
     setShowConfirmation(false);
     setConfirmationType(null);
   };

@@ -766,18 +766,38 @@ const CarbonEmissionData = ({
     setShowConfirmation(true);
   };
 
-  const handleConfirm = () => {
-    if (confirmationType === 'next') {
+const handleConfirm = () => {
+  if (confirmationType === 'next') {
+    // Save materials data to database
+    saveMaterialsToDatabase().then(() => {
       console.log('Carbon emission data:', materials);
       setHasUnsavedChanges(false);
       navigation.navigate(navigation.getNextForm());
-    } else if (confirmationType === 'back') {
-      navigation.navigate(navigation.getPreviousForm());
-    }
+    });
+  } else if (confirmationType === 'back') {
+    navigation.navigate(navigation.getPreviousForm());
+  }
+  
+  setShowConfirmation(false);
+  setConfirmationType(null);
+};
+
+// Add this new function:
+const saveMaterialsToDatabase = async () => {
+  try {
+    const response = await fetch('http://127.0.0.1:5000/api/save-carbon-emission-materials', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ materials })
+    });
     
-    setShowConfirmation(false);
-    setConfirmationType(null);
-  };
+    if (response.ok) {
+      console.log('Carbon emission materials saved to database');
+    }
+  } catch (error) {
+    console.error('Error saving carbon materials:', error);
+  }
+};
 
   const handleCloseConfirmation = () => {
     setShowConfirmation(false);
@@ -902,8 +922,8 @@ const CarbonEmissionData = ({
                       </tr>
                     </thead>
                     <tbody>
-                      {formMaterials.map((material) => (
-                        <tr key={material.id} className="align-middle hover:bg-gray-50">
+                      {formMaterials.map((material, index) => (
+  <tr key={`${material.form_name}_${material.id}_${index}`} className="align-middle hover:bg-gray-50">
                           <td className="p-2 border">
                             <div className="text-sm">
                               {material.component}

@@ -120,6 +120,8 @@
 //     console.error('Error:', error);
 //   }
 // };
+
+//bridge and traffic form
 import React, { useState } from "react"; 
 import {useFormNavigation, ConfirmationModal} from './UseFormNavigation' 
  
@@ -176,20 +178,89 @@ const BridgeandTraffic = ({ currentForm, onNavigate, onClose, setActiveTabs,Acti
     setConfirmationType('back') 
     setShowConfirmation(true) 
   } 
- 
+const calculateAndLogAllCosts = async () => {
+  try {
+    // Get initial construction cost from DB
+    const initialCostResponse = await fetch('http://127.0.0.1:5000/api/get-initial-construction-cost');
+    const initialCostData = await initialCostResponse.json();
+    
+    // Get time cost from DB
+    const timeCostResponse = await fetch('http://127.0.0.1:5000/api/get-stored-time-cost');
+    const timeCostData = await timeCostResponse.json();
+    
+    // Get stored road user cost instead of calculating again
+    const roadUserResponse = await fetch('http://127.0.0.1:5000/api/get-stored-road-user-cost');
+    const roadUserData = await roadUserResponse.json();
+    
+    // Calculate initial carbon emission cost
+    const carbonResponse = await fetch('http://127.0.0.1:5000/api/calculate-initial-carbon-emission-cost', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    const carbonData = await carbonResponse.json();
+    
+    // Calculate additional carbon emission cost (this one is working)
+    const additionalCarbonResponse = await fetch('http://127.0.0.1:5000/api/calculate-additional-carbon-cost', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    const additionalCarbonData = await additionalCarbonResponse.json();
+    
+    console.log('=== ALL COST CALCULATIONS ===');
+    
+    // Fix: Access the correct properties based on backend response format
+    const initialCost = initialCostData.success && initialCostData.result 
+      ? initialCostData.result.total_initial_cost 
+      : 'Not found';
+      
+    const timeCost = timeCostData.success && timeCostData.result 
+      ? timeCostData.result.time_cost 
+      : 'Not found';
+      
+    const roadUserCost = roadUserData.success 
+      ? roadUserData.road_user_cost 
+      : 'Not found';
+      
+    const carbonCost = carbonData.success 
+      ? carbonData.initial_carbon_emission_cost 
+      : 'Not calculated';
+      
+    const additionalCarbonCost = additionalCarbonData.success 
+      ? additionalCarbonData.additional_carbon_emission_cost 
+      : 'Not calculated';
+    
+    console.log('Initial Construction Cost:', initialCost);
+    console.log('Time Cost:', timeCost);
+    console.log('Initial Carbon Emission Cost:', carbonCost);
+    console.log('Road User Cost:', roadUserCost);
+    console.log('Additional Carbon Emission Cost:', additionalCarbonCost);
+    
+    // Optional: Log raw responses for debugging
+    console.log('=== RAW RESPONSES DEBUG ===');
+    console.log('Initial Cost Response:', initialCostData);
+    console.log('Time Cost Response:', timeCostData);
+    console.log('Road User Response:', roadUserData);
+    
+  } catch (error) {
+    console.error('Error calculating costs:', error);
+  }
+};
   const handleConfirm = () => { 
-    if (confirmationType === 'next') { 
-      // Save form data before navigating
-      handleSave().then(() => {
-        setHasUnsavedChanges(false); 
-        navigation.navigate(navigation.getNextForm()); 
-      });
-    } else if (confirmationType === 'back') { 
-      navigation.navigate(navigation.getPreviousForm()); 
-    } 
-    setShowConfirmation(false); 
-    setConfirmationType(null); 
-  }; 
+   if (confirmationType === 'next') {
+    handleSave().then(async () => {
+      // Calculate and log all three costs
+      await calculateAndLogAllCosts();
+      setHasUnsavedChanges(false);
+      navigation.navigate(navigation.getNextForm());
+    });
+  } else if (confirmationType === 'back') {
+    navigation.navigate(navigation.getPreviousForm());
+  }
+  setShowConfirmation(false);
+  setConfirmationType(null);
+}; 
  
   const handleCloseConfirmation = () => { 
     setShowConfirmation(false); 
@@ -197,44 +268,88 @@ const BridgeandTraffic = ({ currentForm, onNavigate, onClose, setActiveTabs,Acti
   }; 
 
   // Transform form data to match backend expected format
-  const transformDataForBackend = () => {
-    return {
-      road_user_inputs: {
-        Lane_Type: formData.numberOfLanes || "2", // Default to 2 lanes if empty
-        Roughness: formData.roadRoughness || "Good", // Default to Good if empty
-        RF: formData.roadRiseAndFall || "Rolling", // Default to Rolling if empty
-        Vehicles: [
-          {
-            Vehicle_Type: "Car",
-            Count: parseInt(formData.vehicleComposition.cars) || 0
-          },
-          {
-            Vehicle_Type: "Bus",
-            Count: parseInt(formData.vehicleComposition.buses) || 0
-          },
-          {
-            Vehicle_Type: "HCV",
-            Count: parseInt(formData.vehicleComposition.hcv) || 0
-          },
-          {
-            Vehicle_Type: "MCV",
-            Count: parseInt(formData.vehicleComposition.mcv) || 0
-          },
-          {
-            Vehicle_Type: "LCV",
-            Count: parseInt(formData.vehicleComposition.lcv) || 0
-          }
-        ].filter(vehicle => vehicle.Count > 0) // Only include vehicles with count > 0
-      },
-      financial_inputs: {
-        construction_time: 12, // Default value, you can make this configurable
-        reroute_distance: parseFloat(formData.additionalReRouteDistance) || 0
-      },
-      // Include other form data for reference
-      typeOfRoad: formData.typeOfRoad,
-      annualIncreaseInTraffic: formData.annualIncreaseInTraffic
-    };
+// Add this mapping function before your transformDataForBackend function
+
+const mapLaneType = (laneDescription) => {
+  const mapping = {
+    "Single lane": "2",
+    "Intermediate lane": "2", 
+    "Two lane": "2",
+    "Three lane": "4",
+    "Four lane divided roads": "4",
+    "Four lane divided Expressways": "4"
   };
+  return mapping[laneDescription] || "2"; // Default to "2"
+};
+
+const mapRoughness = (roughnessValue) => {
+  const numValue = parseInt(roughnessValue);
+  if (numValue <= 3000) return "Good";
+  if (numValue <= 5000) return "Fair";
+  return "Poor";
+};
+
+const mapRiseAndFall = (rfValue) => {
+  const numValue = parseInt(rfValue);
+  if (numValue <= 25) return "Rolling";
+  return "Hilly";
+};
+
+// Replace your existing transformDataForBackend function with this:
+const transformDataForBackend = () => {
+  // Map the form values to backend expected format
+  const mappedLaneType = mapLaneType(formData.numberOfLanes);
+  const mappedRoughness = mapRoughness(formData.roadRoughness);
+  const mappedRF = mapRiseAndFall(formData.roadRiseAndFall);
+  
+  console.log("=== FRONTEND MAPPING DEBUG ===");
+  console.log("Original values:", {
+    numberOfLanes: formData.numberOfLanes,
+    roadRoughness: formData.roadRoughness, 
+    roadRiseAndFall: formData.roadRiseAndFall
+  });
+  console.log("Mapped values:", {
+    Lane_Type: mappedLaneType,
+    Roughness: mappedRoughness,
+    RF: mappedRF
+  });
+  
+  return {
+    road_user_inputs: {
+      Lane_Type: mappedLaneType,
+      Roughness: mappedRoughness,
+      RF: mappedRF,
+      Vehicles: [
+        {
+          Vehicle_Type: "Car",
+          Count: parseInt(formData.vehicleComposition.cars) || 0
+        },
+        {
+          Vehicle_Type: "Bus", 
+          Count: parseInt(formData.vehicleComposition.buses) || 0
+        },
+        {
+          Vehicle_Type: "HCV",
+          Count: parseInt(formData.vehicleComposition.hcv) || 0
+        },
+        {
+          Vehicle_Type: "MCV",
+          Count: parseInt(formData.vehicleComposition.mcv) || 0
+        },
+        {
+          Vehicle_Type: "LCV",
+          Count: parseInt(formData.vehicleComposition.lcv) || 0
+        }
+      ].filter(vehicle => vehicle.Count > 0)
+    },
+    financial_inputs: {
+      construction_time: 12,
+      reroute_distance: parseFloat(formData.additionalReRouteDistance) || 0
+    },
+    typeOfRoad: formData.typeOfRoad,
+    annualIncreaseInTraffic: formData.annualIncreaseInTraffic
+  };
+};
 
   const handleSave = async () => { 
     try { 

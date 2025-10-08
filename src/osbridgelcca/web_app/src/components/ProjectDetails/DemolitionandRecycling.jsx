@@ -1,162 +1,7 @@
-// import React, { useState } from "react";
-// import {useFormNavigation, ConfirmationModal} from './UseFormNavigation'
-
-// // Form sequence constant
-
- 
-
-
-
-// const DemolitionandRecycling = ({currentForm, onNavigate, onClose, setActiveTabs,Activetabs, onclicktabs }) => {
-//   const navigation = useFormNavigation(currentForm, onNavigate);
-
-//    const [showConfirmation, setShowConfirmation] = useState(false)
-//   const [confirmationType, setConfirmationType] = useState(null)
-//   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
-//   const [formData, setFormData] = useState({
-//     demolitionCostRate: "10",
-//     scrapValueOfStructuralSteel: "50000",
-//     structuralSteelScrap: "98"
-//   });
-
-//   const handleChange = (field, value) => {
-//     setFormData({
-//       ...formData,
-//       [field]: value
-//     });
-//   };
-//    const handleNext = () => {
-//     if (navigation.canGoNext) {
-//       setConfirmationType('next');
-//       setShowConfirmation(true);
-//     }
-//   };
-  
-//   const saveDemolitionRecyclingData = async (data) => {
-//   try {
-//     const response = await fetch('http://127.0.0.1:5000/api/save-demolition-recycling-data', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify(data),
-//     });
-    
-//     if (!response.ok) {
-//       throw new Error(`HTTP error! status: ${response.status}`);
-//     }
-    
-//     return await response.json();
-//   } catch (error) {
-//     console.error('Error saving demolition recycling data:', error);
-//     throw error;
-//   }
-// };
-
-// const calculateDemolitionRecyclingCosts = async (data) => {
-//   try {
-//     const response = await fetch('http://127.0.0.1:5000/api/calculate-demolition-recycling-costs', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify(data),
-//     });
-    
-//     if (!response.ok) {
-//       throw new Error(`HTTP error! status: ${response.status}`);
-//     }
-    
-//     return await response.json();
-//   } catch (error) {
-//     console.error('Error calculating demolition recycling costs:', error);
-//     throw error;
-//   }
-// };
-
-//   // New calculate function for the Calculate button
-//   const handleCalculate = async () => {
-//     try {
-//       console.log('Starting calculation with data:', formData);
-      
-//       // Calculate demolition and recycling costs
-//       const calculationResult = await calculateDemolitionRecyclingCosts(formData);
-      
-//       // Log the demolition and recycling costs to console
-//       console.log('Demolition and Recycling Costs:', calculationResult);
-      
-//       // You can also log specific parts if the response has a specific structure
-//       if (calculationResult.demolitionCost) {
-//         console.log('Demolition Cost:', calculationResult.demolitionCost);
-//       }
-//       if (calculationResult.recyclingCost) {
-//         console.log('Recycling Cost:', calculationResult.recyclingCost);
-//       }
-//       if (calculationResult.totalCost) {
-//         console.log('Total Cost:', calculationResult.totalCost);
-//       }
-      
-//     } catch (error) {
-//       console.error('Error calculating demolition and recycling costs:', error);
-//       alert('Error calculating costs. Please try again.');
-//     }
-//   };
-
-//   // const handleBack = () => {
-//   //   if (navigation.canGoBack) {
-//   //     if (hasUnsavedChanges) {
-//   //       setConfirmationType('back');
-//   //       setShowConfirmation(true);
-//   //     } else {
-//   //       navigation.navigate(navigation.getPreviousForm());
-//   //     }
-//   //   }
-//   // };
-//     const handleBack = () => {
-//   setConfirmationType('back')
-//   setShowConfirmation(true)
-// }
-
-
-//   const handleConfirm = async () => {
-//   if (confirmationType === 'next') {
-//     try {
-//       // Save form data to storage
-//       console.log('Saving demolition and recycling data:', formData);
-//       await saveDemolitionRecyclingData(formData);
-      
-//       // Calculate demolition and recycling costs
-//       console.log('Calculating demolition and recycling costs...');
-//       const calculationResult = await calculateDemolitionRecyclingCosts(formData);
-//       console.log('Demolition and recycling costs calculated:', calculationResult);
-      
-//       setHasUnsavedChanges(false);
-//       navigation.navigate(navigation.getNextForm());
-//     } catch (error) {
-//       console.error('Error processing demolition and recycling data:', error);
-//       // You might want to show an error message to the user here
-//       alert('Error processing demolition and recycling data. Please try again.');
-//       return; // Don't navigate if there's an error
-//     }
-//   } else if (confirmationType === 'back') {
-//     navigation.navigate(navigation.getPreviousForm());
-//   }
-//   setShowConfirmation(false);
-//   setConfirmationType(null);
-// };
-
-//   const handleCloseConfirmation = () => {
-//     setShowConfirmation(false);
-//     setConfirmationType(null);
-//   };
-//   // Suggested indicator component
-//   const SuggestedTag = () => (
-//     <span className="text-xs text-gray-400 ml-2">Suggested</span>
-//   );
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {useFormNavigation, ConfirmationModal} from './UseFormNavigation'
 
-const DemolitionandRecycling = ({currentForm, onNavigate, onClose, setActiveTabs,Activetabs, onclicktabs }) => {
+const DemolitionandRecycling = ({currentForm, onNavigate, onClose, setActiveTabs, Activetabs, onclicktabs }) => {
   const navigation = useFormNavigation(currentForm, onNavigate);
 
   const [showConfirmation, setShowConfirmation] = useState(false)
@@ -182,147 +27,81 @@ const DemolitionandRecycling = ({currentForm, onNavigate, onClose, setActiveTabs
       setShowConfirmation(true);
     }
   };
-  
-  const saveDemolitionRecyclingData = async (data) => {
-    try {
-      const response = await fetch('http://127.0.0.1:5000/api/save-demolition-recycling-data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error saving demolition recycling data:', error);
-      throw error;
-    }
-  };
-
-  const calculateDemolitionRecyclingCosts = async (data) => {
-    try {
-      const response = await fetch('http://127.0.0.1:5000/api/calculate-demolition-recycling-costs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error calculating demolition recycling costs:', error);
-      throw error;
-    }
-  };
-
-  const getInitialConstructionCost = async () => {
-    try {
-      const response = await fetch('http://127.0.0.1:5000/api/get-initial-construction-cost', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        console.log('No initial construction cost found, will use default');
-        return null;
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error('Error getting initial construction cost:', error);
-      return null;
-    }
-  };
-
-  const handleCalculate = async () => {
-    try {
-      console.log('Starting calculation with data:', formData);
-      
-      // Get initial construction cost from backend
-      const initialCostData = await getInitialConstructionCost();
-      
-      // Prepare data for calculation
-      const calculationData = {
-        ...formData,
-        initialConstructionCost: initialCostData?.initialConstructionCost || 1000000 // Default if not found
-      };
-      
-      console.log('Calculation data prepared:', calculationData);
-      
-      // Calculate demolition and recycling costs
-      const calculationResult = await calculateDemolitionRecyclingCosts(calculationData);
-      
-      // Log the detailed results to console
-      console.log('=== DEMOLITION AND RECYCLING CALCULATION RESULTS ===');
-      console.log('Demolition Cost:', calculationResult.demolitionCost);
-      console.log('Recycling Revenue:', calculationResult.recyclingRevenue);
-      console.log('Net Demolition Cost:', calculationResult.netDemolitionCost);
-      console.log('Structural Steel Weight (tons):', calculationResult.structuralSteelWeight);
-      console.log('Recoverable Steel (tons):', calculationResult.recoverableSteel);
-      console.log('Calculation Parameters:', calculationResult.calculations);
-      console.log('=== END OF CALCULATION RESULTS ===');
-      
-    } catch (error) {
-      console.error('Error calculating demolition and recycling costs:', error);
-      alert('Error calculating costs. Please try again.');
-    }
-  };
 
   const handleBack = () => {
     setConfirmationType('back')
     setShowConfirmation(true)
   }
 
+  const handleCalculate = async () => {
+    try {
+      console.log('Calculating demolition costs with data:', formData);
+      
+      const response = await fetch('http://127.0.0.1:5000/api/calculate-and-store-demolition-costs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      console.log('=== DEMOLITION & RECYCLING CALCULATION ===');
+      console.log('Demolition Cost:', result.results.demolition_cost);
+      console.log('Recycling Revenue:', result.results.recycling_revenue);
+      console.log('Net Demolition Cost:', result.results.net_demolition_cost);
+      console.log('Recoverable Steel (MT):', result.results.calculation_parameters.recoverable_steel_mt);
+      console.log('Total Steel Used (MT):', result.results.calculation_parameters.total_steel_mt);
+      console.log('==========================================');
+      
+      alert('Calculation completed! Check console for results.');
+      
+    } catch (error) {
+      console.error('Error calculating demolition costs:', error);
+      alert('Error: ' + error.message);
+    }
+  };
+
   const handleConfirm = async () => {
     if (confirmationType === 'next') {
       try {
-        console.log('Saving demolition and recycling data:', formData);
+        console.log('Calculating and storing demolition costs...');
         
-        // Save form data to backend
-        const saveResult = await saveDemolitionRecyclingData(formData);
-        console.log('Data saved successfully:', saveResult);
+        const response = await fetch('http://127.0.0.1:5000/api/calculate-and-store-demolition-costs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
         
-        // Get initial construction cost from backend
-        const initialCostData = await getInitialConstructionCost();
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
         
-        // Prepare data for calculation
-        const calculationData = {
-          ...formData,
-          initialConstructionCost: initialCostData?.initialConstructionCost || 1000000
-        };
+        const result = await response.json();
+        console.log('✅ Demolition costs calculated successfully:', result.results);
         
-        console.log('Calculating demolition and recycling costs with data:', calculationData);
-        
-        // Calculate demolition and recycling costs
-        const calculationResult = await calculateDemolitionRecyclingCosts(calculationData);
-        
-        // Log the detailed results to console
-        console.log('=== FINAL DEMOLITION AND RECYCLING COSTS ===');
-        console.log('Demolition Cost:', calculationResult.demolitionCost);
-        console.log('Recycling Revenue:', calculationResult.recyclingRevenue);
-        console.log('Net Demolition Cost:', calculationResult.netDemolitionCost);
-        console.log('Structural Steel Weight (tons):', calculationResult.structuralSteelWeight);
-        console.log('Recoverable Steel (tons):', calculationResult.recoverableSteel);
-        console.log('=== END OF FINAL RESULTS ===');
+        console.log('=== DEMOLITION & RECYCLING COST BREAKDOWN ===');
+        console.log('Demolition Cost:', result.results.demolition_cost);
+        console.log('Recycling Revenue:', result.results.recycling_revenue);
+        console.log('Net Demolition Cost:', result.results.net_demolition_cost);
+        console.log('Recoverable Steel (MT):', result.results.calculation_parameters.recoverable_steel_mt);
+        console.log('Total Steel Used (MT):', result.results.calculation_parameters.total_steel_mt);
+        console.log('=============================================');
         
         setHasUnsavedChanges(false);
         navigation.navigate(navigation.getNextForm());
-        
       } catch (error) {
-        console.error('Error processing demolition and recycling data:', error);
-        alert('Error processing demolition and recycling data. Please try again.');
+        console.error('❌ Error processing demolition data:', error);
+        alert('Error processing demolition data: ' + error.message);
         return;
       }
     } else if (confirmationType === 'back') {
@@ -337,73 +116,45 @@ const DemolitionandRecycling = ({currentForm, onNavigate, onClose, setActiveTabs
     setConfirmationType(null);
   };
 
-  // Suggested indicator component
   const SuggestedTag = () => (
     <span className="text-xs text-gray-400 ml-2">Suggested</span>
   );
 
-  // Load existing data on component mount
-  useEffect(() => {
-    const loadExistingData = async () => {
-      try {
-        const response = await fetch('http://127.0.0.1:5000/api/get-demolition-recycling-data', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          setFormData(result.data);
-          console.log('Loaded existing demolition recycling data:', result.data);
-        }
-      } catch (error) {
-        console.log('No existing data found, using defaults');
-      }
-    };
-    
-    loadExistingData();
-  }, []);
-
- 
-
   return (
     <div className="w-full max-w-4xl mx-auto ">
       {/* Title bar */}
-       <div
-  className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"
-  style={{
-    scrollbarWidth: 'thin', // for Firefox
-  }}
->
-  <div className="flex  w-fit min-w-full">
-    {Activetabs.map((tab, index) => (
       <div
-        onClick={() => onclicktabs(tab)}
-        key={index}
-        className={`flex items-center px-4 py-2 rounded-sm border border-gray-300 whitespace-nowrap cursor-pointer
-          ${tab === currentForm ? 'bg-[#F0E6E6] border-b-[#522828b0] border-b-[0.25rem]' : 'bg-[#F0E6E6]'}
-        `}
+        className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"
         style={{
-          fontSize: Activetabs.length > 5 ? '0.85rem' : '1rem',
+          scrollbarWidth: 'thin',
         }}
       >
-        <span className="font-medium">{tab}</span>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose(tab);
-          }}
-          className="ml-2 text-gray-500 hover:text-gray-700"
-        >
-          ×
-        </button>
+        <div className="flex w-fit min-w-full">
+          {Activetabs.map((tab, index) => (
+            <div
+              onClick={() => onclicktabs(tab)}
+              key={index}
+              className={`flex items-center px-4 py-2 rounded-sm border border-gray-300 whitespace-nowrap cursor-pointer
+                ${tab === currentForm ? 'bg-[#F0E6E6] border-b-[#522828b0] border-b-[0.25rem]' : 'bg-[#F0E6E6]'}
+              `}
+              style={{
+                fontSize: Activetabs.length > 5 ? '0.85rem' : '1rem',
+              }}
+            >
+              <span className="font-medium">{tab}</span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClose(tab);
+                }}
+                className="ml-2 text-gray-500 hover:text-gray-700"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
-    ))}
-  </div>
-</div>
-
 
       {/* Form content */}
       <div className="bg-[#FFF9F9] p-6 border border-gray-300 rounded-b-sm">
@@ -469,7 +220,7 @@ const DemolitionandRecycling = ({currentForm, onNavigate, onClose, setActiveTabs
 
           {/* Navigation buttons */}
           <div className="flex justify-end gap-4 mt-8">
-           <button 
+            <button 
               onClick={handleBack}
               disabled={!navigation.canGoBack}
               className={`px-8 py-1 text-sm rounded-md border ${
@@ -480,19 +231,23 @@ const DemolitionandRecycling = ({currentForm, onNavigate, onClose, setActiveTabs
             >
               Back
             </button>
-            <button onClick={handleCalculate} className="bg-[#522828b0] border-black hover:bg-[#814040] text-black rounded-md px-8 py-1 text-sm transition-colors">
+            <button 
+              onClick={handleCalculate} 
+              className="bg-[#522828b0] border-black hover:bg-[#814040] text-black rounded-md px-8 py-1 text-sm transition-colors"
+            >
               Calculate
             </button>
           </div>
         </div>
       </div>
-        <ConfirmationModal
-              isOpen={showConfirmation}
-              onClose={handleCloseConfirmation}
-              onConfirm={handleConfirm}
-              type={confirmationType}
-              nextForm={confirmationType === 'next' ? navigation.getNextForm() : navigation.getPreviousForm()}
-            />
+
+      <ConfirmationModal
+        isOpen={showConfirmation}
+        onClose={handleCloseConfirmation}
+        onConfirm={handleConfirm}
+        type={confirmationType}
+        nextForm={confirmationType === 'next' ? navigation.getNextForm() : navigation.getPreviousForm()}
+      />
     </div>
   );
 };

@@ -399,102 +399,468 @@
 #     material_data = component_data.get("materials", {}).get(material_name, {})
 #     return unit in material_data.get("units", [])
 # ----------------------------------------------------------------------------------------------------------------
+# import copy
+
+# # Base template for material costs (independent of components)
+# MATERIAL_COSTS_TEMPLATE = {
+#     "concrete": {
+#         "units": ["cum", "kg"],
+#         "grades": {
+#             "M15": {"cum": 0.0, "kg": 0.0},
+#             "M20": {"cum": 0.0, "kg": 0.0},
+#             "M25": {"cum": 0.0, "kg": 0.0},
+#             "M30": {"cum": 0.0, "kg": 0.0},
+#             "M35": {"cum": 0.0, "kg": 0.0},
+#             "M40": {"cum": 0.0, "kg": 0.0},
+#             "M45": {"cum": 0.0, "kg": 0.0},
+#             "M50": {"cum": 0.0, "kg": 0.0},
+#         }
+#     },
+#     "steel": {
+#         "units": ["MT", "kg"],
+#         "grades": {
+#             "E 165(Fe 290)": {"MT": 0.0, "kg": 0.0},
+#             "E 250(Fe 410W)A": {"MT": 0.0, "kg": 0.0},
+#             "E 250(Fe 410W)B": {"MT": 0.0, "kg": 0.0},
+#             "E 250(Fe 410)C": {"MT": 0.0, "kg": 0.0},
+#             "E 300(Fe 440)": {"MT": 0.0, "kg": 0.0},
+#             "E 350(Fe 490)": {"MT": 0.0, "kg": 0.0},
+#             "E 410(Fe 540)": {"MT": 0.0, "kg": 0.0},
+#             "E 450(Fe 570)D": {"MT": 0.0, "kg": 0.0},
+#         }
+#     },
+#     "mastic asphalt": {
+#         "units": ["sqm"],
+#         "grades": {
+#             "standard": {"sqm": 0.0}
+#         }
+#     },
+#     "paint": {
+#         "units": ["ltr"],
+#         "grades": {
+#             "white/yellow": {"ltr": 0.0},
+#             "primer_epoxy": {"ltr": 0.0},
+#             "oil": {"ltr": 0.0},
+#             "alluminium": {"ltr": 0.0}
+#         }
+#     },
+#     "paver blocks": {
+#         "units": ["sqm"],
+#         "grades": {
+#             "standard": {"sqm": 0.0}
+#         }
+#     },
+#     "prestressing tendons": {
+#         "units": ["MT", "kg"],
+#         "grades": {
+#             "E 165(Fe 290)": {"MT": 0.0, "kg": 0.0},
+#             "E 250(Fe 410W)A": {"MT": 0.0, "kg": 0.0},
+#             "E 250(Fe 410W)B": {"MT": 0.0, "kg": 0.0},
+#             "E 250(Fe 410)C": {"MT": 0.0, "kg": 0.0},
+#             "E 300(Fe 440)": {"MT": 0.0, "kg": 0.0},
+#             "E 350(Fe 490)": {"MT": 0.0, "kg": 0.0},
+#             "E 410(Fe 540)": {"MT": 0.0, "kg": 0.0},
+#             "E 450(Fe 570)D": {"MT": 0.0, "kg": 0.0},
+#         }
+#     },
+   
+# }
+
+# # Form-specific components (extracted from your backend data)
+# FORM_COMPONENTS = {
+#     "foundation": [
+#         "Pile",
+#         "Pile Cap"
+#     ],
+#     "sub-structure": [
+#         "Abutment",
+#         "Abutment protection works",
+#         "Pier",
+#         "Pier cap"
+#     ],
+#     "super-structure": [
+#         "Girders/Main beams",
+#         "Cross beams/diaphragms",
+#         "Deck slab",
+#         "Cantilever slab",
+#         "Joints"
+#     ],
+#     "miscellaneous": [
+#         "Wearing surface",
+#         "Footpaths",
+#         "Expansion joints",
+#         "Painting system",
+#         "Bearings"
+#     ]
+# }
+
+# def get_material_cost_template():
+#     return copy.deepcopy(MATERIAL_COSTS_TEMPLATE)
+
+# def get_materials(material_costs=None):
+#     """Get all available materials (independent of components)"""
+#     if material_costs is None:
+#         material_costs = MATERIAL_COSTS_TEMPLATE
+#     return list(material_costs.keys())
+
+# def get_grades(material_costs, material):
+#     """Get all grades for a specific material"""
+#     return list(material_costs.get(material, {}).get("grades", {}).keys())
+
+# def get_units(material_costs, material):
+#     """Get all units for a specific material"""
+#     return material_costs.get(material, {}).get("units", [])
+
+# def get_material_cost(material_costs, material, grade, unit):
+#     """Get cost for a specific material, grade, and unit"""
+#     return material_costs.get(material, {}).get("grades", {}).get(grade, {}).get(unit, None)
+
+# def set_material_cost(material_costs, material, grade, unit, cost):
+#     """Set cost for a specific material, grade, and unit"""
+#     grades = material_costs.get(material, {}).get("grades", {})
+#     if grade in grades and unit in grades[grade]:
+#         grades[grade][unit] = cost
+#         return True
+#     return False
+
+# # Component-related functions
+# def get_forms():
+#     """Get all available forms"""
+#     return list(FORM_COMPONENTS.keys())
+
+# def get_components(form_name):
+#     """Get components for a specific form"""
+#     return FORM_COMPONENTS.get(form_name, [])
+
+# def get_sub_materials(form_name, component_name, material_name):
+#     """Get sub-materials (grades) for a material - independent of form/component"""
+#     return get_grades(MATERIAL_COSTS_TEMPLATE, material_name)
+
+# def get_units_for_material(form_name, component_name, material_name):
+#     """Get units for a material - independent of form/component"""
+#     return get_units(MATERIAL_COSTS_TEMPLATE, material_name)
+
+# # Validation helpers 
+# def is_valid_material(material_costs, material):
+#     """Check if material exists"""
+#     return material in material_costs
+
+# def is_valid_grade(material_costs, material, grade):
+#     """Check if grade exists for material"""
+#     return grade in material_costs.get(material, {}).get("grades", {})
+
+# def is_valid_unit(material_costs, material, unit):
+#     """Check if unit exists for material"""
+#     return unit in material_costs.get(material, {}).get("units", [])
+
+# def is_valid_form(form_name):
+#     """Check if form exists"""
+#     return form_name in FORM_COMPONENTS
+
+# def is_valid_component(form_name, component_name):
+#     """Check if component exists for form"""
+#     return component_name in FORM_COMPONENTS.get(form_name, [])
+
+# def is_valid_material_for_form_component(form_name, component_name, material_name):
+#     """Check if material is valid (materials are independent of form/component)"""
+#     return material_name in MATERIAL_COSTS_TEMPLATE
+
+# # Get all (material, grade, unit) combinations
+# def get_all_material_unit_combinations(material_costs):
+#     """Get all possible material, grade, unit combinations"""
+#     combinations = []
+#     for material, data in material_costs.items():
+#         for grade, units in data.get("grades", {}).items():
+#             for unit in units:
+#                 combinations.append((material, grade, unit))
+#     return combinations
+
+# # Road User Cost Components (unchanged)
+# VEHICLE_TYPES = [
+#     "Small Cars",
+#     "Big Cars",
+#     "Two Wheelers",
+#     "Buses",
+#     "LCV",
+#     "HCV",
+#     "MCV"
+# ]
+
+# LANE_TYPES = [
+#     "Single Lane Roads",
+#     "Intermediate Lane Roads",
+#     "Two Lane Roads",
+#     "Four Lane Divided Roads",
+#     "Four Lane Divided Expressways Roads"
+# ]
+
+# ROUGHNESS_VALUES = [2000, 3000, 4000, 5000, 6000, 7000, 8000]
+
+# RF_VALUES = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+
+# def get_vehicle_types():
+#     return VEHICLE_TYPES
+
+# def get_lane_types():
+#     return LANE_TYPES
+
+# def get_roughness_values():
+#     return ROUGHNESS_VALUES
+
+# def get_rf_values():
+#     return RF_VALUES
+
 import copy
 
 # Base template for material costs (independent of components)
 MATERIAL_COSTS_TEMPLATE = {
-    "concrete": {
-        "units": ["cum", "kg"],
+    "Steel Rebar": {
+        "units": ["MT", "kg", "cum", "rmt", "sqm", "ltr"],
         "grades": {
-            "M15": {"cum": 0.0, "kg": 0.0},
-            "M20": {"cum": 0.0, "kg": 0.0},
-            "M25": {"cum": 0.0, "kg": 0.0},
-            "M30": {"cum": 0.0, "kg": 0.0},
-            "M35": {"cum": 0.0, "kg": 0.0},
-            "M40": {"cum": 0.0, "kg": 0.0},
-            "M45": {"cum": 0.0, "kg": 0.0},
-            "M50": {"cum": 0.0, "kg": 0.0},
+            "Fe415": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "Fe500": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "Fe550": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "Other": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
         }
     },
-    "steel": {
-        "units": ["MT", "kg"],
+    "Reinforced Cement Concrete": {
+        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
         "grades": {
-            "E 165(Fe 290)": {"MT": 0.0, "kg": 0.0},
-            "E 250(Fe 410W)A": {"MT": 0.0, "kg": 0.0},
-            "E 250(Fe 410W)B": {"MT": 0.0, "kg": 0.0},
-            "E 250(Fe 410)C": {"MT": 0.0, "kg": 0.0},
-            "E 300(Fe 440)": {"MT": 0.0, "kg": 0.0},
-            "E 350(Fe 490)": {"MT": 0.0, "kg": 0.0},
-            "E 410(Fe 540)": {"MT": 0.0, "kg": 0.0},
-            "E 450(Fe 570)D": {"MT": 0.0, "kg": 0.0},
+            "M10": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M15": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M20": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M25": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M30": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M35": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M40": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M45": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M50": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M55": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M60": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M65": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M70": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M75": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M80": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M85": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M90": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M95": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M100": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "Other": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
         }
     },
-    "mastic asphalt": {
-        "units": ["sqm"],
+    "Pre-Stressed Cement Concrete": {
+        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
         "grades": {
-            "standard": {"sqm": 0.0}
+            "M10": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M15": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M20": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M25": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M30": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M35": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M40": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M45": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M50": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M55": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M60": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M65": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M70": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M75": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M80": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M85": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M90": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M95": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M100": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "Other": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
         }
     },
-    "paint": {
-        "units": ["ltr"],
+    # Excavation materials - NO GRADES
+    "Rock": {
+        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
         "grades": {
-            "white/yellow": {"ltr": 0.0},
-            "primer_epoxy": {"ltr": 0.0},
-            "oil": {"ltr": 0.0},
-            "alluminium": {"ltr": 0.0}
+            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
         }
     },
-    "paver blocks": {
-        "units": ["sqm"],
+    "Soft Rock": {
+        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
         "grades": {
-            "standard": {"sqm": 0.0}
+            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
         }
     },
-    "prestressing tendons": {
-        "units": ["MT", "kg"],
+    "Medium Soil": {
+        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
         "grades": {
-            "E 165(Fe 290)": {"MT": 0.0, "kg": 0.0},
-            "E 250(Fe 410W)A": {"MT": 0.0, "kg": 0.0},
-            "E 250(Fe 410W)B": {"MT": 0.0, "kg": 0.0},
-            "E 250(Fe 410)C": {"MT": 0.0, "kg": 0.0},
-            "E 300(Fe 440)": {"MT": 0.0, "kg": 0.0},
-            "E 350(Fe 490)": {"MT": 0.0, "kg": 0.0},
-            "E 410(Fe 540)": {"MT": 0.0, "kg": 0.0},
-            "E 450(Fe 570)D": {"MT": 0.0, "kg": 0.0},
+            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
         }
     },
-   
+    "Clay": {
+        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "grades": {
+            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+        }
+    },
+    "Marshy Soil": {
+        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "grades": {
+            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+        }
+    },
+    "Soft Murrum": {
+        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "grades": {
+            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+        }
+    },
+    "Loam": {
+        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "grades": {
+            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+        }
+    },
+    "Stiff Clay": {
+        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "grades": {
+            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+        }
+    },
+    "Gravel": {
+        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "grades": {
+            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+        }
+    },
+    "Hard Laterite": {
+        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "grades": {
+            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+        }
+    },
+    "Marine Clay": {
+        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "grades": {
+            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+        }
+    },
+    "Paint": {
+        "units": ["ltr", "cum", "kg", "MT", "rmt", "sqm"],
+        "grades": {
+            "Epoxy": {"ltr": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0},
+            "Oil Paint": {"ltr": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0},
+            "Primer": {"ltr": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0},
+            "Anti-Corrosive Paint": {"ltr": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0},
+            "Other": {"ltr": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0},
+        }
+    },
+    "Structural Steel": {
+        "units": ["MT", "kg", "cum", "rmt", "sqm", "ltr"],
+        "grades": {
+            "E250": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "E350": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "E410": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "E450": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "Other": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+        }
+    },
+    "Steel Anchor Rods": {
+        "units": ["MT", "kg", "cum", "rmt", "sqm", "ltr"],
+        "grades": {
+            "E250": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "E350": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "E410": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "E450": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "Other": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+        }
+    },
+    "Tendons": {
+        "units": ["MT", "kg", "cum", "rmt", "sqm", "ltr"],
+        "grades": {
+            "Standard": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "Other": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+        }
+    },
+    "Shear Connectors": {
+        "units": ["MT", "kg", "cum", "rmt", "sqm", "ltr"],
+        "grades": {
+            "E250": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "E350": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "E410": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "E450": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "Other": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+        }
+    },
+    "Rubber": {
+        "units": ["kg", "MT", "cum", "rmt", "sqm", "ltr"],
+        "grades": {
+            "Standard": {"kg": 0.0, "MT": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "Other": {"kg": 0.0, "MT": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+        }
+    },
+    "PVC": {
+        "units": ["rmt", "kg", "MT", "cum", "sqm", "ltr"],
+        "grades": {
+            "Standard": {"rmt": 0.0, "kg": 0.0, "MT": 0.0, "cum": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "Other": {"rmt": 0.0, "kg": 0.0, "MT": 0.0, "cum": 0.0, "sqm": 0.0, "ltr": 0.0},
+        }
+    },
+    "FRP": {
+        "units": ["sqm", "kg", "MT", "cum", "rmt", "ltr"],
+        "grades": {
+            "Standard": {"sqm": 0.0, "kg": 0.0, "MT": 0.0, "cum": 0.0, "rmt": 0.0, "ltr": 0.0},
+            "Other": {"sqm": 0.0, "kg": 0.0, "MT": 0.0, "cum": 0.0, "rmt": 0.0, "ltr": 0.0},
+        }
+    },
+    "Asphalt": {
+        "units": ["sqm", "cum", "kg", "MT", "rmt", "ltr"],
+        "grades": {
+            "Standard": {"sqm": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "ltr": 0.0},
+            "Other": {"sqm": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "ltr": 0.0},
+        }
+    },
+    "Waterproofing": {
+        "units": ["sqm", "cum", "kg", "MT", "rmt", "ltr"],
+        "grades": {
+            "Standard": {"sqm": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "ltr": 0.0},
+            "Other": {"sqm": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "ltr": 0.0},
+        }
+    },
+    "Other": {
+        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "grades": {
+            "Standard": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+        }
+    }
 }
 
-# Form-specific components (extracted from your backend data)
+# Form-specific components with their applicable materials
 FORM_COMPONENTS = {
-    "foundation": [
-        "Pile",
-        "Pile Cap"
-    ],
-    "sub-structure": [
-        "Abutment",
-        "Abutment protection works",
-        "Pier",
-        "Pier cap"
-    ],
-    "super-structure": [
-        "Girders/Main beams",
-        "Cross beams/diaphragms",
-        "Deck slab",
-        "Cantilever slab",
-        "Joints"
-    ],
-    "miscellaneous": [
-        "Wearing surface",
-        "Footpaths",
-        "Expansion joints",
-        "Painting system",
-        "Bearings"
-    ]
+    "Foundation": {
+        "Pile": ["Steel Rebar", "Reinforced Cement Concrete", "Other"],
+        "Excavation": ["Rock", "Soft Rock", "Medium Soil", "Clay", "Marshy Soil", "Soft Murrum", 
+                       "Loam", "Stiff Clay", "Gravel", "Hard Laterite", "Marine Clay", "Other"],
+        "Pile Cap": ["Steel Rebar", "Reinforced Cement Concrete", "Other"],
+    },
+    "Sub-Structure": {
+        "Pier": ["Steel Rebar", "Reinforced Cement Concrete", "Paint", "Other"],
+        "Pier Cap": ["Steel Rebar", "Reinforced Cement Concrete", "Paint", "Steel Anchor Rods", "Other"],
+    },
+    "Super-Structure": {
+        "Girder": ["Steel Rebar", "Reinforced Cement Concrete", "Pre-Stressed Cement Concrete", 
+                   "Tendons", "Structural Steel", "Shear Connectors", "Paint", "Other"],
+        "Deck Slab": ["Steel Rebar", "Reinforced Cement Concrete", "Other"],
+    },
+    "Miscellaneous": {
+        "Bearings": ["Structural Steel", "Rubber", "Other"],
+        "Railing & Crash Barrier": ["Reinforced Cement Concrete", "Structural Steel", "Steel Rebar", "Paint", "Other"],
+        "Drainage": ["PVC", "Reinforced Cement Concrete", "Structural Steel", "FRP", "Other"],
+        "Asphalt & Utilities": ["Asphalt", "Paint", "Other"],
+        "Waterproofing": ["Waterproofing", "Other"],
+    }
 }
+
+# Standard units available across all materials
+STANDARD_UNITS = ["cum", "kg", "MT", "rmt", "sqm", "ltr"]
 
 def get_material_cost_template():
+    """Get a deep copy of the material costs template"""
     return copy.deepcopy(MATERIAL_COSTS_TEMPLATE)
 
 def get_materials(material_costs=None):
@@ -511,6 +877,10 @@ def get_units(material_costs, material):
     """Get all units for a specific material"""
     return material_costs.get(material, {}).get("units", [])
 
+def get_standard_units():
+    """Get standard units available for all materials"""
+    return STANDARD_UNITS
+
 def get_material_cost(material_costs, material, grade, unit):
     """Get cost for a specific material, grade, and unit"""
     return material_costs.get(material, {}).get("grades", {}).get(grade, {}).get(unit, None)
@@ -523,6 +893,62 @@ def set_material_cost(material_costs, material, grade, unit, cost):
         return True
     return False
 
+def has_grades(material_costs, material):
+    """Check if a material has actual grades (not just N/A)"""
+    grades = material_costs.get(material, {}).get("grades", {})
+    if len(grades) == 1 and "N/A" in grades:
+        return False
+    return True
+
+def add_custom_material(material_costs, material_name, grades_list=None, units_list=None):
+    """Add a new custom material to the material costs"""
+    if material_name in material_costs:
+        return False  # Material already exists
+    
+    if grades_list is None:
+        grades_list = ["Standard", "Other"]
+    if units_list is None:
+        units_list = STANDARD_UNITS
+    
+    grades_dict = {}
+    for grade in grades_list:
+        grade_units = {unit: 0.0 for unit in units_list}
+        grades_dict[grade] = grade_units
+    
+    material_costs[material_name] = {
+        "units": units_list,
+        "grades": grades_dict
+    }
+    return True
+
+def add_custom_grade(material_costs, material, grade_name):
+    """Add a new grade to an existing material"""
+    if material not in material_costs:
+        return False
+    
+    if grade_name in material_costs[material]["grades"]:
+        return False  # Grade already exists
+    
+    units = material_costs[material]["units"]
+    material_costs[material]["grades"][grade_name] = {unit: 0.0 for unit in units}
+    return True
+
+def add_custom_unit(material_costs, material, unit_name):
+    """Add a new unit to an existing material"""
+    if material not in material_costs:
+        return False
+    
+    if unit_name in material_costs[material]["units"]:
+        return False  # Unit already exists
+    
+    material_costs[material]["units"].append(unit_name)
+    
+    # Add this unit to all existing grades
+    for grade in material_costs[material]["grades"]:
+        material_costs[material]["grades"][grade][unit_name] = 0.0
+    
+    return True
+
 # Component-related functions
 def get_forms():
     """Get all available forms"""
@@ -530,7 +956,26 @@ def get_forms():
 
 def get_components(form_name):
     """Get components for a specific form"""
-    return FORM_COMPONENTS.get(form_name, [])
+    return list(FORM_COMPONENTS.get(form_name, {}).keys())
+
+def get_component_materials(form_name, component_name):
+    """Get materials applicable for a specific component"""
+    form_data = FORM_COMPONENTS.get(form_name, {})
+    return form_data.get(component_name, [])
+
+def add_custom_component(form_name, component_name, materials_list=None):
+    """Add a new component to a form"""
+    if form_name not in FORM_COMPONENTS:
+        return False
+    
+    if component_name in FORM_COMPONENTS[form_name]:
+        return False  # Component already exists
+    
+    if materials_list is None:
+        materials_list = []
+    
+    FORM_COMPONENTS[form_name][component_name] = materials_list
+    return True
 
 def get_sub_materials(form_name, component_name, material_name):
     """Get sub-materials (grades) for a material - independent of form/component"""
@@ -559,11 +1004,12 @@ def is_valid_form(form_name):
 
 def is_valid_component(form_name, component_name):
     """Check if component exists for form"""
-    return component_name in FORM_COMPONENTS.get(form_name, [])
+    return component_name in FORM_COMPONENTS.get(form_name, {})
 
 def is_valid_material_for_form_component(form_name, component_name, material_name):
-    """Check if material is valid (materials are independent of form/component)"""
-    return material_name in MATERIAL_COSTS_TEMPLATE
+    """Check if material is valid for a specific component"""
+    component_materials = get_component_materials(form_name, component_name)
+    return material_name in component_materials or material_name == "Other"
 
 # Get all (material, grade, unit) combinations
 def get_all_material_unit_combinations(material_costs):

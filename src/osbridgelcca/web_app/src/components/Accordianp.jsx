@@ -10,7 +10,7 @@ const Accordionp = ({ title, children, level = 0 }) => {
         {isOpen ? '\u2BC6' : '\u2BC8'}  &nbsp;
          {title}
       </button>
-      {isOpen && <div className=" text-sm">{children}</div>}
+      {isOpen && <div className=" text-sm">{ children}</div>}
     </div>
   );
 };

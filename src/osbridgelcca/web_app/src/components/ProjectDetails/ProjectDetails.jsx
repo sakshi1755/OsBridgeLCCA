@@ -119,7 +119,7 @@ const ProjectDetails = ({
 
               <div className="bg-[#F0E6E6] border border-black">
                 <Accordion title="Input Parameters">
-                  <Accordionp title="Structure Works Data" level={1}>
+                  <Accordionp title=" Structure Works Data" level={1}>
                     <StructureWorksData
                       setActiveTabs={setActiveTabs}
                       Activetabs={Activetabs}
@@ -157,18 +157,18 @@ const ProjectDetails = ({
                       <span
                         onClick={() => {
                           setSelectedProjectDetailWindow(
-                            "Carbon Emission Data"
+                            " Carbon Emission Data"
                           );
                           setShowTutorials(false);
                           setActiveTabs((tabs) => {
-                            if (!tabs.includes("Carbon Emission Data")) {
-                              return [...tabs, "Carbon Emission Data"];
+                            if (!tabs.includes(" Carbon Emission Data")) {
+                              return [...tabs, " Carbon Emission Data"];
                             }
                             return tabs;
                           });
                         }}
                       >
-                        Carbon Emission Data
+                      &nbsp;Carbon Emission Data
                       </span>
                     }
                     level={1}

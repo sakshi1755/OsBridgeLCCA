@@ -615,217 +615,217 @@ import copy
 # Base template for material costs (independent of components)
 MATERIAL_COSTS_TEMPLATE = {
     "Steel Rebar": {
-        "units": ["MT", "kg", "cum", "rmt", "sqm", "ltr"],
+        "units": ["MT", "Kg", "Cum", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "Fe415": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "Fe500": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "Fe550": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "Other": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "Fe415": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "Fe500": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "Fe550": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "Other": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Reinforced Cement Concrete": {
-        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "units": ["Cum", "Kg", "MT", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "M10": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M15": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M20": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M25": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M30": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M35": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M40": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M45": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M50": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M55": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M60": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M65": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M70": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M75": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M80": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M85": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M90": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M95": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M100": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "Other": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M10": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M15": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M20": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M25": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M30": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M35": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M40": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M45": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M50": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M55": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M60": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M65": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M70": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M75": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M80": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M85": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M90": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M95": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M100": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "Other": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Pre-Stressed Cement Concrete": {
-        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "units": ["Cum", "Kg", "MT", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "M10": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M15": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M20": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M25": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M30": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M35": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M40": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M45": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M50": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M55": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M60": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M65": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M70": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M75": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M80": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M85": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M90": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M95": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "M100": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "Other": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "M10": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M15": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M20": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M25": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M30": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M35": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M40": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M45": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M50": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M55": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M60": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M65": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M70": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M75": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M80": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M85": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M90": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M95": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "M100": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "Other": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     # Excavation materials - NO GRADES
     "Rock": {
-        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "units": ["Cum", "Kg", "MT", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "N/A": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Soft Rock": {
-        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "units": ["Cum", "Kg", "MT", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "N/A": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Medium Soil": {
-        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "units": ["Cum", "Kg", "MT", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "N/A": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Clay": {
-        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "units": ["Cum", "Kg", "MT", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "N/A": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Marshy Soil": {
-        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "units": ["Cum", "Kg", "MT", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "N/A": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Soft Murrum": {
-        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "units": ["Cum", "Kg", "MT", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "N/A": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Loam": {
-        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "units": ["Cum", "Kg", "MT", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "N/A": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Stiff Clay": {
-        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "units": ["Cum", "Kg", "MT", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "N/A": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Gravel": {
-        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "units": ["Cum", "Kg", "MT", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "N/A": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Hard Laterite": {
-        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "units": ["Cum", "Kg", "MT", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "N/A": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Marine Clay": {
-        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "units": ["Cum", "Kg", "MT", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "N/A": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "N/A": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Paint": {
-        "units": ["ltr", "cum", "kg", "MT", "rmt", "sqm"],
+        "units": ["Ltr", "Cum", "Kg", "MT", "RMT", "Sqm", "Lumpsum"],
         "grades": {
-            "Epoxy": {"ltr": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0},
-            "Oil Paint": {"ltr": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0},
-            "Primer": {"ltr": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0},
-            "Anti-Corrosive Paint": {"ltr": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0},
-            "Other": {"ltr": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0},
+            "Epoxy": {"Ltr": 0.0, "Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Lumpsum": 0.0},
+            "Oil Paint": {"Ltr": 0.0, "Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Lumpsum": 0.0},
+            "Primer": {"Ltr": 0.0, "Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Lumpsum": 0.0},
+            "Anti-Corrosive Paint": {"Ltr": 0.0, "Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Lumpsum": 0.0},
+            "Other": {"Ltr": 0.0, "Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Lumpsum": 0.0},
         }
     },
     "Structural Steel": {
-        "units": ["MT", "kg", "cum", "rmt", "sqm", "ltr"],
+        "units": ["MT", "Kg", "Cum", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "E250": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "E350": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "E410": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "E450": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "Other": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "E250": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "E350": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "E410": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "E450": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "Other": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Steel Anchor Rods": {
-        "units": ["MT", "kg", "cum", "rmt", "sqm", "ltr"],
+        "units": ["MT", "Kg", "Cum", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "E250": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "E350": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "E410": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "E450": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "Other": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "E250": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "E350": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "E410": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "E450": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "Other": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Tendons": {
-        "units": ["MT", "kg", "cum", "rmt", "sqm", "ltr"],
+        "units": ["MT", "Kg", "Cum", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "Standard": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "Other": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "Standard": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "Other": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Shear Connectors": {
-        "units": ["MT", "kg", "cum", "rmt", "sqm", "ltr"],
+        "units": ["MT", "Kg", "Cum", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "E250": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "E350": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "E410": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "E450": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "Other": {"MT": 0.0, "kg": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "E250": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "E350": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "E410": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "E450": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "Other": {"MT": 0.0, "Kg": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Rubber": {
-        "units": ["kg", "MT", "cum", "rmt", "sqm", "ltr"],
+        "units": ["Kg", "MT", "Cum", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "Standard": {"kg": 0.0, "MT": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "Other": {"kg": 0.0, "MT": 0.0, "cum": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "Standard": {"Kg": 0.0, "MT": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "Other": {"Kg": 0.0, "MT": 0.0, "Cum": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "PVC": {
-        "units": ["rmt", "kg", "MT", "cum", "sqm", "ltr"],
+        "units": ["RMT", "Kg", "MT", "Cum", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "Standard": {"rmt": 0.0, "kg": 0.0, "MT": 0.0, "cum": 0.0, "sqm": 0.0, "ltr": 0.0},
-            "Other": {"rmt": 0.0, "kg": 0.0, "MT": 0.0, "cum": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "Standard": {"RMT": 0.0, "Kg": 0.0, "MT": 0.0, "Cum": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "Other": {"RMT": 0.0, "Kg": 0.0, "MT": 0.0, "Cum": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "FRP": {
-        "units": ["sqm", "kg", "MT", "cum", "rmt", "ltr"],
+        "units": ["Sqm", "Kg", "MT", "Cum", "RMT", "Ltr", "Lumpsum"],
         "grades": {
-            "Standard": {"sqm": 0.0, "kg": 0.0, "MT": 0.0, "cum": 0.0, "rmt": 0.0, "ltr": 0.0},
-            "Other": {"sqm": 0.0, "kg": 0.0, "MT": 0.0, "cum": 0.0, "rmt": 0.0, "ltr": 0.0},
+            "Standard": {"Sqm": 0.0, "Kg": 0.0, "MT": 0.0, "Cum": 0.0, "RMT": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "Other": {"Sqm": 0.0, "Kg": 0.0, "MT": 0.0, "Cum": 0.0, "RMT": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Asphalt": {
-        "units": ["sqm", "cum", "kg", "MT", "rmt", "ltr"],
+        "units": ["Sqm", "Cum", "Kg", "MT", "RMT", "Ltr", "Lumpsum"],
         "grades": {
-            "Standard": {"sqm": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "ltr": 0.0},
-            "Other": {"sqm": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "ltr": 0.0},
+            "Standard": {"Sqm": 0.0, "Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "Other": {"Sqm": 0.0, "Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Waterproofing": {
-        "units": ["sqm", "cum", "kg", "MT", "rmt", "ltr"],
+        "units": ["Sqm", "Cum", "Kg", "MT", "RMT", "Ltr", "Lumpsum"],
         "grades": {
-            "Standard": {"sqm": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "ltr": 0.0},
-            "Other": {"sqm": 0.0, "cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "ltr": 0.0},
+            "Standard": {"Sqm": 0.0, "Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
+            "Other": {"Sqm": 0.0, "Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     },
     "Other": {
-        "units": ["cum", "kg", "MT", "rmt", "sqm", "ltr"],
+        "units": ["Cum", "Kg", "MT", "RMT", "Sqm", "Ltr", "Lumpsum"],
         "grades": {
-            "Standard": {"cum": 0.0, "kg": 0.0, "MT": 0.0, "rmt": 0.0, "sqm": 0.0, "ltr": 0.0},
+            "Standard": {"Cum": 0.0, "Kg": 0.0, "MT": 0.0, "RMT": 0.0, "Sqm": 0.0, "Ltr": 0.0, "Lumpsum": 0.0},
         }
     }
 }
@@ -841,11 +841,15 @@ FORM_COMPONENTS = {
     "Sub-Structure": {
         "Pier": ["Steel Rebar", "Reinforced Cement Concrete", "Paint", "Other"],
         "Pier Cap": ["Steel Rebar", "Reinforced Cement Concrete", "Paint", "Steel Anchor Rods", "Other"],
+        "Pedestal": ["Steel Rebar", "Reinforced Cement Concrete", "Paint", "Other"],
+        "Bearing": ["Structural Steel", "Rubber", "Other"],
     },
     "Super-Structure": {
         "Girder": ["Steel Rebar", "Reinforced Cement Concrete", "Pre-Stressed Cement Concrete", 
                    "Tendons", "Structural Steel", "Shear Connectors", "Paint", "Other"],
         "Deck Slab": ["Steel Rebar", "Reinforced Cement Concrete", "Other"],
+        "Diaphragm": ["Steel Rebar", "Reinforced Cement Concrete", "Structural Steel", "Paint", "Other"],
+        "Cross Bracings": ["Structural Steel", "Steel Rebar", "Paint", "Other"],
     },
     "Miscellaneous": {
         "Bearings": ["Structural Steel", "Rubber", "Other"],
@@ -857,7 +861,7 @@ FORM_COMPONENTS = {
 }
 
 # Standard units available across all materials
-STANDARD_UNITS = ["cum", "kg", "MT", "rmt", "sqm", "ltr"]
+STANDARD_UNITS = ["Cum", "Kg", "MT", "RMT", "Sqm", "Ltr", "Lumpsum"]
 
 def get_material_cost_template():
     """Get a deep copy of the material costs template"""

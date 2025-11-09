@@ -2876,25 +2876,39 @@ const Form = ({
     return { success: true, can_navigate: true }
   }
 
+  const groupedMaterials = materials.reduce((acc, material) => {
+    const groupKey = material.componentGroupId || `${material.component}_default`
+    if (!acc[groupKey]) {
+      acc[groupKey] = {
+        component: material.component,
+        materials: []
+      }
+    }
+    acc[groupKey].materials.push(material)
+    return acc
+  }, {})
+
   // Check for duplicate components and show warnings
-  useEffect(() => {
-    const warnings = {}
-    const componentCounts = {}
-    
-    materials.forEach(material => {
-      if (material.component) {
-        componentCounts[material.component] = (componentCounts[material.component] || 0) + 1
-      }
-    })
-    
-    Object.entries(componentCounts).forEach(([component, count]) => {
-      if (count > 1) {
-        warnings[component] = `Warning: This component appears in ${count} sections`
-      }
-    })
-    
-    setComponentWarnings(warnings)
-  }, [materials])
+// Check for duplicate components and show warnings
+// Check for duplicate components and show warnings
+useEffect(() => {
+  const warnings = {}
+  const componentGroupCounts = {}
+  
+  // Count unique component GROUPS, not individual materials
+  Object.values(groupedMaterials).forEach(group => {
+    const componentName = group.component
+    componentGroupCounts[componentName] = (componentGroupCounts[componentName] || 0) + 1
+  })
+  
+  Object.entries(componentGroupCounts).forEach(([component, count]) => {
+    if (count > 1) {
+      warnings[component] = `Warning: This component appears in ${count} sections`
+    }
+  })
+  
+  setComponentWarnings(warnings)
+}, [materials, groupedMaterials])
 
   // Load form data from database
   useEffect(() => {
@@ -2995,7 +3009,11 @@ const Form = ({
     
     onclicktabs(targetTab)
   }
-
+const handleRemoveMaterial = (materialId) => {
+  if (window.confirm('Are you sure you want to remove this material?')) {
+    setMaterials(materials.filter(m => m.id !== materialId))
+  }
+}
   // Track unsaved changes
   useEffect(() => {
     if (materials.length > 0) {
@@ -3043,17 +3061,7 @@ const Form = ({
   }
 
   // Group materials by componentGroupId
-  const groupedMaterials = materials.reduce((acc, material) => {
-    const groupKey = material.componentGroupId || `${material.component}_default`
-    if (!acc[groupKey]) {
-      acc[groupKey] = {
-        component: material.component,
-        materials: []
-      }
-    }
-    acc[groupKey].materials.push(material)
-    return acc
-  }, {})
+
 
   // Get available components from form data
   const availableComponents = Object.keys(formData)
@@ -3112,44 +3120,44 @@ const Form = ({
     ))
   }
 
-  const handleMaterialTypeChange = async (id, value) => {
-    const material = materials.find(m => m.id === id)
+const handleMaterialTypeChange = async (id, value) => {
+  const material = materials.find(m => m.id === id)
+  
+  if (value === "Other") {
+    setMaterials(materials.map((m) =>
+      m.id === id ? {
+        ...m,
+        materialType: "Other",
+        customMaterialType: "Custom Material",
+        subMaterialType: "", // Will be custom text input
+        unit: "" // Will be custom text input
+      } : m
+    ))
+  } else {
+    const subMaterials = await fetchSubMaterials(material.component, value)
+    const units = await fetchUnits(material.component, value)
     
-    if (value === "Other") {
-      setMaterials(materials.map((m) =>
-        m.id === id ? {
-          ...m,
-          materialType: "Other",
-          customMaterialType: "Custom Material",
-          subMaterialType: "",
-          unit: ""
-        } : m
-      ))
-    } else {
-      const subMaterials = await fetchSubMaterials(material.component, value)
-      const units = await fetchUnits(material.component, value)
-      
-      setMaterials(materials.map((m) =>
-        m.id === id ? {
-          ...m,
-          materialType: value,
-          customMaterialType: "",
-          subMaterialType: "",
-          unit: units.length > 0 ? units[0] : ""
-        } : m
-      ))
-      
-      setSubMaterialOptions(prev => ({
-        ...prev,
-        [`${material.component}-${value}`]: subMaterials
-      }))
-      
-      setUnitOptions(prev => ({
-        ...prev,
-        [`${material.component}-${value}`]: units
-      }))
-    }
+    setMaterials(materials.map((m) =>
+      m.id === id ? {
+        ...m,
+        materialType: value,
+        customMaterialType: "",
+        subMaterialType: "",
+        unit: units.length > 0 ? units[0] : ""
+      } : m
+    ))
+    
+    setSubMaterialOptions(prev => ({
+      ...prev,
+      [`${material.component}-${value}`]: subMaterials
+    }))
+    
+    setUnitOptions(prev => ({
+      ...prev,
+      [`${material.component}-${value}`]: units
+    }))
   }
+}    
 
   const handleSubMaterialTypeChange = (id, value) => {
     setMaterials(materials.map((m) =>
@@ -3405,159 +3413,170 @@ const handleNext = async () => {
     }
   }
 
-  return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
-        <div className="flex w-fit min-w-full">
-          {Activetabs.map((tab, index) => (
-            <div
-              onClick={() => handleTabClick(tab)}
-              key={index}
-              className={`flex items-center px-4 py-2 rounded-sm border border-gray-300 whitespace-nowrap cursor-pointer
-                ${tab === currentForm ? 'bg-[#F0E6E6] border-b-[#522828b0] border-b-[0.25rem]' : 'bg-[#F0E6E6]'}
-              `}
-              style={{
-                fontSize: Activetabs.length > 5 ? '0.85rem' : '1rem',
+return (
+  <div className="w-full max-w-4xl mx-auto">
+    <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
+      <div className="flex w-fit min-w-full">
+        {Activetabs.map((tab, index) => (
+          <div
+            onClick={() => handleTabClick(tab)}
+            key={index}
+            className={`flex items-center px-4 py-2 rounded-sm border border-gray-300 whitespace-nowrap cursor-pointer
+              ${tab === currentForm ? 'bg-[#F0E6E6] border-b-[#522828b0] border-b-[0.25rem]' : 'bg-[#F0E6E6]'}
+            `}
+            style={{
+              fontSize: Activetabs.length > 5 ? '0.85rem' : '1rem',
+            }}
+          >
+            <span className="font-medium">{tab}</span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose(tab);
               }}
+              className="ml-2 text-gray-500 hover:text-gray-700"
             >
-              <span className="font-medium">{tab}</span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClose(tab);
-                }}
-                className="ml-2 text-gray-500 hover:text-gray-700"
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
+              ×
+            </button>
+          </div>
+        ))}
       </div>
+    </div>
 
-      <div className="bg-[#FFF9F9] border border-gray-300 rounded-b-sm">
-        <div className="px-6 py-4">
-          {Object.entries(groupedMaterials).map(([groupId, group], componentIndex) => (
-            <div key={groupId} className="mb-4">
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">Component:</span>
-                  <div className="relative">
-                    {group.materials[0]?.isCustomComponent ? (
-                      <input
-                        type="text"
-                        placeholder="Enter custom component"
-                        value={group.materials[0]?.customComponent || group.component}
-                        onChange={(e) => handleCustomComponentChange(groupId, e.target.value)}
-                        className="border border-gray-300 rounded-md px-3 py-1 text-sm bg-white min-w-[150px]"
-                      />
-                    ) : (
-                      <>
-                        <select
-                          className="border border-gray-300 rounded-md px-3 py-1 pr-8 text-sm appearance-none bg-white"
-                          value={group.component}
-                          onChange={(e) => {
-                            if (e.target.value === "Other") {
-                              const updatedMaterials = materials.map((mat) =>
-                                mat.componentGroupId === groupId ? { 
-                                  ...mat, 
-                                  component: "Custom Component", 
-                                  isCustomComponent: true,
-                                  customComponent: "Custom Component",
-                                  materialType: "",
-                                  subMaterialType: "",
-                                  unit: ""
-                                } : mat
-                              )
-                              setMaterials(updatedMaterials)
-                            } else {
-                              handleComponentChange(groupId, e.target.value)
-                            }
-                          }}
-                        >
-                          {availableComponents.map((comp, idx) => (
-                            <option key={idx} value={comp}>{comp}</option>
-                          ))}
-                          {!availableComponents.includes(group.component) && group.component !== "Other" && group.component !== "Custom Component" && (
-                            <option value={group.component}>{group.component}</option>
-                          )}
-                          <option value="Other">Other</option>
-                        </select>
-                        <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">▼</span>
-                      </>
-                    )}
-                  </div>
-                  {componentWarnings[group.component] && (
-                    <span className="text-sm text-amber-600 font-medium">
-                      ⚠️ {componentWarnings[group.component]}
-                    </span>
+    <div className="bg-[#FFF9F9] border border-gray-300 rounded-b-sm">
+      <div className="px-6 py-4">
+        {Object.entries(groupedMaterials).map(([groupId, group], componentIndex) => (
+          <div key={groupId} className="mb-4">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">Component:</span>
+                <div className="relative">
+                  {group.materials[0]?.isCustomComponent ? (
+                    <input
+                      type="text"
+                      placeholder="Enter custom component"
+                      value={group.materials[0]?.customComponent || group.component}
+                      onChange={(e) => handleCustomComponentChange(groupId, e.target.value)}
+                      className="border border-gray-300 rounded-md px-3 py-1 text-sm bg-white min-w-[150px]"
+                    />
+                  ) : (
+                    <>
+                      <select
+                        className="border border-gray-300 rounded-md px-3 py-1 pr-8 text-sm appearance-none bg-white"
+                        value={group.component}
+                        onChange={(e) => {
+                          if (e.target.value === "Other") {
+                            const updatedMaterials = materials.map((mat) =>
+                              mat.componentGroupId === groupId ? { 
+                                ...mat, 
+                                component: "Custom Component", 
+                                isCustomComponent: true,
+                                customComponent: "Custom Component",
+                                materialType: "",
+                                subMaterialType: "",
+                                unit: ""
+                              } : mat
+                            )
+                            setMaterials(updatedMaterials)
+                          } else {
+                            handleComponentChange(groupId, e.target.value)
+                          }
+                        }}
+                      >
+                        {availableComponents.map((comp, idx) => (
+                          <option key={idx} value={comp}>{comp}</option>
+                        ))}
+                        {!availableComponents.includes(group.component) && group.component !== "Other" && group.component !== "Custom Component" && (
+                          <option value={group.component}>{group.component}</option>
+                        )}
+                        <option value="Other">Other</option>
+                      </select>
+                      <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">▼</span>
+                    </>
                   )}
                 </div>
-                <button
-                  onClick={() => handleRemoveComponent(groupId)}
-                  className="bg-gray-50 border border-gray-400 rounded-md px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                  Remove Component
-                </button>
+                {componentWarnings[group.component] && (
+                  <span className="text-sm text-amber-600 font-medium">
+                    ⚠️ {componentWarnings[group.component]}
+                  </span>
+                )}
               </div>
+              <button
+                onClick={() => handleRemoveComponent(groupId)}
+                className="bg-gray-50 border border-gray-400 rounded-md px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                Remove Component
+              </button>
+            </div>
 
-              <div className="grid grid-cols-7 gap-4 mb-2 text-sm font-medium text-gray-600">
-                <div>Material Type <span className="text-red-500">*</span></div>
-                <div>Grade/Sub-material <span className="text-red-500">*</span></div>
-                <div>Rate Data Source</div>
-                <div>Rate <span className="text-red-500">*</span></div>
-                <div>Quantity <span className="text-red-500">*</span></div>
-                <div>Unit <span className="text-red-500">*</span></div>
-                <div>Notes</div>
-              </div>
+            <div className="grid gap-4 mb-2 text-sm font-medium text-gray-600" style={{gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr 1fr 40px'}}>
+              <div>Material Type <span className="text-red-500">*</span></div>
+              <div>Grade/Sub-material <span className="text-red-500">*</span></div>
+              <div>Rate Data Source</div>
+              <div>Rate <span className="text-red-500">*</span></div>
+              <div>Quantity <span className="text-red-500">*</span></div>
+              <div>Unit <span className="text-red-500">*</span></div>
+              <div>Notes</div>
+              <div></div>
+            </div>
 
-              {group.materials.map((material) => {
-                const materialOptionsForComponent = materialOptions[group.component] || 
-                  (formData[group.component] ? Object.keys(formData[group.component]) : [])
-                
-                const subMaterialOptionsForMaterial = subMaterialOptions[`${group.component}-${material.materialType}`] || 
-                  (formData[group.component]?.[material.materialType]?.sub_materials || [])
-                
-                const unitOptionsForMaterial = unitOptions[`${group.component}-${material.materialType}`] || 
-                  (formData[group.component]?.[material.materialType]?.units || [])
+            {group.materials.map((material) => {
+              const materialOptionsForComponent = materialOptions[group.component] || 
+                (formData[group.component] ? Object.keys(formData[group.component]) : [])
+              
+              const subMaterialOptionsForMaterial = subMaterialOptions[`${group.component}-${material.materialType}`] || 
+                (formData[group.component]?.[material.materialType]?.sub_materials || [])
+              
+              const unitOptionsForMaterial = unitOptions[`${group.component}-${material.materialType}`] || 
+                (formData[group.component]?.[material.materialType]?.units || [])
 
-                return (
-                  <div key={material.id} className="grid grid-cols-7 gap-4 mb-3">
-                    <div>
-                      {material.materialType === "Other" ? (
-                        <input
-                          type="text"
-                          placeholder="Enter custom material"
-                          value={material.customMaterialType || ""}
-                          onChange={(e) => handleMaterialChange(material.id, "customMaterialType", e.target.value)}
-                          className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+              return (
+                <div key={material.id} className="grid gap-4 mb-3" style={{gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr 1fr 40px'}}>
+                  <div>
+                    {material.materialType === "Other" ? (
+                      <input
+                        type="text"
+                        placeholder="Enter custom material"
+                        value={material.customMaterialType || ""}
+                        onChange={(e) => handleMaterialChange(material.id, "customMaterialType", e.target.value)}
+                        className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+                        required
+                      />
+                    ) : (
+                      <div className="relative">
+                        <select
+                          value={material.materialType}
+                          onChange={(e) => handleMaterialTypeChange(material.id, e.target.value)}
+                          className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm appearance-none"
                           required
-                        />
-                      ) : (
-                        <div className="relative">
-                          <select
-                            value={material.materialType}
-                            onChange={(e) => handleMaterialTypeChange(material.id, e.target.value)}
-                            className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm appearance-none"
-                            required
-                          >
-                            <option value="">Select material</option>
-                            {materialOptionsForComponent.map((mat, idx) => (
-                              <option key={idx} value={mat}>{mat}</option>
-                            ))}
-                          </select>
-                          <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">▼</span>
-                        </div>
-                      )}
-                    </div>
+                        >
+                          <option value="">Select material</option>
+                          {materialOptionsForComponent.map((mat, idx) => (
+                            <option key={idx} value={mat}>{mat}</option>
+                          ))}
+                        </select>
+                        <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">▼</span>
+                      </div>
+                    )}
+                  </div>
 
-                    <div>
+                  <div>
+                    {material.materialType === "Other" ? (
+                      <input
+                        type="text"
+                        placeholder="Enter custom grade"
+                        value={material.subMaterialType || ""}
+                        onChange={(e) => handleSubMaterialTypeChange(material.id, e.target.value)}
+                        className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+                        required
+                      />
+                    ) : (
                       <div className="relative">
                         <select
                           value={material.subMaterialType}
                           onChange={(e) => handleSubMaterialTypeChange(material.id, e.target.value)}
                           className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm appearance-none"
-                          disabled={!material.materialType || material.materialType === "Other"}
+                          disabled={!material.materialType}
                           required
                         >
                           <option value="">Select grade</option>
@@ -3567,154 +3586,186 @@ const handleNext = async () => {
                         </select>
                         <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">▼</span>
                       </div>
-                    </div>
-
-                    <input 
-                      type="text" 
-                      value={material.rateDataSource} 
-                      onChange={(e) => handleMaterialChange(material.id, "rateDataSource", e.target.value)} 
-                      className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm" 
-                      placeholder="Enter source"
-                    />
-
-                    <input 
-                      type="text" 
-                      value={material.rate} 
-                      onChange={(e) => handleMaterialChange(material.id, "rate", e.target.value)} 
-                      className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm" 
-                      placeholder="Enter rate"
-                      required
-                    />
-
-                    <input 
-                      type="text" 
-                      value={material.quantity} 
-                      onChange={(e) => handleMaterialChange(material.id, "quantity", e.target.value)} 
-                      className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm" 
-                      placeholder="Enter quantity"
-                      required
-                    />
-
-                    <select 
-                      value={material.unit} 
-                      onChange={(e) => handleMaterialChange(material.id, "unit", e.target.value)} 
-                      className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
-                      disabled={!material.materialType || material.materialType === "Other"}
-                      required
-                    >
-                      <option value="">Select unit</option>
-                      {unitOptionsForMaterial.map((unit, i) => (
-                        <option key={i} value={unit}>{unit}</option>
-                      ))}
-                    </select>
-
-                    <input 
-                      type="text" 
-                      value={material.notes || ""} 
-                      onChange={(e) => handleMaterialChange(material.id, "notes", e.target.value)} 
-                      className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm" 
-                      placeholder="Enter notes"
-                    />
+                    )}
                   </div>
-                )
-              })}
 
-              <div className="flex justify-center mt-4">
-                <button 
-                  onClick={() => handleAddMaterialToComponent(groupId)} 
-                  className="w-full border border-gray-300 rounded-md py-1 text-sm bg-white hover:bg-gray-50 transition-colors mt-2"
-                >
-                  + Add Material
-                </button>
-              </div>
+                  <input 
+                    type="text" 
+                    value={material.rateDataSource} 
+                    onChange={(e) => handleMaterialChange(material.id, "rateDataSource", e.target.value)} 
+                    className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm" 
+                    placeholder="Enter source"
+                  />
 
-              {componentIndex < Object.keys(groupedMaterials).length - 1 && (
-                <div className="border-t border-gray-200 my-6"></div>
-              )}
+                  <input 
+                    type="text" 
+                    value={material.rate} 
+                    onChange={(e) => handleMaterialChange(material.id, "rate", e.target.value)} 
+                    className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm" 
+                    placeholder="Enter rate"
+                    required
+                  />
+
+                  <input 
+                    type="text" 
+                    value={material.quantity} 
+                    onChange={(e) => handleMaterialChange(material.id, "quantity", e.target.value)} 
+                    className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm" 
+                    placeholder="Enter quantity"
+                    required
+                  />
+
+                  <div>
+                    {material.unit === "Custom Unit" || (material.materialType === "Other" && material.unit && !unitOptionsForMaterial.includes(material.unit) && material.unit !== "") ? (
+                      <input
+                        type="text"
+                        placeholder="Enter custom unit"
+                        value={material.unit === "Custom Unit" ? "" : material.unit}
+                        onChange={(e) => handleMaterialChange(material.id, "unit", e.target.value)}
+                        className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm"
+                        required
+                      />
+                    ) : (
+                      <div className="relative">
+                        <select 
+                          value={material.unit} 
+                          onChange={(e) => {
+                            if (e.target.value === "Custom Unit") {
+                              handleMaterialChange(material.id, "unit", "Custom Unit")
+                            } else {
+                              handleMaterialChange(material.id, "unit", e.target.value)
+                            }
+                          }}
+                          className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm appearance-none"
+                          disabled={!material.materialType && material.materialType !== "Other"}
+                          required
+                        >
+                          <option value="">Select unit</option>
+                          {unitOptionsForMaterial.map((unit, i) => (
+                            <option key={i} value={unit}>{unit}</option>
+                          ))}
+                          <option value="Custom Unit">Custom Unit</option>
+                        </select>
+                        <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">▼</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <input 
+                    type="text" 
+                    value={material.notes || ""} 
+                    onChange={(e) => handleMaterialChange(material.id, "notes", e.target.value)} 
+                    className="w-full border border-gray-300 rounded-md px-3 py-1 text-sm" 
+                    placeholder="Enter notes"
+                  />
+
+                  <button
+                    onClick={() => handleRemoveMaterial(material.id)}
+                    className="text-red-500 hover:text-red-700 text-lg font-bold flex items-center justify-center"
+                    title="Remove material"
+                  >
+                    ×
+                  </button>
+                </div>
+              )
+            })}
+
+            <div className="flex justify-center mt-4">
+              <button 
+                onClick={() => handleAddMaterialToComponent(groupId)} 
+                className="w-full border border-gray-300 rounded-md py-1 text-sm bg-white hover:bg-gray-50 transition-colors mt-2"
+              >
+                + Add Material
+              </button>
             </div>
-          ))}
 
-          {availableComponents.length > 0 && (
-            <div className="flex justify-center mb-6">
-              <div className="relative">
-                <select
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      handleAddMaterial(e.target.value)
-                      e.target.value = ""
-                    }
-                  }}
-                  className="bg-white border border-gray-300 rounded-md px-4 py-1 text-sm w-48 text-gray-600 hover:bg-gray-50"
-                >
-                  <option value="">+ Add Component</option>
-                  {availableComponents.map((comp, idx) => (
-                    <option key={idx} value={comp}>{comp}</option>
-                  ))}
-                </select>
-              </div>
+            {componentIndex < Object.keys(groupedMaterials).length - 1 && (
+              <div className="border-t border-gray-200 my-6"></div>
+            )}
+          </div>
+        ))}
+
+        {availableComponents.length > 0 && (
+          <div className="flex justify-center mb-6">
+            <div className="relative">
+              <select
+                onChange={(e) => {
+                  if (e.target.value) {
+                    handleAddMaterial(e.target.value)
+                    e.target.value = ""
+                  }
+                }}
+                className="bg-white border border-gray-300 rounded-md px-4 py-1 text-sm w-48 text-gray-600 hover:bg-gray-50"
+              >
+                <option value="">+ Add Component</option>
+                {availableComponents.map((comp, idx) => (
+                  <option key={idx} value={comp}>{comp}</option>
+                ))}
+              </select>
             </div>
-          )}
+          </div>
+        )}
 
-          <div className="flex justify-end gap-4 mt-8">
-            <button 
-              onClick={handleBack} 
-              disabled={!navigation.canGoBack} 
-              className={`px-8 py-1 text-sm rounded-md border ${
-                navigation.canGoBack 
-                  ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700' 
-                  : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
-              }`}
+        <div className="flex justify-end gap-4 mt-8">
+          <button 
+            onClick={handleBack} 
+            disabled={!navigation.canGoBack} 
+            className={`px-8 py-1 text-sm rounded-md border ${
+              navigation.canGoBack 
+                ? 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700' 
+                : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+            }`}
+          >
+            Back
+          </button>
+          <button 
+            onClick={() => {
+              handleSave()
+              handleNext()
+            }}
+            disabled={!navigation.canGoNext} 
+            className={`px-8 py-1 text-sm rounded-md border ${
+              navigation.canGoNext 
+                ? 'bg-[#522828b0] border-black hover:bg-[#814040] text-black'
+                : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+            }`}
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {/* Validation Modal */}
+    {showValidationModal && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="text-yellow-500 text-2xl">⚠️</div>
+            <h3 className="text-lg font-semibold text-gray-900">Form Validation Required</h3>
+          </div>
+          <p className="text-gray-600 mb-6">{validationError}</p>
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={() => setShowValidationModal(false)}
+              className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
             >
-              Back
-            </button>
-            <button 
-              onClick={() => {
-                handleSave()
-                handleNext()
-              }}
-              disabled={!navigation.canGoNext} 
-              className={`px-8 py-1 text-sm rounded-md border ${
-                navigation.canGoNext 
-                  ? 'bg-[#522828b0] border-black hover:bg-[#814040] text-black'
-                  : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
-              }`}
-            >
-              Next
+              OK
             </button>
           </div>
         </div>
       </div>
+    )}
 
-      {/* Validation Modal */}
-      {showValidationModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="text-yellow-500 text-2xl">⚠️</div>
-              <h3 className="text-lg font-semibold text-gray-900">Form Validation Required</h3>
-            </div>
-            <p className="text-gray-600 mb-6">{validationError}</p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowValidationModal(false)}
-                className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
-              >
-                OK
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <ConfirmationModal 
-        isOpen={showConfirmation} 
-        onConfirm={handleConfirm} 
-        onClosed={handleCloseConfirmation} 
-        type={confirmationType} 
-        nextForm={navigation.getNextForm()} 
-      />
-    </div>
-  )
+    <ConfirmationModal 
+      isOpen={showConfirmation} 
+      onConfirm={handleConfirm} 
+      onClosed={handleCloseConfirmation} 
+      type={confirmationType} 
+      nextForm={navigation.getNextForm()} 
+    />
+  </div>
+)
 }
 
 export default Form

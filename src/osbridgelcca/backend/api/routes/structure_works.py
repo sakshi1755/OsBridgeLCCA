@@ -1007,74 +1007,134 @@ def validate_form_sequence():
     """Validate if user can navigate to a specific form"""
     try:
         data = request.json
-        target_form = data.get('target_form', '').lower()
+        target_form = data.get('target_form', '')  # NOW COMES IN TITLE CASE
+        current_form = data.get('current_form', '')  # NOW COMES IN TITLE CASE
         
-        # Define the structure forms sequence
-        structure_forms = ['foundation', 'sub-structure', 'super-structure', 'miscellaneous']
+        # Define the structure forms sequence (Title Case to match database)
+        structure_forms = ['Foundation', 'Sub-Structure', 'Super-Structure', 'Miscellaneous']
         form_sequence = [
-            'foundation', 'sub-structure', 'super-structure', 'miscellaneous',
-            'economic parameter', 'carbon emission data', 'carbon emission cost data',
-            'bridge and traffic', 'maintenance and repair data', 'demolition and recycling'
+            'Foundation', 'Sub-Structure', 'Super-Structure', 'Miscellaneous',
+            'Economic Parameter', 'Carbon Emission Data', 'Carbon Emission Cost Data',
+            'Bridge And Traffic', 'Maintenance And Repair Data', 'Demolition And Recycling'
         ]
         
         if target_form not in form_sequence:
             return jsonify({
                 'success': True,
                 'can_navigate': True,
-                'message': 'Form not in validation sequence'
+                'message': ''
             })
         
-        target_index = form_sequence.index(target_form)
-        
-        # For structure forms, check if previous structure forms are completed
-        if target_form in structure_forms:
-            target_structure_index = structure_forms.index(target_form)
-            required_forms = structure_forms[:target_structure_index]
-        else:
-            # For non-structure forms, check if all structure forms are completed
-            required_forms = structure_forms
-        
-        # Check completion status
         session = get_db_session()
         try:
             project = get_or_create_project(session, "default")
+            
+            # Check CURRENT form completion (BLOCKING)
+            current_form_incomplete = False
+            if current_form in structure_forms:
+                current_form_data = session.query(FormData).filter_by(
+                    project_id=project.id,
+                    form_name=current_form  # Now matches Title Case
+                ).first()
+                
+                print(f"=== VALIDATION CHECK ===")
+                print(f"Current form: {current_form}")
+                print(f"Form data found: {current_form_data is not None}")
+                if current_form_data:
+                    print(f"Materials count: {len(current_form_data.materials) if current_form_data.materials else 0}")
+                
+                if not current_form_data or not current_form_data.materials or len(current_form_data.materials) == 0:
+                    current_form_incomplete = True
+                    print("Form incomplete: No materials")
+                else:
+                    # Check if ALL materials in current form are complete
+                    all_materials_complete = all(
+                        material.get('materialType') and 
+                        material.get('materialType').strip() != '' and
+                        material.get('subMaterialType') and 
+                        material.get('subMaterialType').strip() != '' and
+                        material.get('quantity') and 
+                        str(material.get('quantity')).strip() != '' and
+                        material.get('rate') and 
+                        str(material.get('rate')).strip() != '' and
+                        material.get('unit') and 
+                        material.get('unit').strip() != ''
+                        for material in current_form_data.materials
+                    )
+                    
+                    print(f"All materials complete: {all_materials_complete}")
+                    
+                    if not all_materials_complete:
+                        current_form_incomplete = True
+                        print("Form incomplete: Some materials missing fields")
+            
+            # If current form is incomplete, BLOCK navigation
+            if current_form_incomplete:
+                return jsonify({
+                    'success': True,
+                    'can_navigate': False,
+                    'is_current_form_incomplete': True,
+                    'message': f'Please complete the {current_form.replace("-", " ")} form before proceeding. All fields marked with * are required.'
+                })
+            
+            # Check PREVIOUS forms completion (WARNING only)
+            target_index = form_sequence.index(target_form)
+            
+            # Determine which previous forms to check
+            if target_form in structure_forms:
+                target_structure_index = structure_forms.index(target_form)
+                required_forms = structure_forms[:target_structure_index]
+            else:
+                # For non-structure forms, check all structure forms
+                required_forms = structure_forms
+            
             missing_forms = []
             
             for required_form in required_forms:
                 form_data = session.query(FormData).filter_by(
                     project_id=project.id,
-                    form_name=required_form
+                    form_name=required_form  # Now matches Title Case
                 ).first()
                 
-                if not form_data or not form_data.materials:
-                    missing_forms.append(required_form.replace('-', ' ').title())
-                else:
-                    # Check if form has valid materials
-                    has_valid_materials = any(
-                        material.get('materialType') and 
-                        material.get('subMaterialType') and 
-                        material.get('quantity') and 
-                        material.get('rate') and 
-                        material.get('unit')
-                        for material in form_data.materials
-                    )
-                    if not has_valid_materials:
-                        missing_forms.append(required_form.replace('-', ' ').title())
+                # Check if form exists and has materials
+                if not form_data or not form_data.materials or len(form_data.materials) == 0:
+                    missing_forms.append(required_form.replace('-', ' '))
+                    continue
+                
+                # Check if ALL materials have ALL required fields filled
+                all_materials_complete = all(
+                    material.get('materialType') and 
+                    material.get('materialType').strip() != '' and
+                    material.get('subMaterialType') and 
+                    material.get('subMaterialType').strip() != '' and
+                    material.get('quantity') and 
+                    str(material.get('quantity')).strip() != '' and
+                    material.get('rate') and 
+                    str(material.get('rate')).strip() != '' and
+                    material.get('unit') and 
+                    material.get('unit').strip() != ''
+                    for material in form_data.materials
+                )
+                
+                # If ANY material is incomplete, mark form as incomplete
+                if not all_materials_complete:
+                    missing_forms.append(required_form.replace('-', ' '))
             
-            can_navigate = len(missing_forms) == 0
-            message = ''
-            
-            if not can_navigate:
+            # Previous forms incomplete = WARNING (not blocking)
+            warning_message = ''
+            if len(missing_forms) > 0:
                 if len(missing_forms) == 1:
-                    message = f'Please complete the {missing_forms[0]} form before proceeding.'
+                    warning_message = f'Warning: {missing_forms[0]} form is incomplete. Please complete it for accurate calculations.'
                 else:
-                    message = f'Please complete the following forms first: {", ".join(missing_forms)}'
+                    warning_message = f'Warning: The following forms are incomplete: {", ".join(missing_forms)}. Please complete them for accurate calculations.'
             
             return jsonify({
                 'success': True,
-                'can_navigate': can_navigate,
+                'can_navigate': True,
+                'is_current_form_incomplete': False,
+                'has_incomplete_previous_forms': len(missing_forms) > 0,
                 'missing_forms': missing_forms,
-                'message': message
+                'message': warning_message
             })
             
         finally:

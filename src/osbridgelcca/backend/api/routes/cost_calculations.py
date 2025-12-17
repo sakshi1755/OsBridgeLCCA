@@ -1751,3 +1751,117 @@ def clear_calculation_storage():
             'success': False,
             'error': str(e)
         }), 500
+    
+@cost_calculations_bp.route('/api/calculate-and-save-initial-cost', methods=['POST'])
+def calculate_and_save_initial_cost():
+    """Calculate initial construction cost from ALL saved structure forms and store in database"""
+    try:
+        db_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'databases', 'project_data.db')
+        db_path = os.path.abspath(db_path)
+        
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            
+            structure_forms = ['Foundation', 'Sub-Structure', 'Super-Structure', 'Miscellaneous']
+            
+            all_materials = []
+            forms_processed = []
+            
+            print(f"=== CALCULATING INITIAL CONSTRUCTION COST FROM ALL FORMS ===")
+            
+            for form_name in structure_forms:
+                cursor.execute('''
+                    SELECT materials FROM form_data 
+                    WHERE form_name = ? 
+                    ORDER BY saved_at DESC LIMIT 1
+                ''', (form_name,))
+                result = cursor.fetchone()
+                
+                if result and result[0]:
+                    materials = json.loads(result[0])
+                    if materials:
+                        all_materials.extend(materials)
+                        forms_processed.append(form_name)
+                        print(f"✓ Loaded {len(materials)} materials from {form_name}")
+            
+            if not all_materials:
+                print("✗ No materials found in any structure forms")
+                return jsonify({
+                    'success': False,
+                    'error': 'No materials found in structure forms'
+                })
+            
+            total_cost = 0
+            cost_breakdown = []
+            
+            print(f"\nProcessing {len(all_materials)} total materials...")
+            
+            for material in all_materials:
+                try:
+                    quantity = float(material.get('quantity', 0))
+                    rate = float(material.get('rate', 0))
+                    material_cost = quantity * rate
+                    total_cost += material_cost
+                    
+                    cost_item = {
+                        'component': material.get('component', ''),
+                        'material': material.get('materialType', ''),
+                        'grade': material.get('subMaterialType', ''),
+                        'quantity': quantity,
+                        'unit': material.get('unit', ''),
+                        'rate': rate,
+                        'total_cost': material_cost
+                    }
+                    cost_breakdown.append(cost_item)
+                    
+                    print(f"  - {material.get('materialType', 'Unknown')}: {quantity} {material.get('unit', '')} @ ₹{rate} = ₹{material_cost:.2f}")
+                    
+                except (ValueError, TypeError) as e:
+                    print(f"  ✗ Error processing material: {str(e)}")
+                    continue
+            
+            print(f"\n=== CALCULATION COMPLETE ===")
+            print(f"Forms Processed: {', '.join(forms_processed)}")
+            print(f"Total Materials: {len(all_materials)}")
+            print(f"Total Initial Construction Cost: ₹{total_cost:,.2f}")
+            print("============================\n")
+            
+            cursor.execute('''
+                DELETE FROM calculation_results 
+                WHERE calculation_type = 'initial_construction_cost_auto'
+            ''')
+            
+            result_data = {
+                'total_initial_cost': total_cost,
+                'cost_breakdown': cost_breakdown,
+                'forms_processed': forms_processed,
+                'materials_count': len(all_materials),
+                'calculated_at': datetime.now().isoformat()
+            }
+            
+            cursor.execute('''
+                INSERT INTO calculation_results (calculation_type, result_data, created_at)
+                VALUES (?, ?, ?)
+            ''', ('initial_construction_cost_auto', json.dumps(result_data), datetime.now().isoformat()))
+            
+            conn.commit()
+            
+            print("✓ Calculation saved to database")
+            
+            return jsonify({
+                'success': True,
+                'total_initial_cost': total_cost,
+                'cost_breakdown': cost_breakdown,
+                'forms_processed': forms_processed,
+                'materials_count': len(all_materials),
+                'message': 'Initial construction cost calculated and saved successfully'
+            })
+            
+    except Exception as e:
+        print(f"✗ Error calculating initial cost: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500

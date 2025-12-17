@@ -496,7 +496,12 @@ const handleNext = async () => {
     if (response.ok) {
       const result = await response.json()
       if (result.success) {
-        console.log('Initial construction cost calculated and saved')
+        console.log('=== INITIAL CONSTRUCTION COST ===')
+        console.log('Total Cost:', result.total_initial_cost)
+        console.log('Forms Processed:', result.forms_processed)
+        console.log('Materials Count:', result.materials_count)
+        console.log('Cost Breakdown:', result.cost_breakdown)
+        console.log('================================')
       }
     }
   } catch (error) {

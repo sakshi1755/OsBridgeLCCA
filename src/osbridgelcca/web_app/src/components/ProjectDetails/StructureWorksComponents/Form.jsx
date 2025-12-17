@@ -1,7 +1,7 @@
 //form.js
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useFormNavigation, ConfirmationModal } from '../UseFormNavigation'
 
 const Form = ({ 
@@ -69,7 +69,9 @@ const validateNavigation = async (targetForm) => {
   return { success: true, can_navigate: true }
 }
 
-  const groupedMaterials = materials.reduce((acc, material) => {
+// Move groupedMaterials calculation into useMemo to prevent infinite loops
+const groupedMaterials = useMemo(() => {
+  return materials.reduce((acc, material) => {
     const groupKey = material.componentGroupId || `${material.component}_default`
     if (!acc[groupKey]) {
       acc[groupKey] = {
@@ -80,10 +82,9 @@ const validateNavigation = async (targetForm) => {
     acc[groupKey].materials.push(material)
     return acc
   }, {})
+}, [materials])
 
-  // Check for duplicate components and show warnings
-// Check for duplicate components and show warnings
-// Check for duplicate components and show warnings
+// Update the useEffect to only depend on materials
 useEffect(() => {
   const warnings = {}
   const componentGroupCounts = {}
@@ -101,7 +102,7 @@ useEffect(() => {
   })
   
   setComponentWarnings(warnings)
-}, [materials, groupedMaterials])
+}, [groupedMaterials]) // Now this won't change unless materials actually changes
 
   // Load form data from database
   useEffect(() => {
@@ -531,10 +532,10 @@ const handleNext = async () => {
     setShowConfirmation(true)
   }
 
-  const handleConfirm = () => {
+const handleConfirm = () => {
     if (confirmationType === 'next') {
-      console.log('Saving form data:', materials)
-      setHasUnsavedChanges(false)
+    //  console.log('Saving form data:', materials)
+   //   setHasUnsavedChanges(false)
       navigation.navigate(navigation.getNextForm())
     } else if (confirmationType === 'back') {
       navigation.navigate(navigation.getPreviousForm())

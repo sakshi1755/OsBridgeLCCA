@@ -699,8 +699,8 @@ def get_carbon_materials():
         try:
             project = get_or_create_project(session, "default")
             
-            # ONLY get these 4 specific structure forms - exclude economic_parameter
-            structure_forms = ['foundation', 'sub-structure', 'super-structure', 'miscellaneous']
+            # CHANGE FROM lowercase to Title Case
+            structure_forms = ['Foundation', 'Sub-Structure', 'Super-Structure', 'Miscellaneous']
             
             # Get form data only for structure forms
             form_data_list = session.query(FormData).filter(
@@ -710,7 +710,7 @@ def get_carbon_materials():
             
             all_materials = []
             forms_found = []
-            processed_materials = set()  # Track to avoid duplicates
+            processed_materials = set()
             
             for form_data in form_data_list:
                 forms_found.append(form_data.form_name)
@@ -719,7 +719,6 @@ def get_carbon_materials():
                 print(f"Processing form: {form_data.form_name} with {len(materials)} materials")
                 
                 for material_index, material in enumerate(materials):
-                    # Create a unique key to prevent duplicates
                     material_key = (
                         form_data.form_name,
                         material.get('component', ''),
@@ -730,9 +729,7 @@ def get_carbon_materials():
                         material_index
                     )
                     
-                    # Skip if already processed
                     if material_key in processed_materials:
-                        print(f"  Skipping duplicate material: {material.get('materialType', 'Unknown')}")
                         continue
                     
                     processed_materials.add(material_key)
@@ -754,7 +751,6 @@ def get_carbon_materials():
             print(f"=== CARBON MATERIALS RETRIEVED FROM DATABASE ===")
             print(f"Structure forms processed: {forms_found}")
             print(f"Total unique materials: {len(all_materials)}")
-            print(f"Excluded forms: economic_parameter (and any others not in structure forms)")
             print("===============================================")
             
             return jsonify({
@@ -773,6 +769,7 @@ def get_carbon_materials():
             'success': False,
             'error': str(e)
         }), 500
+
 @structure_works_bp.route('/api/calculate-initial-cost', methods=['POST'])
 def calculate_initial_cost():
     """Calculate initial construction cost for submitted materials and save to database"""
@@ -963,7 +960,7 @@ def check_form_completion():
         try:
             project = get_or_create_project(session, "default")
             
-            structure_forms = ['foundation', 'sub-structure', 'super-structure', 'miscellaneous']
+            structure_forms = ['Foundation', 'Sub-Structure', 'Super-Structure', 'Miscellaneous']
             completed_forms = []
             
             for form_name in structure_forms:
@@ -1219,7 +1216,7 @@ def calculate_and_save_initial_cost():
             project = get_or_create_project(session, "default")
             
             # Get all form data for structure forms
-            structure_forms = ['foundation', 'sub-structure', 'super-structure', 'miscellaneous']
+            structure_forms = ['Foundation', 'Sub-Structure', 'Super-Structure', 'Miscellaneous']
             all_materials = []
             forms_included = []
             
